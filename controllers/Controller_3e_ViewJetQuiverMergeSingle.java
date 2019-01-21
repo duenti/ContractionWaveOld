@@ -2,6 +2,7 @@ package controllers;
 
 import static org.bytedeco.javacpp.opencv_core.CV_8U;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
 import java.awt.Font;
 import java.awt.Graphics;
@@ -124,9 +125,10 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	private boolean contour_state = false;
 	private double mask_value = 0.08;
 	private double scale_start = 0.05;
-	private double scale_end = 7.0;
+	private double scale_end = 57.0;
 	private int xwindow = 8;
 	private int ywindow = 15;  
+	private int global_min;
 	public static final IndexColorModel JET = ColorMap.getJet();
 	private ColorMap this_jet = new ColorMap(scale_start, scale_end, JET);
 	private int current_index;
@@ -253,12 +255,41 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	if (bImage == null) {
     		System.out.println("Null Buffer");
     	}
-    	try {
+//    	try {
     		System.out.println("Saving....");
-    		ImageIO.write(bImage, save_type, file);
-    	} catch (IOException e) {
-    		throw new RuntimeException(e);
-    	}
+//    		if (save_type.equals("jpg")) {
+    			//URL url = new URL(sUrl);
+//    			Image img = Toolkit.getDefaultToolkit().createImage(url);
+//
+//    			PixelGrabber pg = new PixelGrabber(img, 0, 0, -1, -1, true);
+//    			pg.grabPixels();
+//    			int width = pg.getWidth(), height = pg.getHeight();
+//
+//    			DataBuffer buffer = new DataBufferInt((int[]) pg.getPixels(), pg.getWidth() * pg.getHeight());
+//    			WritableRaster raster = Raster.createPackedRaster(buffer, width, height, width, RGB_MASKS, null);
+//    			BufferedImage bi = new BufferedImage(RGB_OPAQUE, raster, false, null);
+    			
+//    		}
+    		Mat imgMat = Java2DFrameUtils.toMat(bImage);
+    		
+    		MatVector channels_a = new MatVector();
+	        Mat finalMat = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
+	        org.bytedeco.javacpp.opencv_core.split(imgMat, channels_a);
+	        Mat blueCh_a = channels_a.get(1);
+	        Mat greenCh_a = channels_a.get(2);
+	        Mat redCh_a = channels_a.get(3);
+	        MatVector channels2_a = new MatVector(3);
+	        channels2_a.put(0, redCh_a);
+	        channels2_a.put(1, greenCh_a);
+	        channels2_a.put(2, blueCh_a);
+	        org.bytedeco.javacpp.opencv_core.merge(channels2_a, finalMat);
+	        
+    		imwrite(current_filename, finalMat);
+//    	}
+    		//ImageIO.write(bImage, save_type, file);
+//    	} catch (IOException e) {
+//    		throw new RuntimeException(e);
+//    	}
         
 //        if (file != null) {
 //        	BufferedImage bImage = SwingFXUtils.fromFXImage(toSaveView.getImage(), null);
@@ -671,6 +702,51 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         main_package.getPlot_preferences().setSeriesColorRGB(newColor);
     }
     
+    @FXML
+    void handleSeriesThickness(ActionEvent event) {
+    	XYPlot plot = currentChart.getXYPlot();
+    	//int thickness = main_package.getPlot_preferences().getLineThickness();
+        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default - 1)");
+        int new_thickness = Integer.parseInt(test1);
+        if (new_thickness > 0) {
+        	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
+        	main_package.getPlot_preferences().setLineThickness(new_thickness);
+        }
+    }
+    
+    
+    @FXML
+    void handleShowAnnotations(ActionEvent event) {
+       	XYPlot plot = currentChart.getXYPlot();
+    	XYDataset dataset = plot.getDataset();
+    	int input = JOptionPane.showConfirmDialog(null, "Hide Annotations?");
+    	if (input == 1 && main_package.getPlot_preferences().isDrawAnnotations() == false) {
+    		//show
+    		main_package.getPlot_preferences().setDrawAnnotations(true);
+    		if (maximum_list.size() + minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
+    	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
+    	        	double x = dataset.getXValue(0, x1);
+    	        	double y = dataset.getYValue(0, x1);
+    	        	if (maximum_list.contains(x1+global_min)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
+    	        	}
+    	        	if (minimum_list.contains(x1+global_min)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
+    	        	}
+    	        	if (first_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
+    	        	}
+    	        	if (fifth_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)  && !first_points.contains(x1+global_min)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
+    	        	}
+    	        }
+    		}
+    	} else if (input == 0 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
+    		main_package.getPlot_preferences().setDrawAnnotations(false);
+    		//hide
+            plot.clearAnnotations();
+    	}
+    }
     
     @FXML
     void handleMinimumColor(ActionEvent event) {
@@ -680,7 +756,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
         main_package.getPlot_preferences().setMinimumDotColorRGB(newColor);
         plot.clearAnnotations();
-		if (maximum_list.size() + minimum_list.size() < 1500) {
+		if (maximum_list.size() + minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -708,7 +784,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
         main_package.getPlot_preferences().setMaximumDotColorRGB(newColor);
         plot.clearAnnotations();
-		if (maximum_list.size() + minimum_list.size() < 1500) {
+		if (maximum_list.size() + minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -736,7 +812,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
         main_package.getPlot_preferences().setFirstDotColorRGB(newColor);
         plot.clearAnnotations();
-		if (maximum_list.size() + minimum_list.size() < 1500) {
+		if (maximum_list.size() + minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -764,7 +840,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
         main_package.getPlot_preferences().setLastDotColorRGB(newColor);
         plot.clearAnnotations();
-		if (maximum_list.size() + minimum_list.size() < 1500) {
+		if (maximum_list.size() + minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -1388,7 +1464,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        } 
 	    });
 		
-		spinnerMask.setValueFactory(facGen(0.0, 10000.0, 0.08, 0.1));
+		spinnerMask.setValueFactory(facGen(0.0, 10000.0, mask_value, 0.1));
 		spinnerMask.setEditable(true);
 		IncrementHandler handler1 = new IncrementHandler();
 		spinnerMask.addEventFilter(MouseEvent.MOUSE_PRESSED, handler1);
@@ -1415,7 +1491,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        } 
 	    });
 		
-		spinnerScaleStart.setValueFactory(facGen(0.0, 10000.0, 0.05, 0.1));
+		spinnerScaleStart.setValueFactory(facGen(0.0, 10000.0, scale_start, 0.1));
 		spinnerScaleStart.setEditable(true);
 		IncrementHandler handler2 = new IncrementHandler();
 		spinnerScaleStart.addEventFilter(MouseEvent.MOUSE_PRESSED, handler2);
@@ -1442,7 +1518,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        } 
 		});
 		
-		spinnerScaleEnd.setValueFactory(facGen(0.0, 10000.0, 7.0, 0.1));
+		spinnerScaleEnd.setValueFactory(facGen(0.0, 10000.0, scale_end, 1.0));
 		spinnerScaleEnd.setEditable(true);
 		IncrementHandler handler3 = new IncrementHandler();
 		spinnerScaleEnd.addEventFilter(MouseEvent.MOUSE_PRESSED, handler3);
@@ -1463,6 +1539,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		spinnerScaleEnd.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
 			try {
 				scale_end = Double.valueOf(newValue);
+				//scale_end = Double.valueOf(newValue) *  (1/fps_value) * (1/pixel_value);
 				renderImageView(current_index, currentRenderType , false);
 			} catch (java.lang.Exception e) {
 				e.printStackTrace();
@@ -1504,6 +1581,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     
   //PLOT GENERATING FUNCTIONS
   	private void writeLinePlot(int min, int max) {
+  		global_min = min;
   		currentChart = createChart(createDataset(min, max), min);
   		ChartPanel linepanel = new ChartPanel(currentChart);
 
@@ -1536,7 +1614,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
   		XYSeries series1 = new XYSeries("Optical Flow");
   		for (int i = min; i < max; i++) {
   			double average = currentGroup.getMagnitudeListValue(i);
-  			series1.add(i / fps_value, average * fps_value * pixel_value);
+//  			series1.add(i / fps_value, average * fps_value * pixel_value);
+  			series1.add(i / fps_value, (average * fps_value * pixel_value) - average_value);
   		}
   		//peak detection algorithm receives a group
           XYSeriesCollection dataset = new XYSeriesCollection();
@@ -1588,7 +1667,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
           plot.setDomainGridlinesVisible(main_package.getPlot_preferences().isGridlineDefaultState());
           plot.setRangeGridlinesVisible(main_package.getPlot_preferences().isGridlineDefaultState());
 
-          if (upperBoundDomain - lowerBoundDomain <= 200) {
+          if (upperBoundDomain - lowerBoundDomain <= 200 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
   	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
   	        	double x = dataset.getXValue(0, x1);
   	        	double y = dataset.getYValue(0, x1);
@@ -1610,7 +1689,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
           	@Override
           	public void plotChanged(PlotChangeEvent event) {
 //          		System.out.println("I am called after a zoom event (and some other events too).");
-          		if (plot.getDomainAxis().getLowerBound() != lowerBoundDomain || plot.getDomainAxis().getUpperBound() != upperBoundDomain) {
+          		if ( (plot.getDomainAxis().getLowerBound() != lowerBoundDomain || plot.getDomainAxis().getUpperBound() != upperBoundDomain) && main_package.getPlot_preferences().isDrawAnnotations() == true ) {
           			lowerBoundDomain = plot.getDomainAxis().getLowerBound();
           			upperBoundDomain = plot.getDomainAxis().getUpperBound();
           			if (upperBoundDomain - lowerBoundDomain <= 200) {
@@ -1640,11 +1719,14 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
   			renderer.setDefaultShapesVisible(false);
   	        renderer.setDefaultShapesFilled(false);
   	        renderer.setSeriesPaint(0, main_package.getPlot_preferences().getSeriesColorRGB());
+        	renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
           } else {
           	XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
       		renderer.setDefaultShapesVisible(false);
               renderer.setDefaultShapesFilled(false);
               renderer.setSeriesPaint(0, main_package.getPlot_preferences().getSeriesColorRGB());
+          	renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
+
           }
           return chart;
       }
@@ -2025,10 +2107,10 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	    		}
 	    		frameGrabber.close();
 	        }
-	        if (contour_state == true) {
-	        	img_src = generateContour(img_src);
-	        	img_src.convertTo(img_src, CV_8U);
-	        }
+//	        if (contour_state == true) {
+//	        	img_src = generateContour(img_src);
+//	        	img_src.convertTo(img_src, CV_8U);
+//	        }
 	        Frame original_image_frame = converter.convert(img_src);
 	        Java2DFrameConverter paintConverter = new Java2DFrameConverter();
 	        BufferedImage original_image = paintConverter.getBufferedImage(original_image_frame,1);
@@ -2052,10 +2134,12 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         PixelWriter myPixelWriter = myWritableImage.getPixelWriter();
         int done = 0;
         this_jet = new ColorMap(scale_start, scale_end, JET);
+        
         for(int x = 0; x < height; x++){
             for(int y = 0; y < width; y++){            	
             	double final_float;
             	final_float = main_package.getListMags().get(index)[done];
+            	final_float = final_float * pixel_value * fps_value;
             	if (final_float < mask_value) {
             		Color this_color;
             		if (to_merge == true) {
@@ -2115,7 +2199,9 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     		}
     		u_total[zy][zx] = floatArrayOp2[z];
     		v_total[zy][zx] = floatArrayOp[z];
-    		mag_total[zy][zx] = main_package.getListMags().get(index)[z];
+        	double final_float = main_package.getListMags().get(index)[z] * pixel_value * fps_value;
+    		//mag_total[zy][zx] = main_package.getListMags().get(index)[z];
+        	mag_total[zy][zx] = final_float;
     		zx += 1;
     	}
   	

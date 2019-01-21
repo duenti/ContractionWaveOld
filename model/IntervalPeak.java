@@ -13,13 +13,15 @@ public class IntervalPeak {
 	private int startInterval;
 	private int endInterval;
 	private double fps_val;
+	private double average_value;
 	private double pixel_val;
 	
-	public IntervalPeak(Group currentGroup, double fps_val1, double pixel_val1, IntervalMarker e, List<Integer> maximum_list, List<Integer> minimum_list, List<Integer> first_points, List<Integer> fifth_points) {
+	public IntervalPeak(Group currentGroup, double average_value1, double fps_val1, double pixel_val1, IntervalMarker e, List<Integer> maximum_list, List<Integer> minimum_list, List<Integer> first_points, List<Integer> fifth_points) {
 		setThisMarker(e);
 		//first find start value
 		fps_val = fps_val1;
 		pixel_val = pixel_val1;
+		average_value = average_value1;
 		int start = -1;
 		double start_val = e.getStartValue();
 		for (int i = 0; i < currentGroup.getMagnitudeSize(); i ++){
@@ -125,15 +127,15 @@ public class IntervalPeak {
 				double tr_vmr_b = ((double) (possible_fifth - possible_fourth))  / fps_val;
 				double t_vmc_vmr = ((double) (possible_fourth - possible_second))  / fps_val;	
 				//calculate speed parameters
-				double vmc = currentGroup.getMagnitudeListValue(possible_second) * fps_val * pixel_val;
-				double vmin = currentGroup.getMagnitudeListValue(possible_third) * fps_val * pixel_val;
-				double vmr = currentGroup.getMagnitudeListValue(possible_fourth) * fps_val * pixel_val;
+				double vmc = (currentGroup.getMagnitudeListValue(possible_second) * fps_val * pixel_val - average_value );
+				double vmin = (currentGroup.getMagnitudeListValue(possible_third) * fps_val * pixel_val - average_value );
+				double vmr = (currentGroup.getMagnitudeListValue(possible_fourth) * fps_val * pixel_val - average_value);
 				double d_vmc_vmr = vmc - vmr;
 				
 				//calculate area parameters by trapezoidal rule]
-				double area_t = getIntegralFromList(currentGroup.getMagnitudeList().subList(first_point, possible_fifth+1).stream().map(n -> n * fps_val * pixel_val).collect(Collectors.toList()), 1.0);
-				double area_c = getIntegralFromList(currentGroup.getMagnitudeList().subList(first_point, possible_third+1).stream().map(n -> n * fps_val * pixel_val).collect(Collectors.toList()), 1.0);
-				double area_r = getIntegralFromList(currentGroup.getMagnitudeList().subList(possible_third, possible_fifth+1).stream().map(n -> n * fps_val * pixel_val).collect(Collectors.toList()), 1.0);
+				double area_t = getIntegralFromList(currentGroup.getMagnitudeList().subList(first_point, possible_fifth+1).stream().map(n -> (n * fps_val * pixel_val) - average_value).collect(Collectors.toList()), 1.0);
+				double area_c = getIntegralFromList(currentGroup.getMagnitudeList().subList(first_point, possible_third+1).stream().map(n -> (n * fps_val * pixel_val) - average_value).collect(Collectors.toList()), 1.0);
+				double area_r = getIntegralFromList(currentGroup.getMagnitudeList().subList(possible_third, possible_fifth+1).stream().map(n -> (n * fps_val * pixel_val) - average_value).collect(Collectors.toList()), 1.0);
 				//allow border redefinition in plot
 				//TODO generate new parker by changing start and end of marker to first_point - 1 to last_point + 1, check if next graphs are gen correct
 				Peak v = new Peak(first_point, possible_fifth, possible_third, possible_second, possible_fourth, e.getStartValue() , e.getEndValue() , tcr, tc, tr, tc_vmc, tc_vmc_min, tr_vmr, tr_vmr_b, t_vmc_vmr, vmc, vmin, vmr, d_vmc_vmr, area_t, area_c, area_r, thisMarker);

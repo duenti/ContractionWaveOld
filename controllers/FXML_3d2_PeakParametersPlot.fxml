@@ -69,6 +69,8 @@
                         <MenuItem mnemonicParsing="false" onAction="#handleMaximumColor" text="Set Peak Max Color" />
                         <MenuItem mnemonicParsing="false" onAction="#handleMinimumColor" text="Set Peak Min Color" />
                         <MenuItem mnemonicParsing="false" onAction="#handleLastColor" text="Set Peak Last Color" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleSeriesThickness" text="Set Line Thickness" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleShowAnnotations" text="Set Annotations on/off" />
                      </items>
                   </Menu>
                </menus>

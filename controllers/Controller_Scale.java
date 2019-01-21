@@ -46,8 +46,8 @@ public class Controller_Scale implements Initializable{
 	private double scale_start;
 	private double scale_end;
 	private int width = 30;
-	private int height = 200;
-	private int spacing = 20;
+	private int height = 450;
+	private int spacing = 10;
 	private int font_size = 15;
 	public static final IndexColorModel JET = ColorMap.getJet();
 	private ColorMap this_jet;
@@ -177,6 +177,12 @@ public class Controller_Scale implements Initializable{
 		this_jet = new ColorMap(scale_start, scale_end, JET);
 	}
 	
+	private double convertScaleToHeight(double y) {
+		double a = (scale_end-scale_start) / height;
+		double b = scale_start;
+		return ((y-b)/a);
+	}
+	
 	private double convertToMag(double x) {
 		double a = (scale_end-scale_start) / height;
 		double b = scale_start;
@@ -201,21 +207,24 @@ public class Controller_Scale implements Initializable{
 	}
 	
 	private BufferedImage generateCanvasScale() {
-//		System.out.println("About to gen test scale 2");
-//		testcanvas.setWidth(width);
-//		testcanvas.setHeight(height);
 		Canvas canvas1 = new Canvas((int) width+(width/2+80), (int) height+((height * 0.1 )+50));
 		GraphicsContext gc = canvas1.getGraphicsContext2D();
     	gc.setFill(Color.WHITE);
     	gc.fillRect(0, 0, canvas1.getWidth(), canvas1.getHeight());
+		gc.save();
 		PixelWriter pixel_writing = canvas1.getGraphicsContext2D().getPixelWriter();
+		
+
+//        int tick_number = (int) (scale_end / spacing);
 		for (int x = 0; x < width; x++) {
-			for (int y = spacing; y < height+spacing; y++) {
-				int y_new = y-spacing;
+			for (int y = 20; y < height+20; y++) {
+				int y_new = y-20;
         		java.awt.Color a = this_jet.getColor(convertToMag(y_new));
 //				java.awt.Color a = this_jet.getColor(convertToMag(y));
         		Color this_color = new Color( (Double.valueOf(a.getRed()) / 255.0), (Double.valueOf(a.getGreen()) / 255.0 ) , (Double.valueOf(a.getBlue()) / 255.0), 1.0);
-				pixel_writing.setColor(x, y, this_color);
+//				pixel_writing.setColor(x, y, this_color);
+				pixel_writing.setColor( x, ((int)canvas1.getHeight()-30-y), this_color);
+				
 			}
 		}
 		//write tick labels
@@ -224,25 +233,53 @@ public class Controller_Scale implements Initializable{
 			gc.setTextAlign(TextAlignment.CENTER);
 	        gc.setTextBaseline(VPos.CENTER);
 	        gc.setFont(new Font("Arial", font_size));
-			int tick_number = height / spacing;
-			for (int t_i = 0; t_i < tick_number+1; t_i++) {
-				int x = width+20;
-				int y = ((t_i+1) * spacing);
-				int y_new = (t_i * spacing);
-				gc.fillText(String.valueOf(convertToMag(y_new)).substring(0, 4), x, y);
+
+	        int tick_number = (int) (scale_end / spacing);
+	        if (tick_number * spacing < scale_end) {
+	        	tick_number++;
+	        }
+	        
+			for (int t_i = 1; t_i < tick_number; t_i++) {
+				int x = width+20; //tick width to write
+				int y = ((int) convertScaleToHeight((t_i) * spacing)) + 20;
+				//normal
+//				gc.fillText(String.valueOf((t_i) * spacing), x, y);
+				//inverse
+				gc.fillText(String.valueOf((t_i) * spacing), x, ((int)canvas1.getHeight()-30-y) );
 			}
+	        
+	        //inverse
+//			for (int t_i = tick_number; t_i >= 1; t_i--) {
+//				int x = width+20; //tick width to write
+//				int y = ((int) convertScaleToHeight((t_i) * spacing)) + 20;
+//				gc.fillText(String.valueOf((t_i) * spacing), x, y);
+//			}
+			int x = width+20; //tick width to write
+			int y = ((int) convertScaleToHeight(scale_end)) + 20;
+//			gc.fillText(String.valueOf(scale_end), x, y);
+			gc.fillText(String.valueOf(scale_end), x, ((int)canvas1.getHeight()-30-y));
+			y = ((int) convertScaleToHeight(scale_start)) + 20;
+			gc.fillText(String.valueOf(scale_start), x, ((int)canvas1.getHeight()-30-y));
+//			
 		}
-//		gc.save();
 		gc.setFill(Color.BLACK);
 		gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
         gc.setFont(new Font("Arial", 15));
-//        gc.rotate(-90);
-	    gc.fillText("\u00B5/s", (int)canvas1.getWidth()-30, (int)(canvas1.getHeight()/2));
-//	    gc.rotate(90);
-//	    gc.restore();
-		drawArrow(gc, (int)canvas1.getWidth()-45, (int)(canvas1.getHeight()/2)-(10*height/50), (int)canvas1.getWidth()-45, (int)(canvas1.getHeight()/2)+(10*height/50));
-//		gc.restore();
+	    Transform transform = Transform.rotate(-90.0, (int)canvas1.getWidth()-25, (int)(canvas1.getHeight()/2));
+	    gc.setTransform(new Affine(transform));
+	    gc.fillText("Speed(\u00B5m/s)", (int)canvas1.getWidth()-25, (int)(canvas1.getHeight()/2));
+	    gc.restore();
+	    
+	    int x_arrow = (int)canvas1.getWidth()-45;
+    	int y_arrow_init = (int)(canvas1.getHeight()/2) - (height/10);
+    	int y_arrow_end = (int)(canvas1.getHeight()/2) + (height/10);
+	    if (y_arrow_end - y_arrow_init  < 30) {
+	    	y_arrow_init = (int)(canvas1.getHeight()/2) - 15;
+	    	y_arrow_end = (int)(canvas1.getHeight()/2) + 15;
+	    }
+//		drawArrow(gc, x_arrow, y_arrow_init, x_arrow, y_arrow_end);
+		drawArrow(gc, x_arrow, y_arrow_end, x_arrow, y_arrow_init);
 		
     	WritableImage writableImage = new WritableImage((int) canvas1.getWidth(), (int)canvas1.getHeight());
     	SnapshotParameters sp = new SnapshotParameters();

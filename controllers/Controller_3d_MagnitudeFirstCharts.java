@@ -103,6 +103,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	private double upper_limit;
 	private List<IntervalMarker> intervalsList = new ArrayList<IntervalMarker>();
 	private static List<TimeSpeed> timespeedlist;
+//	private static List<TimeSpeed> timespeedlist_new;
 	private XYDataset dataset_general;
 	
 	//TODO: set colors by using mainPackage Preference
@@ -359,6 +360,75 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     }
     
     @FXML
+    void handleSeriesThickness(ActionEvent event) {
+    	XYPlot plot = currentChart.getXYPlot();
+    	XYPlot plot2 = currentZoomChart.getXYPlot();
+    	//int thickness = main_package.getPlot_preferences().getLineThickness();
+        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default - 1)");
+        int new_thickness = Integer.parseInt(test1);
+        if (new_thickness > 0) {
+        	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
+        	plot2.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
+        	main_package.getPlot_preferences().setLineThickness(new_thickness);
+        }
+    }
+    
+    @FXML
+    void handleShowAnnotations(ActionEvent event) {
+    	XYPlot plot = currentChart.getXYPlot();
+    	XYPlot plot2 = currentZoomChart.getXYPlot();
+    	XYDataset dataset = plot.getDataset();
+    	XYDataset dataset2 = plot2.getDataset();
+    	int input = JOptionPane.showConfirmDialog(null, "Hide Annotations?");
+    	if (input == 1 && main_package.getPlot_preferences().isDrawAnnotations() == false) {
+    		//show
+    		main_package.getPlot_preferences().setDrawAnnotations(true);
+    		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
+    	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
+    	        	double x = dataset.getXValue(0, x1);
+    	        	double y = dataset.getYValue(0, x1);
+    	        	if (valid_maximum_list.contains(x1)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
+    	        	}
+    	        	if (valid_minimum_list.contains(x1)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
+    	        	}
+    	        	if (first_points.contains(x1) && !valid_minimum_list.contains(x1)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
+    	        	}
+    	        	if (fifth_points.contains(x1) && !valid_minimum_list.contains(x1)  && !first_points.contains(x1)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
+    	        	}
+    	        }
+    		}
+    		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
+    	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
+    	        	double x = dataset2.getXValue(0, x1);
+    	        	double y = dataset2.getYValue(0, x1);
+    	        	if (valid_maximum_list.contains(x1 + zoomMinValue)) {
+    	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
+    	        	}
+    	        	if (valid_minimum_list.contains(x1 + zoomMinValue)) {
+    	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
+    	        	}
+    	        	if (first_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)) {
+    	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
+    	        	}
+    	        	if (fifth_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)  && !first_points.contains(x1 + zoomMinValue)) {
+    	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
+    	        	}
+    	        }
+    		}
+    	} else if (input == 0 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
+    		main_package.getPlot_preferences().setDrawAnnotations(false);
+    		//hide
+    		System.out.println("cleared");
+            plot.clearAnnotations();
+            plot2.clearAnnotations();
+    	}
+    }
+    
+    @FXML
     void handleMinimumColor(ActionEvent event) {
     	XYPlot plot = currentChart.getXYPlot();
     	XYPlot plot2 = currentZoomChart.getXYPlot();
@@ -369,7 +439,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         main_package.getPlot_preferences().setMinimumDotColorRGB(newColor);
         plot.clearAnnotations();
         plot2.clearAnnotations();
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500) {
+		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -387,7 +457,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	        	}
 	        }
 		}
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500) {
+		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
 	        	double x = dataset2.getXValue(0, x1);
 	        	double y = dataset2.getYValue(0, x1);
@@ -418,7 +488,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         main_package.getPlot_preferences().setMaximumDotColorRGB(newColor);
         plot.clearAnnotations();
         plot2.clearAnnotations();
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500) {
+		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -436,7 +506,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	        	}
 	        }
 		}
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500) {
+		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
 	        	double x = dataset2.getXValue(0, x1);
 	        	double y = dataset2.getYValue(0, x1);
@@ -467,7 +537,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         main_package.getPlot_preferences().setFirstDotColorRGB(newColor);
         plot.clearAnnotations();
         plot2.clearAnnotations();
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500) {
+		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -485,7 +555,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	        	}
 	        }
 		}
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500) {
+		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
 	        	double x = dataset2.getXValue(0, x1);
 	        	double y = dataset2.getYValue(0, x1);
@@ -516,7 +586,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         main_package.getPlot_preferences().setLastDotColorRGB(newColor);
         plot.clearAnnotations();
         plot2.clearAnnotations();
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500) {
+		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -534,7 +604,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	        	}
 	        }
 		}
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500) {
+		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
 	        	double x = dataset2.getXValue(0, x1);
 	        	double y = dataset2.getYValue(0, x1);
@@ -636,6 +706,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	commitColors();
 		((Controller_3c_PeakDetectMean)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, timespeedlist);
+//		((Controller_3c_PeakDetectMean)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, timespeedlist_new);
 		primaryStage.setTitle("Image Optical Flow - Define Gap Zone");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -668,6 +739,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 //    	((XYPlot)currentChart2.getPlot()).getRangeAxis().setAutoRange(true);
     	commitColors();
     	((Controller_3d2_PeakParametersPlot)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, intervalsList, valid_maximum_list, valid_minimum_list, first_points, fifth_points, timespeedlist, saved);
+//    	((Controller_3d2_PeakParametersPlot)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, intervalsList, valid_maximum_list, valid_minimum_list, first_points, fifth_points, timespeedlist_new, saved);
     	primaryStage.setTitle("Image Optical Flow - Peak Parameters Plot");
 //    	primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -1156,18 +1228,20 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 			renderer.setDefaultShapesVisible(false);
 	        renderer.setDefaultShapesFilled(false);
 	        renderer.setSeriesPaint(0, main_package.getPlot_preferences().getSeriesColorRGB());
+        	renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
         } else {
         	XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
     		renderer.setDefaultShapesVisible(false);
             renderer.setDefaultShapesFilled(false);
             renderer.setSeriesPaint(0, main_package.getPlot_preferences().getSeriesColorRGB());
+        	renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
         }
         //https://stackoverflow.com/questions/11350380/place-a-circle-on-top-of-an-xylinechart-in-jfreechart
         double delta = spinnerDelta.getValue() / fps_val / pixel_val;
 		
 		//maximum and minimum detection
 		peakDetectionAlgorithm(delta);
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500) {
+		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -1189,7 +1263,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         	@Override
         	public void plotChanged(PlotChangeEvent event) {
 //        		System.out.println("I am called after a zoom event (and some other events too).");
-        		if (plot.getDomainAxis().getLowerBound() != lowerBoundDomain || plot.getDomainAxis().getUpperBound() != upperBoundDomain) {
+        		if ( (plot.getDomainAxis().getLowerBound() != lowerBoundDomain || plot.getDomainAxis().getUpperBound() != upperBoundDomain) && main_package.getPlot_preferences().isDrawAnnotations() == true) {
         			lowerBoundDomain = plot.getDomainAxis().getLowerBound();
         			upperBoundDomain = plot.getDomainAxis().getUpperBound();
     				plot.clearAnnotations();
@@ -1489,7 +1563,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 //		System.out.println("this_minimum_list");
 //		System.out.println(this_minimum_list);
 //        if (upperBoundDomainZoom - lowerBoundDomainZoom <= 200) {
-		if (this_maximum_list.size() + this_minimum_list.size() < 1500) {
+		if (this_maximum_list.size() + this_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -1511,7 +1585,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	        	@Override
 	        	public void plotChanged(PlotChangeEvent event) {
 //	        		System.out.println("I am called after a zoom event (and some other events too).");
-	        		if (plot.getDomainAxis().getLowerBound() != lowerBoundDomainZoom || plot.getDomainAxis().getUpperBound() != upperBoundDomainZoom) {
+	        		if ( (plot.getDomainAxis().getLowerBound() != lowerBoundDomainZoom || plot.getDomainAxis().getUpperBound() != upperBoundDomainZoom) && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        			lowerBoundDomainZoom = plot.getDomainAxis().getLowerBound();
 	        			upperBoundDomainZoom = plot.getDomainAxis().getUpperBound();
 //	        			if (upperBoundDomainZoom - lowerBoundDomainZoom <= 200) {
@@ -1546,11 +1620,14 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	    	   renderer.setDefaultShapesVisible(false);
 	    	   renderer.setDefaultShapesFilled(false);
 	    	   renderer.setSeriesPaint(0, main_package.getPlot_preferences().getSeriesColorRGB());
+	    	   renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
 	       } else {
 	    	   XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
 	    	   renderer.setDefaultShapesVisible(false);
 	    	   renderer.setDefaultShapesFilled(false);
 	    	   renderer.setSeriesPaint(0, main_package.getPlot_preferences().getSeriesColorRGB());
+	    	   renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
+
 	       }
 	       currentZoomChart = chart;
 	       return chart;

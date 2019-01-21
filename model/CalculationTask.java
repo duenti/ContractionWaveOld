@@ -210,49 +210,53 @@ public class CalculationTask extends Task<Void> {
     
 	@Override
 	protected Void call() throws Exception {
-		String name = this.thisgroup.getName();
-		updateMessage(name);
-		int type = this.thisgroup.getType();
-		if (type == 0) {//Image
-			calculateMagnitudes(this.thisgroup, this.parent);
-		} else {//Video
-			calculateMagnitudesVideo(this.thisgroup, this.parent);
-		}
-		Group localgroup = this.thisgroup;
-		boolean save_data = this.save_data;
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				localgroup.setStatus("Done");
-				localgroup.setRemainingTime("0 miliseconds");
-				if (save_data == true) {
-					FileOutputStream fout = null;
-					try {
-						String home = System.getProperty("user.dir");
-						System.out.println(home);
-//						java.nio.file.Path path = java.nio.file.Paths.get(home);
-						fout = new FileOutputStream(System.getProperty("user.dir") + File.separator + name + "_group.ser");
-					} catch (FileNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					ObjectOutputStream oos = null;
-					try {
-						oos = new ObjectOutputStream(fout);
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					try {
-						oos.writeObject(localgroup);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				//System.out.println("--\n--\n--\nStatus of group:" + localgroup.getName() + " is done\n--\n--\n--\n");
+		try {
+			String name = this.thisgroup.getName();
+			updateMessage(name);
+			int type = this.thisgroup.getType();
+			if (type == 0) {//Image
+				calculateMagnitudes(this.thisgroup, this.parent);
+			} else {//Video
+				calculateMagnitudesVideo(this.thisgroup, this.parent);
 			}
-        });
+			Group localgroup = this.thisgroup;
+			boolean save_data = this.save_data;
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					localgroup.setStatus("Done");
+					localgroup.setRemainingTime("0 miliseconds");
+					if (save_data == true) {
+						FileOutputStream fout = null;
+						try {
+							String home = System.getProperty("user.dir");
+							System.out.println(home);
+	//						java.nio.file.Path path = java.nio.file.Paths.get(home);
+							fout = new FileOutputStream(System.getProperty("user.dir") + File.separator + name + "_group.ser");
+						} catch (FileNotFoundException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						ObjectOutputStream oos = null;
+						try {
+							oos = new ObjectOutputStream(fout);
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						try {
+							oos.writeObject(localgroup);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					//System.out.println("--\n--\n--\nStatus of group:" + localgroup.getName() + " is done\n--\n--\n--\n");
+				}
+	        });
+		} catch (Exception ex) {
+			   ex.getCause().printStackTrace();
+		}
 		return null;
 	}
 	

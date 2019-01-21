@@ -40,35 +40,35 @@ public class FileReader {
 
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
-//    	DirectoryChooser chooser = new DirectoryChooser();
-//        chooser.setTitle("Select a root path:");
-//        chooser.setInitialDirectory(getInitialDirectory().toFile());
-//        File chosenDir = chooser.showDialog(null);
-//        primaryStage.setMaximized(true);
-//        determineRootDirectory(chosenDir);
-//        if(chosenDir == null){
-//        	return;
-//        }
-		JFileChooser chooser = new JFileChooser() {
-			public void approveSelection() {
-				if (getSelectedFile().isFile()) {
-					return;
-				} else
-					super.approveSelection();
-			}
-		};
-		chooser.setCurrentDirectory(getInitialDirectory().toFile());
-	    chooser.setDialogTitle("Select a root path:");
-		chooser.setFileSelectionMode( JFileChooser.FILES_AND_DIRECTORIES );
-		int returnVal = chooser.showOpenDialog(null);
-	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-	       System.out.println("You chose to open this folder as root: " +
-	            chooser.getSelectedFile().getName());
-	       determineRootDirectory(chooser.getSelectedFile());
-	    } else {
-	    	return;
-	    }
-	    
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select a root path:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+        File chosenDir = chooser.showDialog(null);
+        primaryStage.setMaximized(true);
+        determineRootDirectory(chosenDir);
+        if(chosenDir == null){
+        	return;
+        }
+//		JFileChooser chooser = new JFileChooser() {
+//			public void approveSelection() {
+//				if (getSelectedFile().isFile()) {
+//					return;
+//				} else
+//					super.approveSelection();
+//			}
+//		};
+//		chooser.setCurrentDirectory(getInitialDirectory().toFile());
+//	    chooser.setDialogTitle("Select a root path:");
+//		chooser.setFileSelectionMode( JFileChooser.FILES_AND_DIRECTORIES );
+//		int returnVal = chooser.showOpenDialog(null);
+//	    if(returnVal == JFileChooser.APPROVE_OPTION) {
+//	       System.out.println("You chose to open this folder as root: " +
+//	            chooser.getSelectedFile().getName());
+//	       determineRootDirectory(chooser.getSelectedFile());
+//	    } else {
+//	    	return;
+//	    }
+//	    
 
 		//URL url = getClass().getResource("FXML_2b_ImagesNew.fxml");
 		FXMLLoader fxmlloader = new FXMLLoader();

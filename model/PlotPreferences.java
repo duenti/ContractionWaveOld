@@ -21,8 +21,12 @@ public class PlotPreferences implements Serializable {
 	private Color rangeGridColorRGB;
 	private boolean gridlineDefaultState;
 	private boolean splineDefaultState;
+	private int lineThickness;
+	private boolean drawAnnotations;
 	
 	public PlotPreferences(){
+		setDrawAnnotations(true);
+		lineThickness = 1;
 		markerAlpha = 0.5f;
 		markerColorRGB = new Color(247, 246, 215);
 		seriesColorRGB = new Color(0x00, 0x00, 0xFF);
@@ -36,7 +40,12 @@ public class PlotPreferences implements Serializable {
 		gridlineDefaultState = true;
 		setSplineDefaultState(false);
 	}
-	
+	public int getLineThickness() {
+		return lineThickness;
+	}
+	public void setLineThickness(int thick) {
+		lineThickness = thick;
+	}
 	public float getMarkerAlpha() {
 		return markerAlpha;
 	}
@@ -107,9 +116,14 @@ public class PlotPreferences implements Serializable {
 	public boolean isSplineDefaultState() {
 		return splineDefaultState;
 	}
-
 	public void setSplineDefaultState(boolean splineDefaultState) {
 		this.splineDefaultState = splineDefaultState;
+	}
+	public boolean isDrawAnnotations() {
+		return drawAnnotations;
+	}
+	public void setDrawAnnotations(boolean drawAnnotations) {
+		this.drawAnnotations = drawAnnotations;
 	}
 
 }

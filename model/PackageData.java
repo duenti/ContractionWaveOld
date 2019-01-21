@@ -94,9 +94,11 @@ public class PackageData  implements Serializable {
 			if (!g.getStatus().equals("Done")) {
 				CalculationTask new_task = new CalculationTask(g, this, save_data);
 				
-//			new_task.setOnSucceeded(e -> {
-//				String group_name = e.getSource().getMessage();
-//			});
+				new_task.setOnFailed(e -> {
+//					String group_name = e.getSource().getMessage();
+					Throwable thingThatWentWrong = new_task.getException();
+					thingThatWentWrong.getCause().printStackTrace();
+				});
 				exec.execute(new_task);
 			}
 		}

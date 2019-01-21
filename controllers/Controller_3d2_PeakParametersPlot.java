@@ -12,6 +12,8 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -44,6 +46,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
@@ -68,6 +71,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
@@ -119,6 +123,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	private int start;
 	private int stop;
 	private int step = 1;
+	private int global_min;
 	private List<TimeSpeed> timespeedlist;
 	private double delta;
 	private double intra;
@@ -279,7 +284,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 				double average = currentGroup.getMagnitudeListValue(i);
 				writer.write(String.valueOf(i / fps_val));
 				writer.write(",");
-				writer.write(String.valueOf(average * fps_val * pixel_val));
+//				writer.write(String.valueOf(average * fps_val * pixel_val));
+				writer.write(String.valueOf((average * fps_val * pixel_val) - average_value));
 				writer.write("\n");
 			}	        
 	    } catch (Exception ex) {
@@ -305,7 +311,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 			row = spreadsheet.createRow(i + 1);
 			
 			row.createCell(0).setCellValue(i / fps_val);
-			row.createCell(1).setCellValue(average * fps_val * pixel_val);			
+//			row.createCell(1).setCellValue(average * fps_val * pixel_val);
+			row.createCell(1).setCellValue((average * fps_val * pixel_val) - average_value);
 		}
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName("time-speed.xls");
@@ -379,6 +386,39 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
+    @FXML
+    void handleShowAnnotations(ActionEvent event) {
+       	XYPlot plot = currentChart.getXYPlot();
+    	XYDataset dataset = plot.getDataset();
+    	int input = JOptionPane.showConfirmDialog(null, "Hide Annotations?");
+    	if (input == 1 && main_package.getPlot_preferences().isDrawAnnotations() == false) {
+    		//show
+    		main_package.getPlot_preferences().setDrawAnnotations(true);
+    		if (maximum_list.size() + minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
+    	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
+    	        	double x = dataset.getXValue(0, x1);
+    	        	double y = dataset.getYValue(0, x1);
+    	        	if (maximum_list.contains(x1+global_min)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
+    	        	}
+    	        	if (minimum_list.contains(x1+global_min)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
+    	        	}
+    	        	if (first_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
+    	        	}
+    	        	if (fifth_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)  && !first_points.contains(x1+global_min)) {
+    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
+    	        	}
+    	        }
+    		}
+    	} else if (input == 0 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
+    		main_package.getPlot_preferences().setDrawAnnotations(false);
+    		//hide
+            plot.clearAnnotations();
+    	}
+    }
+    
     
     @FXML
     void handleMinimumColor(ActionEvent event) {
@@ -388,20 +428,20 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
         java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
         main_package.getPlot_preferences().setMinimumDotColorRGB(newColor);
         plot.clearAnnotations();
-		if (maximum_list.size() + minimum_list.size() < 1500) {
+		if (maximum_list.size() + minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
-	        	if (maximum_list.contains(x1)) {
+	        	if (maximum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
 	        	}
-	        	if (minimum_list.contains(x1)) {
+	        	if (minimum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
 	        	}
-	        	if (first_points.contains(x1) && !minimum_list.contains(x1)) {
+	        	if (first_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
 	        	}
-	        	if (fifth_points.contains(x1) && !minimum_list.contains(x1)  && !first_points.contains(x1)) {
+	        	if (fifth_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)  && !first_points.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
 	        	}
 	        }
@@ -416,20 +456,20 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
         java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
         main_package.getPlot_preferences().setMaximumDotColorRGB(newColor);
         plot.clearAnnotations();
-		if (maximum_list.size() + minimum_list.size() < 1500) {
+		if (maximum_list.size() + minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
-	        	if (maximum_list.contains(x1)) {
+	        	if (maximum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
 	        	}
-	        	if (minimum_list.contains(x1)) {
+	        	if (minimum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
 	        	}
-	        	if (first_points.contains(x1) && !minimum_list.contains(x1)) {
+	        	if (first_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
 	        	}
-	        	if (fifth_points.contains(x1) && !minimum_list.contains(x1)  && !first_points.contains(x1)) {
+	        	if (fifth_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)  && !first_points.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
 	        	}
 	        }
@@ -444,20 +484,20 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
         java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
         main_package.getPlot_preferences().setFirstDotColorRGB(newColor);
         plot.clearAnnotations();
-		if (maximum_list.size() + minimum_list.size() < 1500) {
+		if (maximum_list.size() + minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
-	        	if (maximum_list.contains(x1)) {
+	        	if (maximum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
 	        	}
-	        	if (minimum_list.contains(x1)) {
+	        	if (minimum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
 	        	}
-	        	if (first_points.contains(x1) && !minimum_list.contains(x1)) {
+	        	if (first_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
 	        	}
-	        	if (fifth_points.contains(x1) && !minimum_list.contains(x1)  && !first_points.contains(x1)) {
+	        	if (fifth_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)  && !first_points.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
 	        	}
 	        }
@@ -472,20 +512,20 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
         java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
         main_package.getPlot_preferences().setLastDotColorRGB(newColor);
         plot.clearAnnotations();
-		if (maximum_list.size() + minimum_list.size() < 1500) {
+		if (maximum_list.size() + minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
-	        	if (maximum_list.contains(x1)) {
+	        	if (maximum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
 	        	}
-	        	if (minimum_list.contains(x1)) {
+	        	if (minimum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
 	        	}
-	        	if (first_points.contains(x1) && !minimum_list.contains(x1)) {
+	        	if (first_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
 	        	}
-	        	if (fifth_points.contains(x1) && !minimum_list.contains(x1)  && !first_points.contains(x1)) {
+	        	if (fifth_points.contains(x1+global_min) && !minimum_list.contains(x1+global_min)  && !first_points.contains(x1+global_min)) {
 	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
 	        	}
 	        }
@@ -604,6 +644,18 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
         main_package.getPlot_preferences().setSeriesColorRGB(newColor);
     }
     
+    @FXML
+    void handleSeriesThickness(ActionEvent event) {
+    	XYPlot plot = currentChart.getXYPlot();
+    	//int thickness = main_package.getPlot_preferences().getLineThickness();
+        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default - 1)");
+        int new_thickness = Integer.parseInt(test1);
+        if (new_thickness > 0) {
+        	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
+        	main_package.getPlot_preferences().setLineThickness(new_thickness);
+        }
+    }
+    
     private void commitColors() {
     	XYPlot plot = currentChart.getXYPlot();
     	main_package.getPlot_preferences().setSeriesColorRGB( (java.awt.Color) plot.getRenderer().getSeriesPaint(0));
@@ -647,7 +699,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     }
     
     void navigation() {
-       	double peak_size = (stop - start);
+       		double peak_size = (stop - start);
     		int option = alertRAM(peak_size);
     		if(option == -1) return;
     		CalculationTaskSave new_task = new CalculationTaskSave(currentGroup, main_package, stop, start, 1, 0);
@@ -672,8 +724,13 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	        for (int j = 0; j < viewResultsTable.getColumns().size(); j++) {
 				if (j == 0) {
 					text2 = ((TableColumn<Peak, String>) viewResultsTable.getColumns().get(j)).getText();
+					System.out.println(text2 + " 1");
 				} else {
-					text2 = ((TableColumn<Peak, Double>) viewResultsTable.getColumns().get(j)).getText();
+					TableColumn<Peak, Double> a = (TableColumn<Peak, Double>) viewResultsTable.getColumns().get(j);
+					Label b = (Label) a.getGraphic();
+					//text2 = ((TableColumn<Peak, Double>) viewResultsTable.getColumns().get(j)).getText();
+					text2 = b.getText();
+					System.out.println(text2 + " 2");
 				}
 				writer.write(text2 + "\t");
 			}
@@ -684,17 +741,21 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	        		if (j == 0) {
 						if(((TableColumnBase<Peak, String>) viewResultsTable.getColumns().get(j)).getCellData(i) != null) {
 							text2 = ((TableColumnBase<Peak, String>) viewResultsTable.getColumns().get(j)).getCellData(i).toString();
+							System.out.println(text2 + " 3");
 						}
 						else {
 							text2 = "";
+							System.out.println(text2 + " 4");
 						}
 						
 					} else {
 						if(((TableColumnBase<Peak, Double>) viewResultsTable.getColumns().get(j)).getCellData(i) != null) {
-							text2 = ((TableColumnBase<Peak, Double>) viewResultsTable.getColumns().get(j)).getCellData(i).toString(); 
+							text2 = ((TableColumnBase<Peak, Double>) viewResultsTable.getColumns().get(j)).getCellData(i).toString();
+							System.out.println(text2 + " 5");
 						}
 						else {
 							text2 = "";
+							System.out.println(text2 + " 6");
 						}
 					}
 	        		writer.write(text2 + "\t");
@@ -720,7 +781,9 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 				if (j == 0) {
 					row.createCell(j).setCellValue(((TableColumn<Peak, String>) viewResultsTable.getColumns().get(j)).getText());
 				} else {
-					row.createCell(j).setCellValue(((TableColumn<Peak, Double>) viewResultsTable.getColumns().get(j)).getText());
+					TableColumn<Peak, Double> a = (TableColumn<Peak, Double>) viewResultsTable.getColumns().get(j);
+					Label b = (Label) a.getGraphic();
+					row.createCell(j).setCellValue(b.getText());
 				}
 			}
 			for (int i = 0; i < viewResultsTable.getItems().size(); i++) {
@@ -806,19 +869,20 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 			alert.setContentText("Choose your option:");
 	
 			ButtonType buttonTypeOne = new ButtonType("Run using Memory (faster)");
-			ButtonType buttonTypeTwo = new ButtonType("Save each result in files (slower)");
+//			ButtonType buttonTypeTwo = new ButtonType("Save each result in files (slower)");
 			ButtonType buttonTypeCancel = new ButtonType("Cancel operation", ButtonData.CANCEL_CLOSE);
 	
-			alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+//			alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeCancel);
+			alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
 	
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == buttonTypeOne){
 			    // ... user chose "One"
 				return 0;
-			} else if (result.get() == buttonTypeTwo) {
+//			} else if (result.get() == buttonTypeTwo) {
 			    // ... user chose "Two"
 				// TODO: Write option for buffering files
-				return 1;
+//				return 1;
 			} else {
 			    // ... user chose CANCEL or closed the dialog
 				return -1;
@@ -855,7 +919,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	System.out.println("intervalsList.size()");
     	System.out.println(intervalsList.size());
       	for (IntervalMarker e : intervalsList) {
-    		IntervalPeak f = new IntervalPeak(currentGroup, fps_val, pixel_val, e, maximum_list, minimum_list, first_points, fifth_points);
+    		IntervalPeak f = new IntervalPeak(currentGroup, average_value, fps_val, pixel_val, e, maximum_list, minimum_list, first_points, fifth_points);
     		intervalPeaks.addIntervalPeak(f);
     	}
     	System.out.println("intervalPeaks.getListPeaks().size()");
@@ -885,8 +949,13 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	timeTableView.getSelectionModel().selectFirst();
     	speedTableView.getSelectionModel().selectFirst();
     	areaTableView.getSelectionModel().selectFirst();
+    	currentSelModel = timeTableView.getSelectionModel().getSelectedIndices().stream().collect(java.util.stream.Collectors.toList());
+//		currentSelModel = timeTableView.getSelectionModel().getSelectedIndices();
 	}
-    
+	
+	
+	private List<Integer> currentSelModel = new ArrayList<Integer>();
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		timeRadio.setToggleGroup(radioGroup);
@@ -934,92 +1003,223 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		
 		
 		speedTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-		speedTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		speedTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-		    if ((newSelection != null) && (currentPeak.getF_point() != timeTableView.getSelectionModel().getSelectedItem().getF_point()) && (currentPeak.getEnd_point() != timeTableView.getSelectionModel().getSelectedItem().getEnd_point())) {
-		    	currentPeak = timeTableView.getSelectionModel().getSelectedItem();
-		    	int index = timeTableView.getSelectionModel().getSelectedIndex();
-				int to_val;
-				int from_val;
-				if (currentPeak.getF_point() - 1 >= 0) {
-					System.out.println("case start");
-					from_val = currentPeak.getF_point() - 1;
-				} else {
-					from_val = 0;
+//		speedTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		speedTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		speedTableView.getSelectionModel().getSelectedItems().addListener((Change<? extends Peak> c) -> {
+//		speedTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+			System.out.println("speed");
+			System.out.println(currentSelModel.toString());
+			System.out.println(speedTableView.getSelectionModel().getSelectedIndices().toString());
+		    if ((speedTableView.getSelectionModel().getSelectedIndices().size() >= 1) && (!speedTableView.getSelectionModel().getSelectedIndices().equals(currentSelModel))) {
+				//List<Integer> indexes = areaTableView.getSelectionModel().getSelectedIndices();
+		    	System.out.println("ch ch changeee");
+				int final_from = currentGroup.size();
+				int final_to = 0;
+				for (Peak z : speedTableView.getSelectionModel().getSelectedItems()) {
+					currentPeak = z;
+					int to_val;
+					int from_val;
+					if (currentPeak.getF_point() - 1 >= 0) {
+						from_val = currentPeak.getF_point() - 1;
+					} else {
+						from_val = 0;
+					}
+					if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
+						to_val = currentPeak.getEnd_point() + 1;
+					} else {
+						to_val = currentGroup.size() - 1;
+					}
+					if (final_from > from_val) {
+						final_from = from_val;
+					}
+					if (final_to < to_val) {
+						final_to = to_val;
+					}
 				}
-				start = from_val;
-				if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
-					System.out.println("case end");
-					to_val = currentPeak.getEnd_point() + 1;
-				} else {
-					to_val = currentGroup.size() - 1;
-				}
-				stop = to_val;
+				start = final_from;
+				stop = final_to;
 				System.out.println("start , stop:");
 				System.out.println(start + "," + stop);
 		    	writeLinePlot(start, stop);
-		    	timeTableView.getSelectionModel().select(index);
-		    	areaTableView.getSelectionModel().select(index);
-		    }
+//		    	currentSelModel = new ArrayList<Integer>(speedTableView.getSelectionModel().getSelectedIndices().size());
+//		    	Collections.copy(currentSelModel, speedTableView.getSelectionModel().getSelectedIndices());
+		    	currentSelModel = speedTableView.getSelectionModel().getSelectedIndices().stream().collect(java.util.stream.Collectors.toList());
+		    	areaTableView.setSelectionModel(speedTableView.getSelectionModel());
+		    	timeTableView.setSelectionModel(speedTableView.getSelectionModel());
+			}
+		    
+		    
+//		    if ((newSelection != null) && (currentPeak.getF_point() != timeTableView.getSelectionModel().getSelectedItem().getF_point()) && (currentPeak.getEnd_point() != timeTableView.getSelectionModel().getSelectedItem().getEnd_point())) {
+//		    	currentPeak = timeTableView.getSelectionModel().getSelectedItem();
+//		    	int index = timeTableView.getSelectionModel().getSelectedIndex();
+//				int to_val;
+//				int from_val;
+//				if (currentPeak.getF_point() - 1 >= 0) {
+//					System.out.println("case start");
+//					from_val = currentPeak.getF_point() - 1;
+//				} else {
+//					from_val = 0;
+//				}
+//				start = from_val;
+//				if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
+//					System.out.println("case end");
+//					to_val = currentPeak.getEnd_point() + 1;
+//				} else {
+//					to_val = currentGroup.size() - 1;
+//				}
+//				stop = to_val;
+//				System.out.println("start , stop:");
+//				System.out.println(start + "," + stop);
+//		    	writeLinePlot(start, stop);
+//		    	timeTableView.getSelectionModel().select(index);
+//		    	areaTableView.getSelectionModel().select(index);
+//		    }
 		});
 		
 		
 		timeTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-		timeTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		timeTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-		    if ((newSelection != null) && (currentPeak.getF_point() != timeTableView.getSelectionModel().getSelectedItem().getF_point()) && (currentPeak.getEnd_point() != timeTableView.getSelectionModel().getSelectedItem().getEnd_point())) {
-		    	currentPeak = timeTableView.getSelectionModel().getSelectedItem();
-		    	int index = timeTableView.getSelectionModel().getSelectedIndex();
-				int to_val;
-				int from_val;
-				if (currentPeak.getF_point() - 1 >= 0) {
-					from_val = currentPeak.getF_point() - 1;
-				} else {
-					from_val = 0;
+//		timeTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		timeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+//		timeTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+		timeTableView.getSelectionModel().getSelectedItems().addListener((Change<? extends Peak> c) -> {
+			System.out.println("time");
+			System.out.println(currentSelModel.toString());
+			System.out.println(timeTableView.getSelectionModel().getSelectedIndices().toString());
+		    if ((timeTableView.getSelectionModel().getSelectedIndices().size() >= 1) && (!timeTableView.getSelectionModel().getSelectedIndices().equals(currentSelModel))) {
+				//List<Integer> indexes = areaTableView.getSelectionModel().getSelectedIndices();
+				System.out.println("time changeee");
+				int final_from = currentGroup.size();
+				int final_to = 0;
+				for (Peak z : timeTableView.getSelectionModel().getSelectedItems()) {
+					currentPeak = z;
+					int to_val;
+					int from_val;
+					if (currentPeak.getF_point() - 1 >= 0) {
+						from_val = currentPeak.getF_point() - 1;
+					} else {
+						from_val = 0;
+					}
+					if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
+						to_val = currentPeak.getEnd_point() + 1;
+					} else {
+						to_val = currentGroup.size() - 1;
+					}
+					if (final_from > from_val) {
+						final_from = from_val;
+					}
+					if (final_to < to_val) {
+						final_to = to_val;
+					}
 				}
-				start = from_val;
-				if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
-					to_val = currentPeak.getEnd_point() + 1;
-				} else {
-					to_val = currentGroup.size() - 1;
-				}
-				stop = to_val;
+				start = final_from;
+				stop = final_to;
 				System.out.println("start , stop:");
 				System.out.println(start + "," + stop);
 		    	writeLinePlot(start, stop);
-		    	speedTableView.getSelectionModel().select(index);
-		    	areaTableView.getSelectionModel().select(index);
-		    }
+//		    	currentSelModel = new ArrayList<Integer>(timeTableView.getSelectionModel().getSelectedIndices().size());
+//		    	Collections.copy(currentSelModel, timeTableView.getSelectionModel().getSelectedIndices());
+		    	currentSelModel = timeTableView.getSelectionModel().getSelectedIndices().stream().collect(java.util.stream.Collectors.toList());
+
+		    	areaTableView.setSelectionModel(timeTableView.getSelectionModel());
+		    	speedTableView.setSelectionModel(timeTableView.getSelectionModel());
+			}
+			
+			
+//		    if ((newSelection != null) && (currentPeak.getF_point() != timeTableView.getSelectionModel().getSelectedItem().getF_point()) && (currentPeak.getEnd_point() != timeTableView.getSelectionModel().getSelectedItem().getEnd_point())) {
+//		    	currentPeak = timeTableView.getSelectionModel().getSelectedItem();
+//		    	int index = timeTableView.getSelectionModel().getSelectedIndex();
+//				int to_val;
+//				int from_val;
+//				if (currentPeak.getF_point() - 1 >= 0) {
+//					from_val = currentPeak.getF_point() - 1;
+//				} else {
+//					from_val = 0;
+//				}
+//				start = from_val;
+//				if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
+//					to_val = currentPeak.getEnd_point() + 1;
+//				} else {
+//					to_val = currentGroup.size() - 1;
+//				}
+//				stop = to_val;
+//				System.out.println("start , stop:");
+//				System.out.println(start + "," + stop);
+//		    	writeLinePlot(start, stop);
+//		    	speedTableView.getSelectionModel().select(index);
+//		    	areaTableView.getSelectionModel().select(index);
+//		    }
 		});
 		
 		areaTableView.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
-		areaTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		areaTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-		    if ((newSelection != null) && (currentPeak.getF_point() != areaTableView.getSelectionModel().getSelectedItem().getF_point()) && (currentPeak.getEnd_point() != areaTableView.getSelectionModel().getSelectedItem().getEnd_point())) {
-		    	currentPeak = areaTableView.getSelectionModel().getSelectedItem();
-		    	int index = areaTableView.getSelectionModel().getSelectedIndex();
-				int to_val;
-				int from_val;
-				if (currentPeak.getF_point() - 1 >= 0) {
-					from_val = currentPeak.getF_point() - 1;
-				} else {
-					from_val = 0;
+//		areaTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+		areaTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		areaTableView.getSelectionModel().getSelectedItems().addListener((Change<? extends Peak> c) -> {
+//		areaTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+			System.out.println("area");
+//		    if ((newSelection != null) && (!areaTableView.getSelectionModel().getSelectedIndices().equals(currentSelModel))) {
+			if ((areaTableView.getSelectionModel().getSelectedIndices().size() >= 1) && (!areaTableView.getSelectionModel().getSelectedIndices().equals(currentSelModel))) {
+				System.out.println("area changee");
+				//List<Integer> indexes = areaTableView.getSelectionModel().getSelectedIndices();
+				int final_from = currentGroup.size();
+				int final_to = 0;
+				for (Peak z : areaTableView.getSelectionModel().getSelectedItems()) {
+					currentPeak = z;
+					int to_val;
+					int from_val;
+					if (currentPeak.getF_point() - 1 >= 0) {
+						from_val = currentPeak.getF_point() - 1;
+					} else {
+						from_val = 0;
+					}
+					if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
+						to_val = currentPeak.getEnd_point() + 1;
+					} else {
+						to_val = currentGroup.size() - 1;
+					}
+					if (final_from > from_val) {
+						final_from = from_val;
+					}
+					if (final_to < to_val) {
+						final_to = to_val;
+					}
 				}
-				start = from_val;
-				if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
-					to_val = currentPeak.getEnd_point() + 1;
-				} else {
-					to_val = currentGroup.size() - 1;
-				}
-				stop = to_val;
+				start = final_from;
+				stop = final_to;
 				System.out.println("start , stop:");
 				System.out.println(start + "," + stop);
 		    	writeLinePlot(start, stop);
-		    	speedTableView.getSelectionModel().select(index);
-		    	timeTableView.getSelectionModel().select(index);
-		    }
-		});		
-		
+//		    	currentSelModel = new ArrayList<Integer>(areaTableView.getSelectionModel().getSelectedIndices().size());
+//		    	Collections.copy(currentSelModel, areaTableView.getSelectionModel().getSelectedIndices());
+		    	currentSelModel = areaTableView.getSelectionModel().getSelectedIndices().stream().collect(java.util.stream.Collectors.toList());
+
+		    	speedTableView.setSelectionModel(areaTableView.getSelectionModel());
+		    	timeTableView.setSelectionModel(areaTableView.getSelectionModel());
+			}
+			
+//		    if ((newSelection != null) && (currentPeak.getF_point() != areaTableView.getSelectionModel().getSelectedItem().getF_point()) && (currentPeak.getEnd_point() != areaTableView.getSelectionModel().getSelectedItem().getEnd_point())) {
+//		    	currentPeak = areaTableView.getSelectionModel().getSelectedItem();
+//		    	int index = areaTableView.getSelectionModel().getSelectedIndex();
+//				int to_val;
+//				int from_val;
+//				if (currentPeak.getF_point() - 1 >= 0) {
+//					from_val = currentPeak.getF_point() - 1;
+//				} else {
+//					from_val = 0;
+//				}
+//				start = from_val;
+//				if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
+//					to_val = currentPeak.getEnd_point() + 1;
+//				} else {
+//					to_val = currentGroup.size() - 1;
+//				}
+//				stop = to_val;
+//				System.out.println("start , stop:");
+//				System.out.println(start + "," + stop);
+//		    	writeLinePlot(start, stop);
+//		    	speedTableView.getSelectionModel().select(index);
+//		    	timeTableView.getSelectionModel().select(index);
+//		    }
+		});
 
 	    
 	    
@@ -1153,6 +1353,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	
 	//PLOT GENERATING FUNCTIONS
 	private void writeLinePlot(int min, int max) {
+		global_min = min;
 		currentChart = createChart(createDataset(min, max), min);
 		ChartPanel linepanel = new ChartPanel(currentChart);
 
@@ -1185,7 +1386,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		XYSeries series1 = new XYSeries("Optical Flow");
 		for (int i = min; i < max; i++) {
 			double average = currentGroup.getMagnitudeListValue(i);
-			series1.add(i / fps_val, average * fps_val * pixel_val);
+//			series1.add(i / fps_val, average * fps_val * pixel_val);
+			series1.add(i / fps_val, (average * fps_val * pixel_val) - average_value);
 		}
 		//peak detection algorithm receives a group
         XYSeriesCollection dataset = new XYSeriesCollection();
@@ -1225,7 +1427,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
         plot.setDomainGridlinesVisible(main_package.getPlot_preferences().isGridlineDefaultState());
         plot.setRangeGridlinesVisible(main_package.getPlot_preferences().isGridlineDefaultState());
         
-        if (upperBoundDomain - lowerBoundDomain <= 200) {
+        if (upperBoundDomain - lowerBoundDomain <= 200 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
 	        	double y = dataset.getYValue(0, x1);
@@ -1247,7 +1449,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
         	@Override
         	public void plotChanged(PlotChangeEvent event) {
 //        		System.out.println("I am called after a zoom event (and some other events too).");
-        		if (plot.getDomainAxis().getLowerBound() != lowerBoundDomain || plot.getDomainAxis().getUpperBound() != upperBoundDomain) {
+        		if ( (plot.getDomainAxis().getLowerBound() != lowerBoundDomain || plot.getDomainAxis().getUpperBound() != upperBoundDomain) && main_package.getPlot_preferences().isDrawAnnotations() == true) {
         			lowerBoundDomain = plot.getDomainAxis().getLowerBound();
         			upperBoundDomain = plot.getDomainAxis().getUpperBound();
         			if (upperBoundDomain - lowerBoundDomain <= 200) {
@@ -1278,11 +1480,13 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 			renderer.setDefaultShapesVisible(false);
 	        renderer.setDefaultShapesFilled(false);
 	        renderer.setSeriesPaint(0, main_package.getPlot_preferences().getSeriesColorRGB());
+        	renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
         } else {
         	XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
     		renderer.setDefaultShapesVisible(false);
             renderer.setDefaultShapesFilled(false);
             renderer.setSeriesPaint(0, main_package.getPlot_preferences().getSeriesColorRGB());
+        	renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
         }
         return chart;
     }

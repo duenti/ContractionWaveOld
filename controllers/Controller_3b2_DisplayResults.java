@@ -269,6 +269,18 @@ public class Controller_3b2_DisplayResults implements Initializable{
         main_package.getPlot_preferences().setSeriesColorRGB(newColor);
     }
     
+    @FXML
+    void handleSeriesThickness(ActionEvent event) {
+    	XYPlot plot = currentChart.getXYPlot();
+    	//int thickness = main_package.getPlot_preferences().getLineThickness();
+        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness: (Default: 1)");
+        int new_thickness = Integer.parseInt(test1);
+        if (new_thickness > 0) {
+        	main_package.getPlot_preferences().setLineThickness(new_thickness);
+        	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
+        }
+    }
+    
     
     private void commitColors() {
     	XYPlot plot = currentChart.getXYPlot();
@@ -683,11 +695,13 @@ public class Controller_3b2_DisplayResults implements Initializable{
 			renderer.setDefaultShapesVisible(false);
 	        renderer.setDefaultShapesFilled(false);
 	        renderer.setSeriesPaint(0, main_package.getPlot_preferences().getSeriesColorRGB());
+        	renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
         } else {
         	XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer) plot.getRenderer();
     		renderer.setDefaultShapesVisible(false);
             renderer.setDefaultShapesFilled(false);
             renderer.setSeriesPaint(0, main_package.getPlot_preferences().getSeriesColorRGB());
+        	renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
         }
         return chart;
     }

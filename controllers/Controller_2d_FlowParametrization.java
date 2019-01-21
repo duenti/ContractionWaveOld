@@ -24,6 +24,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -118,7 +120,6 @@ public class Controller_2d_FlowParametrization implements Initializable {
 
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-    	
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData());
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
@@ -204,8 +205,8 @@ public class Controller_2d_FlowParametrization implements Initializable {
     	
     	
     	
-//		((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(groups, main_package);
-		((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
+		((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(groups, main_package);
+//		((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
 		primaryStage.setTitle("Image Optical Flow - Processing Progress");
 //		primaryStage.setMaximized(true);
     	primaryStage.setScene(scene);

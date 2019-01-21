@@ -30,13 +30,13 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <TextField fx:id="heightInput" alignment="CENTER" text="200" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+      <TextField fx:id="heightInput" alignment="CENTER" text="450" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
       <Label text="Width:" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <TextField fx:id="widthInput" alignment="CENTER" text="50" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+      <TextField fx:id="widthInput" alignment="CENTER" text="30" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
       <Label text="Include Ticks:" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER">
          <font>
             <Font size="18.0" />
@@ -48,7 +48,7 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <TextField fx:id="spacingInput" alignment="CENTER" text="20" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+      <TextField fx:id="spacingInput" alignment="CENTER" text="10" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
       <Label text="Font Size:" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
          <font>
             <Font size="18.0" />

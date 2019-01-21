@@ -156,6 +156,38 @@ public class Controller_2a_ProgressBar implements Initializable {
     	
     	tableRunStatus.setItems(gs.getObservableList());
     	
+//    	ask_save_groups();
+    	
+    	timeline = new Timeline(new KeyFrame(Duration.seconds(0.001),
+    			new EventHandler<ActionEvent>() {
+    				@Override
+    				public void handle(ActionEvent event) {
+    					tableRunStatus.refresh();
+    					boolean is_it_done = true;
+    					for (int i = 0; i < main_package.getCurrent_groups().size(); i++) {
+    						Group g = main_package.getCurrent_groups().get(i);
+    						String currentStatus = g.getStatus();
+    						if (!currentStatus.equals("Done")) {
+    							is_it_done = false;
+    						}
+    					}
+    		    		if (is_it_done == true) {
+    		    			killTimeline();
+    		    		}
+    				}
+    			}
+    	));
+    	timeline.setCycleCount(Timeline.INDEFINITE);
+    	timeline.play();
+    }
+    
+    public void setContext(Groups gs2, PackageData main_package_init) { //first form of setContext. involves listening to the queue
+    	//here groups are added to their queue
+    	main_package = main_package_init;
+    	Groups gs = main_package.getCurrent_groups();
+    	
+    	tableRunStatus.setItems(gs.getObservableList());
+    	
     	ask_save_groups();
     	
     	timeline = new Timeline(new KeyFrame(Duration.seconds(0.001),
