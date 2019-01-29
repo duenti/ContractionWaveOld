@@ -227,7 +227,7 @@ public class IntervalPeak {
 	public IntervalMarker getThisMarker() {
 		return thisMarker;
 	}
-
+	
 	public void setThisMarker(IntervalMarker thisMarker) {
 		this.thisMarker = thisMarker;
 	}

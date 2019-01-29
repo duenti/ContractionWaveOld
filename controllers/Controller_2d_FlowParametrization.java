@@ -120,7 +120,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
 
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData());
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);

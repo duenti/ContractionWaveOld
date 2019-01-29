@@ -1,5 +1,7 @@
 package controllers;
 
+import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
+
 //import org.apache.commons.math.MathException;
 //import org.apache.commons.math.distribution.NormalDistribution;
 //import org.apache.commons.math.distribution.NormalDistributionImpl;
@@ -12,6 +14,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -36,6 +39,9 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.MatVector;
+import org.bytedeco.javacv.Java2DFrameUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartMouseEvent;
 import org.jfree.chart.ChartMouseListener;
@@ -164,7 +170,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData());
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -194,7 +200,19 @@ public class Controller_3c_PeakDetectMean implements Initializable {
         //Show save file dialog
         File file = fileChooser.showSaveDialog(primaryStage);
 		writeTSV(file);
-		JOptionPane.showMessageDialog(null, "The file were saved.");
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+    }
+    
+    @FXML
+    void handleExportTXT(ActionEvent event) throws Exception{
+    	FileChooser fileChooser = new FileChooser();
+    	fileChooser.setInitialFileName("time-speed.txt");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdNext.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+		writeTSV(file);
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     public void writeTSV(File file) throws Exception {
@@ -247,7 +265,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 		workbook.close();
 		fileOut.close();
 		
-		JOptionPane.showMessageDialog(null, "The file were saved.");
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -264,7 +282,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
                 currentChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "The file were saved.");
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -281,7 +299,35 @@ public class Controller_3c_PeakDetectMean implements Initializable {
                 currentChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "The file were saved.");
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+    }
+    
+    @FXML
+    void handleExportTIFF(ActionEvent event) throws Exception{
+    	FileChooser fileChooser = new FileChooser();
+    	fileChooser.setInitialFileName("time-speed.tiff");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdNext.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+        ChartPanel panel = (ChartPanel) swgChart.getContent();
+        JFreeChart chart = panel.getChart();
+        BufferedImage bImage = chart.createBufferedImage(panel.getWidth(), panel.getHeight());
+        
+        Mat imgLayer = Java2DFrameUtils.toMat(bImage);
+        MatVector channels = new MatVector();
+        Mat imgLayerRGB = new Mat(bImage.getHeight(), bImage.getWidth(), org.bytedeco.javacpp.opencv_core.CV_8UC3);
+        org.bytedeco.javacpp.opencv_core.split(imgLayer, channels);
+        Mat blueCh = channels.get(1);
+        Mat greenCh = channels.get(2);
+        Mat redCh = channels.get(3);
+        MatVector channels2 = new MatVector(3);
+        channels2.put(0, redCh);
+        channels2.put(1, greenCh);
+        channels2.put(2, blueCh);
+        org.bytedeco.javacpp.opencv_core.merge(channels2, imgLayerRGB);
+		imwrite(file.getCanonicalPath(), imgLayerRGB);
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -347,8 +393,8 @@ public class Controller_3c_PeakDetectMean implements Initializable {
     void handleSeriesThickness(ActionEvent event) {
     	XYPlot plot = currentChart.getXYPlot();
     	//int thickness = main_package.getPlot_preferences().getLineThickness();
-        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default - 1)");
-        int new_thickness = Integer.parseInt(test1);
+        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default: 1)");
+        float new_thickness = Float.parseFloat(test1);
         if (new_thickness > 0) {
         	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
         	main_package.getPlot_preferences().setLineThickness(new_thickness);
@@ -796,8 +842,13 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	    @Override
 	    public void mouseReleased(MouseEvent e) {
 	        markerEnd = getPosition(e);
-	        plot.removeAnnotation(shapeAnnotation);
-	        updateMarker();
+	        try {
+	        	plot.removeAnnotation(shapeAnnotation);
+	        	updateMarker();
+			} catch (IllegalArgumentException z) {
+				// TODO: handle exception
+				z.printStackTrace();
+			}
 	    }
 	    
 	    @Override

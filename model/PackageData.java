@@ -43,7 +43,7 @@ public class PackageData  implements Serializable {
         return (rootDir == null) ? Paths.get(DEFAULT_DIRECTORY) : rootDir;
     }
 	
-	public PackageData() throws IOException, ClassNotFoundException {
+	public PackageData(Boolean load_pref) throws IOException, ClassNotFoundException {
 		exec = Executors.newFixedThreadPool(cores);
 		/*
 		exec = Executors.newSingleThreadExecutor(r -> {
@@ -54,7 +54,7 @@ public class PackageData  implements Serializable {
 		 */
 		File tmpDir = new File(getInitialDirectory().toFile().getAbsolutePath() + "/preferences.pref");
 		boolean exists = tmpDir.exists();
-		if (exists == true) {
+		if (exists == true && load_pref == true) {
 	        FileInputStream fin = new FileInputStream(tmpDir);
 			ObjectInputStream oin = new ObjectInputStream(fin);
 			PlotPreferences readCase = (PlotPreferences) oin.readObject();

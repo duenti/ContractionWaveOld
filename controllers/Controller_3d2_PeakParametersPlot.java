@@ -1,10 +1,14 @@
 package controllers;
 
+import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,6 +33,9 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.MatVector;
+import org.bytedeco.javacv.Java2DFrameUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtils;
@@ -85,6 +92,8 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
@@ -135,6 +144,9 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     @FXML
     private Button cmdNext;
     
+	@FXML
+	private CheckBox checkSeconds;
+	
     @FXML
     private TableView<Peak> timeTableView;
 
@@ -146,7 +158,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 
     @FXML
     private TableColumn<Peak, Double> tcCol;
-
+    
     @FXML
     private TableColumn<Peak, Double> trCol;
 
@@ -240,7 +252,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData());
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -273,6 +285,18 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
+    @FXML
+    void handleExportTXT(ActionEvent event) throws Exception{
+    	FileChooser fileChooser = new FileChooser();
+    	fileChooser.setInitialFileName("time-speed.txt");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdNext.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+		writeTSV(file);
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+    }
+    
     public void writeTSV(File file) throws Exception {
 	    Writer writer = null;
 	    try {
@@ -280,7 +304,11 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	        String text2 = "Time(s)\tSpeed(\u00B5/s)\n";
 	        writer.write(text2);
 	        
-	        for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
+//	        for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
+	        
+//		    for (int i = start; i < stop; i++) {
+		    for (int i = start; i < stop; i++) {
+
 				double average = currentGroup.getMagnitudeListValue(i);
 				writer.write(String.valueOf(i / fps_val));
 				writer.write(",");
@@ -306,7 +334,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		row.createCell(0).setCellValue("Time(s)");
 		row.createCell(1).setCellValue("Speed(\u00B5/s)");
 		
-		for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
+//		for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
+		for (int i = start; i < stop; i++) {
 			double average = currentGroup.getMagnitudeListValue(i);
 			row = spreadsheet.createRow(i + 1);
 			
@@ -359,7 +388,35 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
                 currentChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "File was saved successfully..");
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+    }
+    
+    @FXML
+    void handleExportTIFF(ActionEvent event) throws Exception{
+    	FileChooser fileChooser = new FileChooser();
+    	fileChooser.setInitialFileName("time-speed.tiff");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdNext.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+        ChartPanel panel = (ChartPanel) swgNode.getContent();
+        JFreeChart chart = panel.getChart();
+        BufferedImage bImage = chart.createBufferedImage(panel.getWidth(), panel.getHeight());
+        
+        Mat imgLayer = Java2DFrameUtils.toMat(bImage);
+        MatVector channels = new MatVector();
+        Mat imgLayerRGB = new Mat(bImage.getHeight(), bImage.getWidth(), org.bytedeco.javacpp.opencv_core.CV_8UC3);
+        org.bytedeco.javacpp.opencv_core.split(imgLayer, channels);
+        Mat blueCh = channels.get(1);
+        Mat greenCh = channels.get(2);
+        Mat redCh = channels.get(3);
+        MatVector channels2 = new MatVector(3);
+        channels2.put(0, redCh);
+        channels2.put(1, greenCh);
+        channels2.put(2, blueCh);
+        org.bytedeco.javacpp.opencv_core.merge(channels2, imgLayerRGB);
+		imwrite(file.getCanonicalPath(), imgLayerRGB);
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -375,6 +432,12 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     }
     
     @FXML
+    void handleExportAllTableXLS(ActionEvent event) throws Exception {
+    	exportTables("all-table.xls");
+    	JOptionPane.showMessageDialog(null, "File was saved successfully.");
+    }
+    
+    @FXML
     void handleExportTableTSV(ActionEvent event) throws Exception{
     	if (radioGroup.getSelectedToggle().getUserData().equals("time") == true) {
     		exportTable(timeTableView,1,"time-table.tsv"); 
@@ -382,6 +445,18 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     		exportTable(speedTableView,1,"speed-table.tsv");
     	} else {
     		exportTable(areaTableView,1,"area-table.tsv");
+    	}
+    	JOptionPane.showMessageDialog(null, "File was saved successfully.");
+    }
+    
+    @FXML
+    void handleExportTableTXT(ActionEvent event) throws Exception{
+    	if (radioGroup.getSelectedToggle().getUserData().equals("time") == true) {
+    		exportTable(timeTableView,1,"time-table.txt"); 
+    	} else if (radioGroup.getSelectedToggle().getUserData().equals("speed") == true) {
+    		exportTable(speedTableView,1,"speed-table.txt");
+    	} else {
+    		exportTable(areaTableView,1,"area-table.txt");
     	}
     	JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
@@ -648,8 +723,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     void handleSeriesThickness(ActionEvent event) {
     	XYPlot plot = currentChart.getXYPlot();
     	//int thickness = main_package.getPlot_preferences().getLineThickness();
-        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default - 1)");
-        int new_thickness = Integer.parseInt(test1);
+        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default: 1)");
+        float new_thickness = Float.parseFloat(test1);
         if (new_thickness > 0) {
         	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
         	main_package.getPlot_preferences().setLineThickness(new_thickness);
@@ -771,6 +846,62 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	    } 
 	}
     
+	
+	void createNewSheet(Sheet spreadsheet, TableView viewResultsTable) {
+		Row row = spreadsheet.createRow(0);
+		for (int j = 0; j < viewResultsTable.getColumns().size(); j++) {
+			if (j == 0) {
+				row.createCell(j).setCellValue(((TableColumn<Peak, String>) viewResultsTable.getColumns().get(j)).getText());
+			} else {
+				TableColumn<Peak, Double> a = (TableColumn<Peak, Double>) viewResultsTable.getColumns().get(j);
+				Label b = (Label) a.getGraphic();
+				row.createCell(j).setCellValue(b.getText());
+			}
+		}
+		for (int i = 0; i < viewResultsTable.getItems().size(); i++) {
+			row = spreadsheet.createRow(i + 1);
+			for (int j = 0; j < viewResultsTable.getColumns().size(); j++) {
+
+				if (j == 0) {
+					if(((TableColumnBase<Peak, String>) viewResultsTable.getColumns().get(j)).getCellData(i) != null) {
+						row.createCell(j).setCellValue(((TableColumnBase<Peak, String>) viewResultsTable.getColumns().get(j)).getCellData(i).toString()); 
+					}
+					else {
+						row.createCell(j).setCellValue("");
+					}
+					
+				} else {
+					if(((TableColumnBase<Peak, Double>) viewResultsTable.getColumns().get(j)).getCellData(i) != null) {
+						row.createCell(j).setCellValue(((TableColumnBase<Peak, Double>) viewResultsTable.getColumns().get(j)).getCellData(i).toString()); 
+					}
+					else {
+						row.createCell(j).setCellValue("");
+					}
+				}
+			}
+		}
+	}
+	
+	void exportTables(String filename) throws IOException {
+		Workbook workbook = new HSSFWorkbook();
+		Sheet spreadsheet = workbook.createSheet("time");
+		createNewSheet(spreadsheet, timeTableView);
+		Sheet spreadsheet2 = workbook.createSheet("speed");
+		createNewSheet(spreadsheet2, speedTableView);
+		Sheet spreadsheet3 = workbook.createSheet("area");
+		createNewSheet(spreadsheet3, areaTableView);
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialFileName(filename);
+	    Stage primaryStage;
+	    primaryStage = (Stage) cmdNext.getScene().getWindow();
+	    //Show save file dialog
+	    File file = fileChooser.showSaveDialog(primaryStage);
+		FileOutputStream fileOut = new FileOutputStream(file);
+		workbook.write(fileOut);
+		workbook.close();
+		fileOut.close();
+	}
+	
     void exportTable(TableView viewResultsTable, int type, String filename) throws Exception {
 		if (type == 0){
 			Workbook workbook = new HSSFWorkbook();
@@ -845,7 +976,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	commitColors();
 //    	((Controller_3e_ViewJetQuiverMerge)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, use_double, start, stop, step, timespeedlist);
-    	((Controller_3e_ViewJetQuiverMergeSingle)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, start, stop, step, intervalsList, maximum_list, minimum_list, first_points, fifth_points, timespeedlist, ask_saved);
+    	((Controller_3e_ViewJetQuiverMergeSingle)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, start, stop, step, intervalsList, maximum_list, minimum_list, first_points, fifth_points, timespeedlist, ask_saved, checkSeconds.isSelected());
     	primaryStage.setTitle("Image Optical Flow - Peak Parameters Plot");
 //    	primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -857,10 +988,13 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     
     
 	private int alertRAM(double frames){
+		System.out.println("querying available RAM");
 		double height = currentGroup.getHeight();
 		double width = currentGroup.getWidth();
 		double consumption = (frames * height * width * Double.BYTES) / (1024 * 1024);
 		double freeRAM = Runtime.getRuntime().freeMemory();
+		System.out.println(consumption);
+		System.out.println(freeRAM);
 		
 		if(consumption > freeRAM){
 			Alert alert = new Alert(AlertType.WARNING);
@@ -940,7 +1074,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
 			to_val = currentPeak.getEnd_point() + 1;
 		} else {
-			to_val = currentGroup.size() - 1;
+//			to_val = currentGroup.size() - 1;
+			to_val = currentGroup.size();
 		}
 		stop = to_val;
 		System.out.println("start , stop:");
@@ -951,11 +1086,52 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	areaTableView.getSelectionModel().selectFirst();
     	currentSelModel = timeTableView.getSelectionModel().getSelectedIndices().stream().collect(java.util.stream.Collectors.toList());
 //		currentSelModel = timeTableView.getSelectionModel().getSelectedIndices();
+    	resizeTable(timeTableView);
+    	resizeTable(speedTableView);
+    	resizeTable(areaTableView);
 	}
 	
 	
 	private List<Integer> currentSelModel = new ArrayList<Integer>();
 	
+	
+	@SuppressWarnings("unchecked")
+	public void resizeTable(TableView viewResultsTable) {
+		for (int j = 0; j < viewResultsTable.getColumns().size(); j++) {
+			if (j > 0) {
+				TableColumn<Peak, Double> a = (TableColumn<Peak, Double>) viewResultsTable.getColumns().get(j);
+				Label b = (Label) a.getGraphic();
+				Text theText = new Text(b.getText());
+//				double col_width = a.getWidth();
+				double col_width = a.widthProperty().get();
+				double text_width = theText.getBoundsInLocal().getWidth();
+				double text_f_size = theText.getFont().getSize();
+				String f_name = theText.getFont().getName();
+				double diff = col_width - text_width;
+				while (diff < 0 && text_f_size > 10) {
+					text_f_size -= 1;
+//					javafx.scene.text.Fontnew javafx.scene.text.Font(f_name, text_f_size);
+					theText.setFont(javafx.scene.text.Font.font(theText.getFont().getFamily(), FontWeight.SEMI_BOLD, text_f_size));
+					text_width = theText.getBoundsInLocal().getWidth();
+					diff = col_width - text_width;
+				}
+				((Label) ((TableColumn<Peak, Double>) viewResultsTable.getColumns().get(j)).getGraphic()).setFont( javafx.scene.text.Font.font(theText.getFont().getFamily(), FontWeight.SEMI_BOLD, theText.getFont().getSize()));
+
+			}
+		}
+//				TableColumn<Peak, Double> a = (TableColumn<Peak, Double>) viewResultsTable.getColumns().get(j);
+//				Label b = (Label) a.getGraphic();
+//				row.createCell(j).setCellValue(b.getText());
+//			}
+//		}
+//		for (int i = 0; i < viewResultsTable.getItems().size(); i++) {
+//			row = spreadsheet.createRow(i + 1);
+//			for (int j = 0; j < viewResultsTable.getColumns().size(); j++) {
+//		
+//				if (j == 0) {
+//					if(((TableColumnBase<Peak, String>) viewResultsTable.getColumns().get(j)).getCellData(i) != null) {
+		
+	}
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		timeRadio.setToggleGroup(radioGroup);
@@ -1102,7 +1278,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 					if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
 						to_val = currentPeak.getEnd_point() + 1;
 					} else {
-						to_val = currentGroup.size() - 1;
+//						to_val = currentGroup.size() - 1;
+						to_val = currentGroup.size();
 					}
 					if (final_from > from_val) {
 						final_from = from_val;
@@ -1174,7 +1351,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 					if (currentPeak.getEnd_point() + 1 <= currentGroup.size() - 1) {
 						to_val = currentPeak.getEnd_point() + 1;
 					} else {
-						to_val = currentGroup.size() - 1;
+//						to_val = currentGroup.size() - 1;
+						to_val = currentGroup.size();
 					}
 					if (final_from > from_val) {
 						final_from = from_val;
@@ -1228,49 +1406,60 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		
 		//Time Labels and Size
 		
-		Label tcrLabel = new Label("CRT");
+		Label tcrLabel = new Label("Contraction-Relaxation Time");
+//		Label tcrLabel = new Label("CRT");
 	    tcrLabel.setTooltip(new Tooltip("Contraction-Relaxation Time"));
 	    tcrCol.setText("");
 	    tcrCol.setGraphic(tcrLabel);
 		tcrCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label ctLabel = new Label("CT");
+		Label ctLabel = new Label("Contraction Time");
+//		Label ctLabel = new Label("CT");
 	    ctLabel.setTooltip(new Tooltip("Contraction Time"));
 	    tcCol.setText("");
 	    tcCol.setGraphic(ctLabel);
 		tcCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label rtLabel = new Label("RT");
+		Label rtLabel = new Label("Relaxation Time");
+//		Label rtLabel = new Label("RT");
 	    rtLabel.setTooltip(new Tooltip("Relaxation Time"));
 	    trCol.setText("");
 	    trCol.setGraphic(rtLabel);
 		trCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label vmcLabel = new Label("CT-VMC");
+		Label vmcLabel = new Label("Contraction Time up to VMC");
+//		Label vmcLabel = new Label("CT-VMC");
 	    vmcLabel.setTooltip(new Tooltip("Contraction Time up to VMC"));
 	    tc_vmcCol.setText("");
 	    tc_vmcCol.setGraphic(vmcLabel);
 		tc_vmcCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label vmcMinLabel = new Label("CT-MS");
+		Label vmcMinLabel = new Label("Contraction Time up to Minimum Speed");
+		
+//		Label vmcMinLabel = new Label("CT-MS");
 		vmcMinLabel.setTooltip(new Tooltip("Contraction Time up to Minimum Speed"));
 	    tc_vmc_minCol.setText("");
 	    tc_vmc_minCol.setGraphic(vmcMinLabel);
 		tc_vmc_minCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label tr_vmrLabel = new Label("RT-VMR");
+//		System.out.println(tc_vmc_minCol.getMaxWidth() - theText.getBoundsInLocal().getWidth());
+		
+		Label tr_vmrLabel = new Label("Relaxation Time up to VMR");
+//		Label tr_vmrLabel = new Label("RT-VMR");
 		tr_vmrLabel.setTooltip(new Tooltip("Relaxation Time up to VMR"));
 	    tr_vmrCol.setText("");
 	    tr_vmrCol.setGraphic(tr_vmrLabel);
 		tr_vmrCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label tr_vmr_bLabel = new Label("RT-B");
+		Label tr_vmr_bLabel = new Label("Relaxation Time up to Basal");
+//		Label tr_vmr_bLabel = new Label("RT-B");
 		tr_vmr_bLabel.setTooltip(new Tooltip("Relaxation Time up to Basal"));
 	    tr_vmr_bCol.setText("");
 	    tr_vmr_bCol.setGraphic(tr_vmr_bLabel);
 		tr_vmr_bCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label t_vmc_vmrLabel = new Label("MCS/MRS-DT");
+		Label t_vmc_vmrLabel = new Label("MCS/MRS Difference Time");
+//		Label t_vmc_vmrLabel = new Label("MCS/MRS-DT");
 		t_vmc_vmrLabel.setTooltip(new Tooltip("MCS/MRS Difference Time"));
 	    t_vmc_vmrCol.setText("");
 	    t_vmc_vmrCol.setGraphic(t_vmc_vmrLabel);
@@ -1281,19 +1470,22 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		
 		speedPosCol.setMaxWidth( 1f * Integer.MAX_VALUE * 25 );
 		
-		Label speedVMCLabel = new Label("MCS");
+//		Label speedVMCLabel = new Label("MCS");
+		Label speedVMCLabel = new Label("Maximum Contraction Speed");
 		speedVMCLabel.setTooltip(new Tooltip("Maximum Contraction Speed"));
 	    speedVMCCol.setText("");
 	    speedVMCCol.setGraphic(speedVMCLabel);
 		speedVMCCol.setMaxWidth( 1f * Integer.MAX_VALUE * 25 );
 		
-		Label speedVMRLabel = new Label("MRS");
+//		Label speedVMRLabel = new Label("MRS");
+		Label speedVMRLabel = new Label("Maximum Relaxation Speed");
 		speedVMRLabel.setTooltip(new Tooltip("Maximum Relaxation Speed"));
 	    speedVMRCol.setText("");
 	    speedVMRCol.setGraphic(speedVMRLabel);
 		speedVMRCol.setMaxWidth( 1f * Integer.MAX_VALUE * 25 );
 		
-		Label speed_DVMCVMRLabel = new Label("MCS/MRS-DS");
+		Label speed_DVMCVMRLabel = new Label("MCS/MRS Difference Speed");
+//		Label speed_DVMCVMRLabel = new Label("MCS/MRS-DS");
 		speed_DVMCVMRLabel.setTooltip(new Tooltip("MCS/MRS Difference Speed"));
 	    speed_DVMCVMRCol.setText("");
 	    speed_DVMCVMRCol.setGraphic(speed_DVMCVMRLabel);
@@ -1309,13 +1501,15 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		
 		areaPosCol.setMaxWidth( 1f * Integer.MAX_VALUE * 34 );
 		
-		Label speedAREATLabel = new Label("CRA");
+		Label speedAREATLabel = new Label("Contraction-Relaxation Area");
+//		Label speedAREATLabel = new Label("CRA");
 		speedAREATLabel.setTooltip(new Tooltip("Contraction-Relaxation Area"));
 	    speedAREATCol.setText("");
 	    speedAREATCol.setGraphic(speedAREATLabel);
 		speedAREATCol.setMaxWidth( 1f * Integer.MAX_VALUE * 33 );
 		
-		Label speedAREACLabel = new Label("SFA");
+		Label speedAREACLabel = new Label("Shortening Fraction Area");
+//		Label speedAREACLabel = new Label("SFA");
 		speedAREACLabel.setTooltip(new Tooltip("Shortening Fraction Area"));
 	    speedAREACCol.setText("");
 	    speedAREACCol.setGraphic(speedAREACLabel);
@@ -1348,6 +1542,27 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		speedAREATCol.setCellValueFactory(new PropertyValueFactory<Peak,Double>("area_t"));
 		speedAREACCol.setCellValueFactory(new PropertyValueFactory<Peak,Double>("area_c"));
 //		speedAREARCol.setCellValueFactory(new PropertyValueFactory<Peak,Double>("area_r"));
+		
+		ChangeListener<Number> stageSizeListener = new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+            	System.out.println("resizing all");
+    		   	resizeTable(timeTableView);
+    	    	resizeTable(speedTableView);
+    	    	resizeTable(areaTableView);
+            }
+        };
+		
+        timeTableView.widthProperty().addListener(stageSizeListener);
+        timeTableView.heightProperty().addListener(stageSizeListener);
+        checkSeconds.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+            	intervalPeaks.convertTime();
+            	timeTableView.refresh();
+            	writeLinePlot(start, stop);
+            }
+        });
 	}
 	
 	
@@ -1387,7 +1602,11 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		for (int i = min; i < max; i++) {
 			double average = currentGroup.getMagnitudeListValue(i);
 //			series1.add(i / fps_val, average * fps_val * pixel_val);
-			series1.add(i / fps_val, (average * fps_val * pixel_val) - average_value);
+			double new_time = i / fps_val;
+			if (checkSeconds.isSelected() == false) {
+				new_time *= 1000;
+			}
+			series1.add(new_time, (average * fps_val * pixel_val) - average_value);
 		}
 		//peak detection algorithm receives a group
         XYSeriesCollection dataset = new XYSeriesCollection();
@@ -1396,11 +1615,15 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     }
 	
 	
-	private JFreeChart createChart(XYDataset dataset, int min) {			
+	private JFreeChart createChart(XYDataset dataset, int min) {
+		String time_str =  "Time (s)";
+		if (checkSeconds.isSelected() == false) {
+			time_str = "Time (\u00B5s)";
+		}
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Main Plot",
-            "Time(s)",
-            "Speed(\u00B5m/s)",
+            time_str,
+            "Speed (\u00B5m/s)",
             dataset,
             PlotOrientation.VERTICAL,
             true,

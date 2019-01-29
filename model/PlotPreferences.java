@@ -21,7 +21,7 @@ public class PlotPreferences implements Serializable {
 	private Color rangeGridColorRGB;
 	private boolean gridlineDefaultState;
 	private boolean splineDefaultState;
-	private int lineThickness;
+	private float lineThickness;
 	private boolean drawAnnotations;
 	
 	public PlotPreferences(){
@@ -40,11 +40,11 @@ public class PlotPreferences implements Serializable {
 		gridlineDefaultState = true;
 		setSplineDefaultState(false);
 	}
-	public int getLineThickness() {
+	public float getLineThickness() {
 		return lineThickness;
 	}
-	public void setLineThickness(int thick) {
-		lineThickness = thick;
+	public void setLineThickness(float new_thickness) {
+		lineThickness = new_thickness;
 	}
 	public float getMarkerAlpha() {
 		return markerAlpha;

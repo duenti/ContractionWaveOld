@@ -1,5 +1,7 @@
 package controllers;
 
+import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
@@ -7,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,6 +37,9 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.MatVector;
+import org.bytedeco.javacv.Java2DFrameUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtils;
@@ -66,6 +72,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -73,10 +80,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
@@ -169,7 +179,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData());
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -199,7 +209,19 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         //Show save file dialog
         File file = fileChooser.showSaveDialog(primaryStage);
 		writeTSV(file);
-		JOptionPane.showMessageDialog(null, "The file were saved.");
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+    }
+    
+    @FXML
+    void handleExportTXT(ActionEvent event) throws Exception{
+    	FileChooser fileChooser = new FileChooser();
+    	fileChooser.setInitialFileName("time-speed.txt");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdNext.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+		writeTSV(file);
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     public void writeTSV(File file) throws Exception {
@@ -251,7 +273,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		workbook.write(fileOut);
 		workbook.close();
 		fileOut.close();
-		JOptionPane.showMessageDialog(null, "The file were saved.");
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -268,7 +290,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
                 currentZoomChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "The file were saved.");
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -285,7 +307,35 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
                 currentZoomChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "The file were saved.");
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+    }
+    
+    @FXML
+    void handleExportTIFF(ActionEvent event) throws Exception{
+    	FileChooser fileChooser = new FileChooser();
+    	fileChooser.setInitialFileName("time-speed.tiff");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdNext.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+        ChartPanel panel = (ChartPanel) swgChart.getContent();
+        JFreeChart chart = panel.getChart();
+        BufferedImage bImage = chart.createBufferedImage(panel.getWidth(), panel.getHeight());
+        
+        Mat imgLayer = Java2DFrameUtils.toMat(bImage);
+        MatVector channels = new MatVector();
+        Mat imgLayerRGB = new Mat(bImage.getHeight(), bImage.getWidth(), org.bytedeco.javacpp.opencv_core.CV_8UC3);
+        org.bytedeco.javacpp.opencv_core.split(imgLayer, channels);
+        Mat blueCh = channels.get(1);
+        Mat greenCh = channels.get(2);
+        Mat redCh = channels.get(3);
+        MatVector channels2 = new MatVector(3);
+        channels2.put(0, redCh);
+        channels2.put(1, greenCh);
+        channels2.put(2, blueCh);
+        org.bytedeco.javacpp.opencv_core.merge(channels2, imgLayerRGB);
+		imwrite(file.getCanonicalPath(), imgLayerRGB);
+		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -364,8 +414,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	XYPlot plot = currentChart.getXYPlot();
     	XYPlot plot2 = currentZoomChart.getXYPlot();
     	//int thickness = main_package.getPlot_preferences().getLineThickness();
-        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default - 1)");
-        int new_thickness = Integer.parseInt(test1);
+        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default: 1)");
+        float new_thickness = Float.parseFloat(test1);
         if (new_thickness > 0) {
         	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
         	plot2.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
@@ -654,7 +704,17 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 				first_points.clear();
 				fifth_points.clear();
 				writeLinePlotPop();
-				writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+				//redraw markers to avoid caos
+				XYPlot fplot = (XYPlot) currentChart.getPlot();
+//				intervalsList.clear();
+				for (IntervalMarker az : intervalsList) {
+					az.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
+					az.setAlpha(main_package.getPlot_preferences().getMarkerAlpha());
+					fplot.addDomainMarker(az,Layer.BACKGROUND);
+				}
+				writeFlowLinePlotZoom(last_min_zoom, last_max_zoom, last_addition);
+				//reset previous zoom
+				
 				main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
 			} catch (java.lang.Exception e) {
 				e.printStackTrace();
@@ -775,12 +835,17 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		valid_minimum_list.clear();
 		first_points.clear();
 		fifth_points.clear();
+		System.out.println("Resetted view");
 		writeLinePlotPop();
+		last_min_zoom = 0;
+		last_max_zoom = currentGroup.getMagnitudeSize();
+		last_addition = 0;
 		writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
 	}
 	
 	
 		
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		Image imgBack = new Image(getClass().getResourceAsStream("/left-arrow-angle.png"));
@@ -795,24 +860,29 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		tooltip6.setText("Display and Save Jet, Quiver and Merge plots");
 		cmdNext.setTooltip(tooltip6);
 		
-		spinnerDelta.setValueFactory(facGen(0.0, 10000.0, 1.0, 1.0));
+		SpinnerValueFactory deltaFac = facGen(0.0, 10000.0, 1.0, 1.0);
+		spinnerDelta.setValueFactory(deltaFac);
 		spinnerDelta.setEditable(true);
-		spinnerDelta.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-			try {
-				maximum_list.clear();
-				minimum_list.clear();
-				valid_maximum_list.clear();
-				valid_minimum_list.clear();
-				first_points.clear();
-				fifth_points.clear();
-				writeLinePlotPop();
-				writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-				main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
-			}
-	    });
-		spinnerDelta.focusedProperty().addListener((obs, oldValue, newValue) -> {
+		TextFormatter formatter = new TextFormatter(deltaFac.getConverter(), deltaFac.getValue());
+		spinnerDelta.getEditor().setTextFormatter(formatter);
+		// bidi-bind the values
+		deltaFac.valueProperty().bindBidirectional(formatter.valueProperty());
+		formatter.valueProperty().addListener((s, ov, nv) -> {
+		    // do stuff that needs to be done on commit
+//			intervalsList.clear();
+//			maximum_list.clear();
+//			minimum_list.clear();
+//			valid_maximum_list.clear();
+//			valid_minimum_list.clear();
+//			first_points.clear();
+//			fifth_points.clear();
+//			System.out.print("Delta change");
+//			writeLinePlotPop();
+//			last_min_zoom = 0;
+//			last_max_zoom = currentGroup.getMagnitudeSize();
+//			last_addition = 0;
+//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+//			main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
 			maximum_list.clear();
 			minimum_list.clear();
 			valid_maximum_list.clear();
@@ -820,97 +890,211 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 			first_points.clear();
 			fifth_points.clear();
 			writeLinePlotPop();
-			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+			//redraw markers to avoid caos
+			XYPlot fplot = (XYPlot) currentChart.getPlot();
+//			intervalsList.clear();
+			for (IntervalMarker az : intervalsList) {
+				az.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
+				az.setAlpha(main_package.getPlot_preferences().getMarkerAlpha());
+				fplot.addDomainMarker(az,Layer.BACKGROUND);
+			}
+			writeFlowLinePlotZoom(last_min_zoom, last_max_zoom, last_addition);
 			main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
-			if (newValue == false) {
-				spinnerDelta.increment(0);
-			} 
+			
 		});
-		
-		spinnerIntra.setValueFactory(facGen(0.0, 10000.0, 0.1, 0.01));
-		spinnerIntra.setEditable(true);
-		spinnerIntra.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-			try {
-				System.out.println("Change detected");
-				maximum_list.clear();
-				minimum_list.clear();
-				valid_maximum_list.clear();
-				valid_minimum_list.clear();
-				first_points.clear();
-				fifth_points.clear();
-				writeLinePlotPop();
-				writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-				main_package.setIntra(Double.valueOf(spinnerIntra.getValue()));
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
-			}
-	    });
-		spinnerIntra.focusedProperty().addListener((obs, oldValue, newValue) -> {
-			maximum_list.clear();
-			minimum_list.clear();
-			valid_maximum_list.clear();
-			valid_minimum_list.clear();
-			first_points.clear();
-			fifth_points.clear();
-			writeLinePlotPop();
-			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-			main_package.setIntra(Double.valueOf(spinnerIntra.getValue()));
-			if (newValue == false) {
-				spinnerIntra.increment(0);
-			} 
-		});
-		
-		spinnerInter.setValueFactory(facGen(0.0, 10000.0, 0.1, 0.01));
-		spinnerInter.setEditable(true);
-//		IncrementHandler handler5 = new IncrementHandler();
-//		spinnerInter.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, handler5);
-//		spinnerInter.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, evt -> {
-//	        Node node = evt.getPickResult().getIntersectedNode();
-//	        if (node.getStyleClass().contains("increment-arrow-button") ||
-//	            node.getStyleClass().contains("decrement-arrow-button")) {
-//	                if (evt.getButton() == MouseButton.PRIMARY) {
-//	                    handler5.stop();
-//	                }
-//	        }
-//	    });
-		spinnerInter.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-			try {
-				maximum_list.clear();
-				minimum_list.clear();
-				valid_maximum_list.clear();
-				valid_minimum_list.clear();
-				first_points.clear();
-				fifth_points.clear();
-				writeLinePlotPop();
-				writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-				main_package.setInter(Double.valueOf(spinnerInter.getValue()));
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
-			}
-	    });
-		spinnerInter.focusedProperty().addListener((obs, oldValue, newValue) -> {
-			maximum_list.clear();
-			minimum_list.clear();
-			valid_maximum_list.clear();
-			valid_minimum_list.clear();
-			first_points.clear();
-			fifth_points.clear();
-			writeLinePlotPop();
-			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-			main_package.setInter(Double.valueOf(spinnerInter.getValue()));
-	        if (newValue == false) {
-	        	spinnerInter.increment(0);
-	        } 
-		});
-//		spinnerInter.setOnScroll(event -> {
-//			if (event.getDeltaY() > 0) {
-//				spinnerInter.decrement();
-//			} else if (event.getDeltaY() < 0) {
-//				spinnerInter.increment();
+//		spinnerDelta.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				maximum_list.clear();
+//				minimum_list.clear();
+//				valid_maximum_list.clear();
+//				valid_minimum_list.clear();
+//				first_points.clear();
+//				fifth_points.clear();
+//				System.out.print("Delta change");
+//				writeLinePlotPop();
+//				last_min_zoom = 0;
+//				last_max_zoom = currentGroup.getMagnitudeSize();
+//				last_addition = 0;
+//				writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+//				main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
 //			}
+//	    });
+		
+		
+//		spinnerDelta.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//			maximum_list.clear();
+//			minimum_list.clear();
+//			valid_maximum_list.clear();
+//			valid_minimum_list.clear();
+//			first_points.clear();
+//			fifth_points.clear();
+//			System.out.print("Delta unfocus");
+//			writeLinePlotPop();
+//			last_min_zoom = 0;
+//			last_max_zoom = currentGroup.getMagnitudeSize();
+//			last_addition = 0;
+//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+//			main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
+//			if (newValue == false) {
+//				spinnerDelta.increment(0);
+//			} 
 //		});
 		
+		SpinnerValueFactory intraFac = facGen(0.0, 10000.0, 0.1, 0.01);
+		spinnerIntra.setValueFactory(intraFac);
+		spinnerIntra.setEditable(true);
 		
+		TextFormatter formatter2 = new TextFormatter(intraFac.getConverter(), intraFac.getValue());
+		intraFac.valueProperty().bindBidirectional(formatter2.valueProperty());
+		formatter2.valueProperty().addListener((s, ov, nv) -> {
+		    // do stuff that needs to be done on commit
+//			intervalsList.clear();
+//			maximum_list.clear();
+//			minimum_list.clear();
+//			valid_maximum_list.clear();
+//			valid_minimum_list.clear();
+//			first_points.clear();
+//			fifth_points.clear();
+//			System.out.print("Delta change");
+//			writeLinePlotPop();
+//			last_min_zoom = 0;
+//			last_max_zoom = currentGroup.getMagnitudeSize();
+//			last_addition = 0;
+//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+			maximum_list.clear();
+			minimum_list.clear();
+			valid_maximum_list.clear();
+			valid_minimum_list.clear();
+			first_points.clear();
+			fifth_points.clear();
+			writeLinePlotPop();
+			//redraw markers to avoid caos
+			XYPlot fplot = (XYPlot) currentChart.getPlot();
+//			intervalsList.clear();
+			for (IntervalMarker az : intervalsList) {
+				az.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
+				az.setAlpha(main_package.getPlot_preferences().getMarkerAlpha());
+				fplot.addDomainMarker(az,Layer.BACKGROUND);
+			}
+			writeFlowLinePlotZoom(last_min_zoom, last_max_zoom, last_addition);
+			main_package.setIntra(Double.valueOf(spinnerIntra.getValue()));
+		});
+		
+//		spinnerIntra.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				System.out.println("Change detected");
+//				maximum_list.clear();
+//				minimum_list.clear();
+//				valid_maximum_list.clear();
+//				valid_minimum_list.clear();
+//				first_points.clear();
+//				fifth_points.clear();
+//				System.out.print("Intra change");
+//				writeLinePlotPop();
+//				last_min_zoom = 0;
+//				last_max_zoom = currentGroup.getMagnitudeSize();
+//				last_addition = 0;
+//				writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+//				main_package.setIntra(Double.valueOf(spinnerIntra.getValue()));
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		spinnerIntra.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//			maximum_list.clear();
+//			minimum_list.clear();
+//			valid_maximum_list.clear();
+//			valid_minimum_list.clear();
+//			first_points.clear();
+//			fifth_points.clear();
+//			System.out.print("Intra unfocus");
+//			writeLinePlotPop();
+//			last_min_zoom = 0;
+//			last_max_zoom = currentGroup.getMagnitudeSize();
+//			last_addition = 0;
+//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+//			main_package.setIntra(Double.valueOf(spinnerIntra.getValue()));
+//			if (newValue == false) {
+//				spinnerIntra.increment(0);
+//			} 
+//		});
+		SpinnerValueFactory interFac = facGen(0.0, 10000.0, 0.1, 0.01);
+		spinnerInter.setValueFactory(interFac);
+		spinnerInter.setEditable(true);
+		TextFormatter formatter3 = new TextFormatter(interFac.getConverter(), interFac.getValue());
+		interFac.valueProperty().bindBidirectional(formatter3.valueProperty());
+		formatter3.valueProperty().addListener((s, ov, nv) -> {
+		    // do stuff that needs to be done on commit
+//			intervalsList.clear();
+//			maximum_list.clear();
+//			minimum_list.clear();
+//			valid_maximum_list.clear();
+//			valid_minimum_list.clear();
+//			first_points.clear();
+//			fifth_points.clear();
+//			System.out.print("Delta change");
+//			writeLinePlotPop();
+//			last_min_zoom = 0;
+//			last_max_zoom = currentGroup.getMagnitudeSize();
+//			last_addition = 0;
+//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+			maximum_list.clear();
+			minimum_list.clear();
+			valid_maximum_list.clear();
+			valid_minimum_list.clear();
+			first_points.clear();
+			fifth_points.clear();
+			writeLinePlotPop();
+			//redraw markers to avoid caos
+			XYPlot fplot = (XYPlot) currentChart.getPlot();
+//			intervalsList.clear();
+			for (IntervalMarker az : intervalsList) {
+				az.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
+				az.setAlpha(main_package.getPlot_preferences().getMarkerAlpha());
+				fplot.addDomainMarker(az,Layer.BACKGROUND);
+			}
+			writeFlowLinePlotZoom(last_min_zoom, last_max_zoom, last_addition);
+			main_package.setInter(Double.valueOf(spinnerInter.getValue()));
+		});
+//		spinnerInter.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				maximum_list.clear();
+//				minimum_list.clear();
+//				valid_maximum_list.clear();
+//				valid_minimum_list.clear();
+//				first_points.clear();
+//				fifth_points.clear();
+//				System.out.print("Inter change");
+//				writeLinePlotPop();
+//				last_min_zoom = 0;
+//				last_max_zoom = currentGroup.getMagnitudeSize();
+//				last_addition = 0;
+//				writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+//				main_package.setInter(Double.valueOf(spinnerInter.getValue()));
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		spinnerInter.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//			maximum_list.clear();
+//			minimum_list.clear();
+//			valid_maximum_list.clear();
+//			valid_minimum_list.clear();
+//			first_points.clear();
+//			fifth_points.clear();
+//			System.out.print("Inter unfocus");
+//			writeLinePlotPop();
+//			last_min_zoom = 0;
+//			last_max_zoom = currentGroup.getMagnitudeSize();
+//			last_addition = 0;
+//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
+//			main_package.setInter(Double.valueOf(spinnerInter.getValue()));
+//	        if (newValue == false) {
+//	        	spinnerInter.increment(0);
+//	        } 
+//		});
 	}
 	
 	@FXML
@@ -1329,7 +1513,11 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 				linepanel2
 				);
 	}
-		
+	
+	private double last_min_zoom;
+	private double last_max_zoom;
+	private int last_addition;
+	
 	private final class MouseMarker extends MouseAdapter{
 	    private List<IntervalMarker> markers;
 	    private Double markerStart = Double.NaN;
@@ -1375,6 +1563,9 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		                	}
 		                }
 		                currentMarker += 1;
+		                last_min_zoom = v1;
+		                last_max_zoom = v2;
+		                last_addition = addition;
 		                writeFlowLinePlotZoom(v1, v2, addition);
 		                //marker.setPaint(new java.awt.Color(0xDD, 0xFF, 0xDD, 0x80));
 		                marker.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
@@ -1396,8 +1587,13 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	    @Override
 	    public void mouseReleased(MouseEvent e) {
 	        markerEnd = getPosition(e);
-	        plot.removeAnnotation(shapeAnnotation);
-	        updateMarker();
+	        try {
+	        	plot.removeAnnotation(shapeAnnotation);
+	        	updateMarker();
+			} catch (IllegalArgumentException z) {
+				// TODO: handle exception
+				z.printStackTrace();
+			}
 	    }
 
 	    @Override
@@ -1469,6 +1665,9 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 				                		break;
 				                	}
 				                }
+				                last_min_zoom = new_start;
+				                last_max_zoom = new_end;
+				                last_addition = addition;
 				                writeFlowLinePlotZoom(new_start, new_end, addition);
 				                currentMarker -= 1;
 		    				} else  {
@@ -1483,9 +1682,15 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 					                		break;
 					                	}
 					                }
+					                last_min_zoom = new_start;
+					                last_max_zoom = new_end;
+					                last_addition = addition;
 					                writeFlowLinePlotZoom(new_start, new_end, addition);
 					                currentMarker += 1;
 		    					} else {
+		    						last_min_zoom = 0;
+		    						last_max_zoom = currentGroup.getMagnitudeSize();
+		    						last_addition = 0;
 		    						writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
 		    						currentMarker = -1;
 		    					}
@@ -1494,6 +1699,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	    					currentMarker -= 1;
 	    				}
 	    				markers.remove(i);
+//	    				intervalsList = markers;
 	    				plot.removeDomainMarker(im,Layer.BACKGROUND);
 	    				return;
 	    			}

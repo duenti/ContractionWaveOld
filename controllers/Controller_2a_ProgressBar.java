@@ -101,7 +101,7 @@ public class Controller_2a_ProgressBar implements Initializable {
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData());
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);

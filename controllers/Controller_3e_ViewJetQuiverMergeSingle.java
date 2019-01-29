@@ -4,9 +4,13 @@ import static org.bytedeco.javacpp.opencv_core.CV_8U;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
+import java.awt.AWTException;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
@@ -57,6 +61,16 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import controllers.Controller_3b2_DisplayResults.IncrementHandler;
 import edu.mines.jtk.awt.ColorMap;
+import io.humble.video.Codec;
+import io.humble.video.Encoder;
+import io.humble.video.MediaPacket;
+import io.humble.video.MediaPicture;
+import io.humble.video.Muxer;
+import io.humble.video.MuxerFormat;
+import io.humble.video.Property;
+import io.humble.video.Rational;
+import io.humble.video.awt.MediaPictureConverter;
+import io.humble.video.awt.MediaPictureConverterFactory;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -72,6 +86,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
+import javafx.geometry.VPos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -97,13 +112,16 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
 import model.Group;
@@ -153,10 +171,18 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	private List<Integer> fifth_points;
 	private ImageView toSaveView = new ImageView();
 	private Timeline sliderTimer;
+	private Timeline sliderTimerOnce;
 		
 	@FXML
 	void handleMenuNewImage(ActionEvent event) throws IOException{
 		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+		if (sliderState == true) {
+			sliderState = false;
+			sliderTimer.stop();
+		}
+		if (imageDstate == true) {
+			dialogImage.close();
+		}
 		URL url = getClass().getResource("FXML_2b_ImagesNew.fxml");
 		main_package.getListFlows().clear();
 		FileReader.chooseSourceDirectory(primaryStage, url, main_package);
@@ -165,6 +191,13 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	@FXML
 	void handleMenuNewVideo(ActionEvent event) throws IOException{
 		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+		if (sliderState == true) {
+			sliderState = false;
+			sliderTimer.stop();
+		}
+		if (imageDstate == true) {
+			dialogImage.close();
+		}
 		URL url = getClass().getResource("FXML_2b_ImagesNew.fxml");
 		main_package.getListFlows().clear();
 		FileReader.chooseVideoFiles(primaryStage, url, main_package);
@@ -173,12 +206,26 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	@FXML
 	void handleClose(ActionEvent event){
 		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+		if (sliderState == true) {
+			sliderState = false;
+			sliderTimer.stop();
+		}
+		if (imageDstate == true) {
+			dialogImage.close();
+		}
 		primaryStage.close();
 	}
 
 	@FXML
 	void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
 		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+		if (sliderState == true) {
+			sliderState = false;
+			sliderTimer.stop();
+		}
+		if (imageDstate == true) {
+			dialogImage.close();
+		}
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
@@ -191,7 +238,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 		main_package.getListFlows().clear();
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData());
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -243,6 +290,16 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         return (rootDir == null) ? Paths.get(DEFAULT_DIRECTORY) : rootDir;
     }
 	
+	private boolean save_as_video = false;
+	//private List<BufferedImage> videoImage = new ArrayList<BufferedImage>();
+	
+	private BufferedImage videoImage = null;
+	
+	void saveCurrentImageVideo(Image this_img) {
+    	BufferedImage bImage = SwingFXUtils.fromFXImage(this_img, null);
+    	videoImage = bImage;
+	}
+	
     void saveCurrentImageView(Image this_img) throws IOException {
     	System.out.println("Trying to save image 2");
         //Show save file dialog
@@ -255,21 +312,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	if (bImage == null) {
     		System.out.println("Null Buffer");
     	}
-//    	try {
     		System.out.println("Saving....");
-//    		if (save_type.equals("jpg")) {
-    			//URL url = new URL(sUrl);
-//    			Image img = Toolkit.getDefaultToolkit().createImage(url);
-//
-//    			PixelGrabber pg = new PixelGrabber(img, 0, 0, -1, -1, true);
-//    			pg.grabPixels();
-//    			int width = pg.getWidth(), height = pg.getHeight();
-//
-//    			DataBuffer buffer = new DataBufferInt((int[]) pg.getPixels(), pg.getWidth() * pg.getHeight());
-//    			WritableRaster raster = Raster.createPackedRaster(buffer, width, height, width, RGB_MASKS, null);
-//    			BufferedImage bi = new BufferedImage(RGB_OPAQUE, raster, false, null);
-    			
-//    		}
     		Mat imgMat = Java2DFrameUtils.toMat(bImage);
     		
     		MatVector channels_a = new MatVector();
@@ -285,20 +328,6 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        org.bytedeco.javacpp.opencv_core.merge(channels2_a, finalMat);
 	        
     		imwrite(current_filename, finalMat);
-//    	}
-    		//ImageIO.write(bImage, save_type, file);
-//    	} catch (IOException e) {
-//    		throw new RuntimeException(e);
-//    	}
-        
-//        if (file != null) {
-//        	BufferedImage bImage = SwingFXUtils.fromFXImage(toSaveView.getImage(), null);
-//            try {
-//              ImageIO.write(bImage, type, file);
-//            } catch (IOException e) {
-//              throw new RuntimeException(e);
-//            }
-//        }
     }
     
 	@FXML
@@ -342,6 +371,27 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		returnCursor();
     	JOptionPane.showMessageDialog(null, "Files saved successfully");
 	}
+	
+	@FXML
+	void handleExportJetTIFF(ActionEvent event) throws IOException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+//    	Stage dialog = new Stage();
+//    	dialog.initOwner(primaryStage);
+//    	dialog.initModality(Modality.APPLICATION_MODAL); 
+        File chosenDir = chooser.showDialog(primaryStage);
+        waitCursor();
+		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
+	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Jet" +".tiff";
+	    	save_type = "tiff";
+			renderImageView(i, "Jet", true);
+		}
+		returnCursor();
+    	JOptionPane.showMessageDialog(null, "Files saved successfully");
+	}
 
 	@FXML
 	void handleExportJetPNG(ActionEvent event) throws IOException {
@@ -360,6 +410,90 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		returnCursor();
     	JOptionPane.showMessageDialog(null, "Files saved successfully");
 	}
+	
+	public static BufferedImage convertBufToType (BufferedImage sourceImage, int targetType) {
+        // if the source image is already the target type, return the source image
+		BufferedImage image;
+        if (sourceImage.getType() == targetType) {
+            image = sourceImage;
+        }
+        else {
+            image = new BufferedImage(sourceImage.getWidth(), sourceImage.getHeight(), targetType);
+            image.getGraphics().drawImage(sourceImage, 0, 0, null);
+        }
+        return image;
+	}
+	
+	void genericVideoExportation(String type_do) throws IOException, InterruptedException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+        File chosenDir = chooser.showDialog(primaryStage);
+        current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() + "_" + type_do + ".mp4";
+        waitCursor();
+        save_as_video = true;
+        Rational framerate_do = Rational.make(1, (int)frameRate);
+        Muxer muxer = Muxer.make(current_filename, null, "mp4");
+        MuxerFormat format = muxer.getFormat();
+        Codec codec = Codec.findEncodingCodec(format.getDefaultVideoCodecId());
+//        System.out.println(codec.toString());
+//        System.out.println(codec.getName());
+        Encoder encoder = Encoder.make(codec);
+        encoder.setWidth(width);
+        encoder.setHeight(height);
+//        System.out.println(width);
+//        System.out.println(height);
+//        System.out.println(encoder.getWidth());
+//        System.out.println(encoder.getHeight());
+        io.humble.video.PixelFormat.Type pixelformat = io.humble.video.PixelFormat.Type.PIX_FMT_YUV420P;
+        encoder.setPixelFormat(pixelformat);
+        encoder.setTimeBase(framerate_do);
+        encoder.setProperty("b", 0);
+        //io.humble.video.Property
+        if (format.getFlag(MuxerFormat.Flag.GLOBAL_HEADER)) {
+            encoder.setFlag(Encoder.Flag.FLAG_GLOBAL_HEADER, true);
+        }
+        encoder.open(null, null);
+        muxer.addNewStream(encoder);
+        muxer.open(null, null);
+        MediaPictureConverter converter = null;
+        MediaPicture picture = MediaPicture.make(encoder.getWidth(), encoder.getHeight(), pixelformat);
+        picture.setTimeBase(framerate_do);
+        MediaPacket packet = MediaPacket.make();
+		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
+			renderImageView(i, type_do, true);
+			//add videoImage to created video
+			 BufferedImage screen = convertBufToType(videoImage, BufferedImage.TYPE_3BYTE_BGR);
+			 if (converter == null) {
+				 converter = MediaPictureConverterFactory.createConverter(screen, picture);
+			 }
+			 converter.toPicture(picture, screen, i);
+			 do {
+				 encoder.encode(packet, picture);
+				 if (packet.isComplete()) {
+					 muxer.write(packet, false);
+				 }
+			 } while (packet.isComplete());
+//			 Thread.sleep((long) (1000 * framerate_do.getDouble()));
+		}
+		do {
+			encoder.encode(packet, null);
+			if (packet.isComplete()) {
+				muxer.write(packet, false);
+			}
+		} while (packet.isComplete());
+		muxer.close();
+		save_as_video = false;
+		returnCursor();
+    	JOptionPane.showMessageDialog(null, "File saved successfully");
+	}
+	
+	@FXML
+	void handleExportJetAVI(ActionEvent event) throws IOException, InterruptedException {
+		genericVideoExportation("Jet");
+	}
 
 	@FXML
 	void handleExportMergeBothJPG(ActionEvent event) throws IOException {
@@ -371,8 +505,26 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MergeJetQuiver"  +".jpg";
+	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetQuiverMerge"  +".jpg";
 	    	save_type = "jpg";
+			renderImageView(i, "JetQuiverMerge", true);
+		}
+		returnCursor();
+    	JOptionPane.showMessageDialog(null, "Files saved successfully");
+	}
+	
+	@FXML
+	void handleExportMergeBothTIFF(ActionEvent event) throws IOException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+        File chosenDir = chooser.showDialog(primaryStage);
+        waitCursor();
+		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
+	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetQuiverMerge"  +".tiff";
+	    	save_type = "tiff";
 			renderImageView(i, "JetQuiverMerge", true);
 		}
 		returnCursor();
@@ -389,12 +541,17 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MergeJetQuiver" +".png";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetQuiverMerge" +".png";
 	    	save_type = "png";
 			renderImageView(i, "JetQuiverMerge", true);
 		}
 		returnCursor();
     	JOptionPane.showMessageDialog(null, "Files saved successfully");
+	}
+	
+	@FXML
+	void handleExportMergeBothAVI(ActionEvent event) throws IOException, InterruptedException {
+		genericVideoExportation("JetQuiverMerge");
 	}
 
 	@FXML
@@ -407,8 +564,26 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MergeJet" +".jpg";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetMerge" +".jpg";
 	    	save_type = "jpg";
+			renderImageView(i, "JetMerge", true);
+		}
+		returnCursor();
+    	JOptionPane.showMessageDialog(null, "Files saved successfully");
+	}
+	
+	@FXML
+	void handleExportMergeJetTIFF(ActionEvent event) throws IOException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+        File chosenDir = chooser.showDialog(primaryStage);
+        waitCursor();
+		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetMerge" +".tiff";
+	    	save_type = "tiff";
 			renderImageView(i, "JetMerge", true);
 		}
 		returnCursor();
@@ -425,12 +600,17 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MergeJet" +".png";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetMerge" +".png";
 	    	save_type = "png";
 			renderImageView(i, "JetMerge", true);
 		}
 		returnCursor();
     	JOptionPane.showMessageDialog(null, "Files saved successfully");
+	}
+	
+	@FXML
+	void handleExportMergeJetAVI(ActionEvent event) throws IOException, InterruptedException {
+		genericVideoExportation("JetMerge");
 	}
 
 	@FXML
@@ -443,8 +623,26 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MergeQuiver"  +".jpg";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_QuiverMerge"  +".jpg";
 	    	save_type = "jpg";
+			renderImageView(i, "QuiverMerge", true);
+		}
+		returnCursor();
+    	JOptionPane.showMessageDialog(null, "Files saved successfully");
+	}
+	
+	@FXML
+	void handleExportMergeQuiverTIFF(ActionEvent event) throws IOException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+        File chosenDir = chooser.showDialog(primaryStage);
+        waitCursor();
+		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_QuiverMerge"  +".tiff";
+	    	save_type = "tiff";
 			renderImageView(i, "QuiverMerge", true);
 		}
 		returnCursor();
@@ -461,12 +659,17 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i+ "_MergeQuiver" +".png";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i+ "_QuiverMerge" +".png";
 	    	save_type = "png";
 			renderImageView(i, "QuiverMerge", true);
 		}
 		returnCursor();
     	JOptionPane.showMessageDialog(null, "Files saved successfully");
+	}
+	
+	@FXML
+	void handleExportMergeQuiverAVI(ActionEvent event) throws IOException, InterruptedException {
+		genericVideoExportation("QuiverMerge");
 	}
 
 	@FXML
@@ -485,6 +688,29 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		}
 		returnCursor();
     	JOptionPane.showMessageDialog(null, "Files saved successfully");
+	}
+	
+	@FXML
+	void handleExportQuiverTIFF(ActionEvent event) throws IOException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+        File chosenDir = chooser.showDialog(primaryStage);
+        waitCursor();
+		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Quiver" +".tiff";
+	    	save_type = "tiff";
+			renderImageView(i, "Quiver", true);
+		}
+		returnCursor();
+    	JOptionPane.showMessageDialog(null, "Files saved successfully");
+	}
+	
+	@FXML
+	void handleExportQuiverAVI(ActionEvent event) throws IOException, InterruptedException {
+		genericVideoExportation("Quiver");
 	}
 
 	@FXML
@@ -524,6 +750,24 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	}
 	
 	@FXML
+	void handleExportJetQuiverTIFF(ActionEvent event) throws IOException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+        File chosenDir = chooser.showDialog(primaryStage);
+        waitCursor();
+		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetQuiver"+".tiff";
+	    	save_type = "tiff";
+			renderImageView(i, "JetQuiver", true);
+		}
+		returnCursor();
+    	JOptionPane.showMessageDialog(null, "Files saved successfully");
+	}
+	
+	@FXML
 	void handleExportJetQuiverPNG(ActionEvent event) throws IOException {
     	DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Saving path selection:");
@@ -542,6 +786,11 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	}
 	
 	@FXML
+	void handleExportJetQuiverAVI(ActionEvent event) throws IOException, InterruptedException {
+		genericVideoExportation("JetQuiver");
+	}
+	
+	@FXML
 	void handleExportCurrentJPG(ActionEvent event) throws IOException {
     	DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Saving path selection:");
@@ -552,6 +801,22 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         waitCursor();
 		current_filename =chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +current_index + "_Current" +".jpg";
 	    save_type = "jpg";
+		renderImageView(current_index, currentRenderType , true);
+		returnCursor();
+	    JOptionPane.showMessageDialog(null, "File saved successfully");
+	}
+	
+	@FXML
+	void handleExportCurrentTIFF(ActionEvent event) throws IOException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+        File chosenDir = chooser.showDialog(primaryStage);
+        waitCursor();
+		current_filename =chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +current_index + "_Current" +".tiff";
+	    save_type = "tiff";
 		renderImageView(current_index, currentRenderType , true);
 		returnCursor();
 	    JOptionPane.showMessageDialog(null, "File saved successfully");
@@ -573,16 +838,19 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	    JOptionPane.showMessageDialog(null, "File saved successfully");
 	}
 	
+	private boolean sliderState = false;
 	@FXML
 	void handlePlayStopButton(ActionEvent event){
 		System.out.println(cmdSliderPlay.getText());
 		if(cmdSliderPlay.getText().equals("Play")){
 			System.out.println("Play");
+			sliderState = true;
 			sliderTimer.play();
 			
 			cmdSliderPlay.setText("Stop");
 		}else{
 			System.out.println("Stop");
+			sliderState = false;
 			sliderTimer.stop();
 			
 			cmdSliderPlay.setText("Play");
@@ -633,6 +901,9 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	
 	@FXML
 	private Button cmdSliderPlay;
+	
+	@FXML
+	private HBox emptyBoxSize;
     
     private JFreeChart currentChart;
 	private double lowerBoundDomain;
@@ -706,8 +977,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     void handleSeriesThickness(ActionEvent event) {
     	XYPlot plot = currentChart.getXYPlot();
     	//int thickness = main_package.getPlot_preferences().getLineThickness();
-        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default - 1)");
-        int new_thickness = Integer.parseInt(test1);
+        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default: 1)");
+        float new_thickness = Float.parseFloat(test1);
         if (new_thickness > 0) {
         	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
         	main_package.getPlot_preferences().setLineThickness(new_thickness);
@@ -874,6 +1145,13 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     @FXML
     void back(ActionEvent event) throws ClassNotFoundException, IOException {
 		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+		if (sliderState == true) {
+			sliderState = false;
+			sliderTimer.stop();
+		}
+		if (imageDstate == true) {
+			dialogImage.close();
+		}
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_3d2_PeakParametersPlot.fxml");
@@ -991,10 +1269,10 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	Label label4 = new Label("Kernel Smoothing: ");
     	Label label5 = new Label("Border Width: ");
     	Label label6 = new Label("Sigma Value: ");
-    	Label label7 = new Label("Merge Alpha Background: ");
-    	Label label8 = new Label("Merge Alpha Foreground: ");
-    	Label label9 = new Label("Merge Alpha Background 2: ");
-    	Label label10 = new Label("Merge Alpha Foreground 2: ");
+    	Label label7 = new Label("Bg Alpha Image: ");
+    	Label label8 = new Label("Bg Alpha Jet: ");
+    	Label label9 = new Label("Bg Alpha Image (Layer2): ");
+    	Label label10 = new Label("Bg Alpha Quiver: ");
     	Spinner<Integer> blurSpin = new Spinner<Integer>();
     	Spinner<Integer> dilationSpin= new Spinner<Integer>();
     	Spinner<Integer> erosionSpin = new Spinner<Integer>();
@@ -1313,8 +1591,10 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	}
     }
 
+    private boolean checkSec;
+    private double frameRate = 1;
     
-    public void setContext(PackageData main_package_data, Group g1, double fps_value1, double pixel_value1, double average_value1, double upper_limit1, int start, int stop, int step, List<IntervalMarker> intervalsList2, List<Integer> maximum_list2, List<Integer> minimum_list2, List<Integer> first_points2, List<Integer> fifth_points2, List<TimeSpeed> timespeedlist2, boolean saved) throws IOException{
+    public void setContext(PackageData main_package_data, Group g1, double fps_value1, double pixel_value1, double average_value1, double upper_limit1, int start, int stop, int step, List<IntervalMarker> intervalsList2, List<Integer> maximum_list2, List<Integer> minimum_list2, List<Integer> first_points2, List<Integer> fifth_points2, List<TimeSpeed> timespeedlist2, boolean saved, boolean checkSec1) throws IOException{
     	main_package = main_package_data;
 		currentGroup = g1;
 		fps_value = fps_value1;
@@ -1330,12 +1610,15 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		minimum_list = minimum_list2;
 		first_points = first_points2;
 		fifth_points = fifth_points2;
+		checkSec = checkSec1;
 		width = currentGroup.getWidth();
 		height = currentGroup.getHeight();
 		ask_saved = saved;
     	current_index = 0;
+    	writeLinePlot(start, stop);
 		sliderGroups.setMin(1);
-		sliderGroups.setMax(main_package.getListFlows().size() + 1);
+//		sliderGroups.setMax(main_package.getListFlows().size() + 1);
+		sliderGroups.setMax(main_package.getListFlows().size());
 		sliderGroups.setValue(1);
 		sliderGroups.setBlockIncrement(1.0);
 		sliderGroups.setMajorTickUnit(1.0);
@@ -1345,7 +1628,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		sliderGroups.setSnapToTicks(true);
 		jetCheck.setSelected(true);
 		constructRenderType();
-    	writeLinePlot(start, stop);
+//		renderImageScale();
     }
     
     
@@ -1372,14 +1655,28 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	private void createSliderAnimation(double seconds){
 		sliderTimer = new Timeline(new KeyFrame(Duration.seconds(seconds), event -> {
 		    double i = sliderGroups.getValue();
-		    if(i >= sliderGroups.getMax())
+		    if(i >= sliderGroups.getMax()) {
 		    	sliderGroups.setValue(1);
-		    else
+		    }
+		    else {
 		    	sliderGroups.setValue(i+1);
+		    }
 		}));
 		sliderTimer.setCycleCount(Timeline.INDEFINITE);
 	}
     
+	private ControllerImage image_controller = null;
+	private Stage dialogImage;
+	private boolean imageDstate = false;
+	
+	public boolean isImageDState() {
+		return imageDstate;
+	}
+	
+	public void closeDialogImageStage() {
+		this.dialogImage.close();
+	}
+	
     @Override
 	public void initialize(URL location, ResourceBundle resources) {
 		Image imgBack = new Image(getClass().getResourceAsStream("/left-arrow-angle.png"));
@@ -1450,10 +1747,13 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		spinnerFPS.getEditor().textProperty().addListener((obs,oldValue,newValue) ->{
 			if (!"".equals(newValue)) {
 				int newFPS = Integer.valueOf(newValue);
+				frameRate = newFPS;
 				double frameSeconds = 1.0/(double)newFPS;
+				sliderState = false;
 				sliderTimer.stop();
 				createSliderAnimation(frameSeconds);
 				if(cmdSliderPlay.getText().equals("Stop")){
+					sliderState = true;
 					sliderTimer.play();
 				}				
 			}
@@ -1551,7 +1851,104 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        } 
 		});
 		
+		ChangeListener<Number> gridSizeListenerWidth = new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//            	System.out.println("width resize:");
+            	double newValue2 = newValue.doubleValue();
+//            	System.out.println(newValue2);
+            	if (imgview1.getFitWidth() < width) {
+//            		System.out.println("Changed width");
+//            		System.out.println(imgview1.getFitHeight());
+            		imgview1.setFitWidth(newValue2 * 9);
+//            		System.out.println(imgview1.getFitWidth());
+//            		renderImageScale();
+            	}
+        		renderImageScale();
+            }
+        };
+        
+		ChangeListener<Number> gridSizeListenerHeight = new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//            	System.out.println("height resize:");
+            	double newValue2 = newValue.doubleValue();
+//            	System.out.println(newValue2);
+            	if (imgview1.getFitHeight() < height) {
+//            		System.out.println("Changed height");
+//            		System.out.println(imgview1.getFitHeight());
+            		imgview1.setFitHeight(newValue2 * 8);
+//            		System.out.println(imgview1.getFitHeight());
+//            		renderImageScale();
+            	}
+        		renderImageScale();
+            }
+        };
 		
+		emptyBoxSize.widthProperty().addListener(gridSizeListenerWidth);
+		emptyBoxSize.heightProperty().addListener(gridSizeListenerHeight);
+		
+		//Imageview, on double click:
+		imgview1.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		    @Override
+		    public void handle(MouseEvent mouseEvent) {
+		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+		            if(mouseEvent.getClickCount() == 2){
+		                System.out.println("Double clicked");
+		                dialogImage = new Stage();    
+		        		URL url = getClass().getResource("FXML_Image.fxml");
+		            	FXMLLoader fxmlloader2 = new FXMLLoader();
+//		            	image_controller = new ControllerImage();
+		            	fxmlloader2.setLocation(url);
+		            	fxmlloader2.setBuilderFactory(new JavaFXBuilderFactory());
+//		            	fxmlloader.setController(image_controller);
+
+		            	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+//		            	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
+		            	double windowWidth = screenSize.getWidth() * 0.8;
+		            	double windowHeight = screenSize.getHeight() * 0.8;
+		            	if (width < windowWidth) {
+		            		windowWidth = width;
+		            	}
+		            	if (height < windowHeight) {
+		            		windowHeight = height;
+		            	}
+		            	Parent root;
+		            	try {
+							root = fxmlloader2.load();
+			            	Scene imageScene = new Scene(root, windowWidth, windowHeight);
+			            	((ControllerImage)fxmlloader2.getController()).setContext(windowWidth, windowHeight);
+			            	((ControllerImage)fxmlloader2.getController()).setImage(imgview1.getImage());
+			            	image_controller = (ControllerImage)fxmlloader2.getController();
+			            	dialogImage.setScene(imageScene);
+//			        		dialogImage.setTitle("Save Jet Scale to Figure:");		
+			            	dialogImage.initModality(Modality.NONE);
+			            	dialogImage.initOwner(null);
+			            	dialogImage.setResizable(false);
+			            	imageDstate = true;
+			            	dialogImage.show();
+			            	dialogImage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			                    public void handle(WindowEvent we) {
+			                        System.out.println("Stage is closing");
+			                        imageDstate = false;
+			                        image_controller = null;
+			                    }
+			                });
+			            	
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		            }
+		        }
+		    }
+		});
+		//set private variable containing controller class of new dialog equal to the controller of the dialog
+		//stage is open with the width height of the image OR of 90% of the screen if image bigger than 90% of screen in any dimension
+		//controller class has setContext which removes all children of dialog stage and adds a single image view with the size of the stage 
+		//set stage close event according to http://www.java2s.com/Code/Java/JavaFX/Stagecloseevent.htm and https://stackoverflow.com/questions/26619566/javafx-stage-close-handler
+		//on open private variable for IF dialog open is true; on close, private variable for IF dialog open should be false
+		//if private variable for dialog open is true, when the imageView is changed, the Image from the dialog Stage is also changed by the controller class setContext
 	}
     
 	private void changeMarker() {
@@ -1615,7 +2012,11 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
   		for (int i = min; i < max; i++) {
   			double average = currentGroup.getMagnitudeListValue(i);
 //  			series1.add(i / fps_value, average * fps_value * pixel_value);
-  			series1.add(i / fps_value, (average * fps_value * pixel_value) - average_value);
+			double new_time = i / fps_value;
+			if (checkSec == false) {
+				new_time *= 1000;
+			}
+  			series1.add(new_time, (average * fps_value * pixel_value) - average_value);
   		}
   		//peak detection algorithm receives a group
           XYSeriesCollection dataset = new XYSeriesCollection();
@@ -1626,9 +2027,13 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
   	private int minimum_value_this = 0;
   	private JFreeChart createChart(XYDataset dataset, int min) {
   		  minimum_value_this = min;
+  		  String time_str =  "Time (s)";
+  		  if (checkSec == false) {
+  		  	time_str = "Time (\u00B5s)";
+  		  }
           JFreeChart chart = ChartFactory.createXYLineChart(
               "",
-              "Time(s)",
+              time_str,
               "Speed(\u00B5m/s)",
               dataset,
               PlotOrientation.VERTICAL,
@@ -2084,6 +2489,45 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		        finalImage = SwingFXUtils.toFXImage(combined, null);
 	        }
 		} else if (rendertype.equals("Merge")){
+//	        Mat img_src = null;
+//	        Mat img_src2 = null;
+//	        if (currentGroup.getType() == 0) {
+//	            ImageGroup g3 = (ImageGroup) currentGroup;
+//	            File path_img  = g3.getImages().get(main_package.getListPoints().get(index));
+//	            img_src = imread(path_img.getCanonicalPath());
+//	        } else {
+//	            VideoGroup g3 = (VideoGroup) currentGroup;
+//	        	FFmpegFrameGrabber frameGrabber = new FFmpegFrameGrabber(g3.getVideo().getAbsolutePath());
+//	    		OpenCVFrameConverter.ToMat converterToMat = new OpenCVFrameConverter.ToMat();
+//	    		frameGrabber.start();
+//	    		int N = frameGrabber.getLengthInFrames();
+//	    		for(int j = 0; j<N; j++){
+//	    			Frame frame = frameGrabber.grab();
+//	    			Mat img = converterToMat.convert(frame);
+//	    			if(j ==index){
+//	    				img_src = img.clone();
+//	    				break;
+//	    			}
+//	    		}
+//	    		frameGrabber.close();
+//	        }
+//            img_src2 = img_src.clone();
+//	        if (contour_state == true) {
+//	        	img_src.convertTo(img_src, CV_8U);
+//	        	img_src2.convertTo(img_src, CV_8U);
+//	        }
+//	        Mat combinedImage = new Mat();
+//			org.bytedeco.javacpp.opencv_core.addWeighted(img_src, alpha_under_two, img_src2, alpha_above_two, 0, combinedImage);
+//	        if (contour_state == true) {
+//	        	Mat mask2 = generateContour(img_src);
+//	        	Mat combinedImage2 = new Mat();
+//	        	combinedImage.copyTo(combinedImage2, mask2);
+//				BufferedImage combined = Java2DFrameUtils.toBufferedImage(combinedImage2);
+//		        finalImage = SwingFXUtils.toFXImage(combined, null);
+//	        } else {
+//				BufferedImage combined = Java2DFrameUtils.toBufferedImage(combinedImage);
+//		        finalImage = SwingFXUtils.toFXImage(combined, null);
+//	        }
 			//render image alone
 			ToMat converter = new OpenCVFrameConverter.ToMat();
 	        Mat img_src = null;
@@ -2107,10 +2551,13 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	    		}
 	    		frameGrabber.close();
 	        }
-//	        if (contour_state == true) {
+	        if (contour_state == true) {
 //	        	img_src = generateContour(img_src);
 //	        	img_src.convertTo(img_src, CV_8U);
-//	        }
+	        	Mat mask2 = generateContour(img_src);	        	
+	        	Mat combinedImage2 = new Mat();
+	        	img_src.copyTo(img_src, mask2);
+	        }
 	        Frame original_image_frame = converter.convert(img_src);
 	        Java2DFrameConverter paintConverter = new Java2DFrameConverter();
 	        BufferedImage original_image = paintConverter.getBufferedImage(original_image_frame,1);
@@ -2122,12 +2569,158 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		
 		if (image_not_save == false) {
 			imgview1.setImage(finalImage);
+			renderImageScale();
+			System.out.println("Rendering scale");
+			if (imageDstate == true) {
+				System.out.println("About to change dialog image");
+				image_controller.setImage(imgview1.getImage());
+			}
 		} else {
 //			imgview1.setImage(finalImage);
-			System.out.println("Trying to save image!");
-			saveCurrentImageView(finalImage);
+			if (save_as_video == false) {
+				System.out.println("Trying to save image!");
+				saveCurrentImageView(finalImage);
+			} else {
+				saveCurrentImageVideo(finalImage);
+			}
 		}
 	}
+	
+	
+	//FUNCTIONS TO RENDER THE SCALE IMAGE BELOW
+	private double convertScaleToHeight(double y) {
+		double a = (scale_end-scale_start) / imgview1.getFitHeight();
+		double b = scale_start;
+		return ((y-b)/a);
+	}
+	
+	private double convertToMag(double x) {
+		double a = (scale_end-scale_start) / imgview1.getFitHeight();
+		double b = scale_start;
+		return ((x*a)+b);
+	}
+	
+	public static String rightPadZeros(String str, int num) {
+		return String.format("%1$-" + num + "s", str).replace(' ', '0');
+	}
+	
+	private final int SCALE_ARR_SIZE = 8;
+	
+	void drawScaleArrow(GraphicsContext gc, int x1, int y1, int x2, int y2) {
+	    gc.setFill(Color.BLACK);
+
+	    double dx = x2 - x1, dy = y2 - y1;
+	    double angle = Math.atan2(dy, dx);
+	    int len = (int) Math.sqrt(dx * dx + dy * dy);
+
+	    Transform transform = Transform.translate(x1, y1);
+	    transform = transform.createConcatenation(Transform.rotate(Math.toDegrees(angle), 0, 0));
+	    gc.setTransform(new Affine(transform));
+	    gc.strokeLine(0, 0, len, 0);
+	    gc.strokeLine(len, 0, len - SCALE_ARR_SIZE, -SCALE_ARR_SIZE);
+	    gc.strokeLine(len, 0, len - SCALE_ARR_SIZE, SCALE_ARR_SIZE);
+//	    gc.strokeLine(len, 0, len + ARR_SIZE, ARR_SIZE);
+//	    gc.fillPolygon(new double[]{len, len - ARR_SIZE, len - ARR_SIZE, len}, new double[]{0, -ARR_SIZE, ARR_SIZE, 0}, 4);
+	}
+	
+	@FXML
+	ImageView scaleImgView;
+	
+	private BufferedImage generateCanvasScale() {
+		//emptyBoxSize.widthProperty()
+		
+//		int scale_width = (int)(emptyBoxSize.getWidth());
+//		if (scale_width < 70) {
+//			scale_width = 70;
+//		}
+//		if (scale_width )
+		int scale_width  = 70;
+//		System.out.println(scale_width);
+//		int scale_height = (int)(emptyBoxSize.getHeight() * 8);
+		int scale_height = (int) imgview1.getFitHeight();
+		System.out.println(scale_height);
+		scaleImgView.setFitHeight(scale_height);
+		scaleImgView.setFitWidth(scale_width);
+		//Calculate: width, height, spacing, font-size dynamically by using the grid
+		//set imageview fitheight and width
+		Canvas canvas1 = new Canvas((int) scale_width, (int) scale_height);
+		GraphicsContext gc = canvas1.getGraphicsContext2D();
+    	gc.setFill(Color.TRANSPARENT);
+    	gc.fillRect(0, 0, canvas1.getWidth(), canvas1.getHeight());
+		gc.save();
+		PixelWriter pixel_writing = canvas1.getGraphicsContext2D().getPixelWriter();
+		for (int x = 0; x < scale_width - 50; x++) {
+			for (int y = 0; y < scale_height; y++) {
+				int y_new = y;
+        		java.awt.Color a = this_jet.getColor(convertToMag(y_new));
+        		Color this_color = new Color( (Double.valueOf(a.getRed()) / 255.0), (Double.valueOf(a.getGreen()) / 255.0 ) , (Double.valueOf(a.getBlue()) / 255.0), 1.0);
+				pixel_writing.setColor( x, ((int)canvas1.getHeight()-y), this_color);
+				
+			}
+		}
+		//write tick labels
+		gc.setFill(Color.BLACK);
+		gc.setTextAlign(TextAlignment.CENTER);
+		gc.setTextBaseline(VPos.CENTER);
+		gc.setFont(new javafx.scene.text.Font("Arial", 12));
+
+		int x = (int) scale_width - 30; //tick width to write
+		int y = ((int) convertScaleToHeight(scale_end));
+		//			gc.fillText(String.valueOf(scale_end), x, y);
+		int currentpad_f = 5;
+		String current_print_f = String.valueOf(scale_end);
+		if (!current_print_f.contains(".")) {
+			current_print_f += ".";
+		} else {
+			int dot_after = current_print_f.split("\\.")[0].length();
+			currentpad_f = currentpad_f - dot_after;
+		}
+		current_print_f = rightPadZeros(current_print_f, currentpad_f);
+
+		int currentpad_s = 5;
+		String current_print_s = String.valueOf(scale_start);
+		if (!current_print_s.contains(".")) {
+			current_print_s += ".";
+		} else {
+			int dot_after = current_print_s.split("\\.")[0].length();
+			currentpad_s = currentpad_s - dot_after;
+		}
+		current_print_s = rightPadZeros(current_print_s, currentpad_s);
+
+		gc.fillText(current_print_f, x, ((int)canvas1.getHeight()-y+10));
+		y = ((int) convertScaleToHeight(scale_start));
+		gc.fillText(current_print_s, x, ((int)canvas1.getHeight()-y-10));
+		gc.setFill(Color.BLACK);
+		gc.setTextAlign(TextAlignment.CENTER);
+        gc.setTextBaseline(VPos.CENTER);
+        gc.setFont(new javafx.scene.text.Font("Arial", 15));
+	    Transform transform = Transform.rotate(-90.0, (int)canvas1.getWidth()-20, (int)(canvas1.getHeight()/2));
+	    gc.setTransform(new Affine(transform));
+	    gc.fillText("Speed (\u00B5m/s)", (int)canvas1.getWidth()-20, (int)(canvas1.getHeight()/2));
+	    gc.restore();
+	    
+	    int x_arrow = (int)canvas1.getWidth()-35;
+	    int y_arrow_init = (int)(canvas1.getHeight()/2) - 41;
+	    int y_arrow_end = (int)(canvas1.getHeight()/2) + 41;
+	    
+		drawScaleArrow(gc, x_arrow, y_arrow_end, x_arrow, y_arrow_init);
+		
+    	WritableImage writableImage = new WritableImage((int) canvas1.getWidth(), (int)canvas1.getHeight());
+    	SnapshotParameters sp = new SnapshotParameters();
+    	sp.setFill(Color.TRANSPARENT);
+        canvas1.snapshot(sp, writableImage);
+        BufferedImage final_scale = SwingFXUtils.fromFXImage(writableImage, null);
+        return final_scale;
+	}
+	
+	void renderImageScale() {
+		//render imgviewscale Image
+		BufferedImage final_scale = generateCanvasScale();
+		scaleImgView.setImage(SwingFXUtils.toFXImage(final_scale, null));
+		//Controller_Scale.
+	}
+	
+	//END FUNCTIONS TO RENDER THE SCALE IMAGE
 	
 	public WritableImage writeJetImage(int index, boolean to_merge) {
 		WritableImage myWritableImage = new WritableImage(width, height);

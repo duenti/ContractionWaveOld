@@ -11,10 +11,25 @@ public class IntervalPeaks implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private List<IntervalPeak> listIntervalPeaks;
 	private List<Peak> listPeaks;
+	private boolean seconds = true;
 	
 	public IntervalPeaks() {
 		listIntervalPeaks = new ArrayList<IntervalPeak>();
 		setListPeaks(new ArrayList<Peak>());
+	}
+	
+	public void convertTime() {
+		if (seconds == true) {
+			for (Peak a : this.getListPeaks()) {
+				a.convertPeakTime(seconds);
+			}
+			seconds = false;
+		} else {
+			for (Peak a : this.getListPeaks()) {
+				a.convertPeakTime(seconds);
+			}
+			seconds = true;
+		}
 	}
 	
 	public void addIntervalPeak(IntervalPeak e) {

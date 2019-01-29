@@ -98,7 +98,7 @@ public class Controller_1_InitialScreen implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData());
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);

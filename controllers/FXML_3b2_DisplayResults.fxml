@@ -52,12 +52,14 @@
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#handleExportXLS" text="XLS" />
                             <MenuItem mnemonicParsing="false" onAction="#handleExportTSV" text="TSV" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportTXT" text="TXT" />
                           </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Image">
                           <items>
                             <MenuItem mnemonicParsing="false" onAction="#handleExportJPEG" text="JPEG" />
                               <MenuItem mnemonicParsing="false" onAction="#handleExportPNG" text="PNG" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportTIFF" text="TIFF" />
                           </items>
                         </Menu>
                     </items>

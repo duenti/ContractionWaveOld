@@ -11,6 +11,8 @@ import java.util.Locale;
 import java.util.Optional;
 
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
@@ -19,12 +21,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import model.PackageData;
 
 
 public class Main extends Application {
 	
-	private PackageData main_package;
+	private PackageData main_package = null;
 	
 	private static Path rootDir; // The chosen root or source directory
 	private static final String DEFAULT_DIRECTORY =
@@ -47,26 +50,103 @@ public class Main extends Application {
     }
 	
 	@Override
-	public void start(Stage primaryStage1) throws IOException, ClassNotFoundException {
+	public void start(Stage primaryStage1) throws Exception {
 		Locale.setDefault(new Locale("en", "US")); //forces use of dots instead of commas
 		setPrimaryStage(primaryStage1);
 		primaryStage = primaryStage1;
+		primaryStage.setOnCloseRequest((new EventHandler<WindowEvent>(){
+			@Override
+			public void handle(WindowEvent event) {
+				System.out.println("Closing all windows");
+				Platform.exit();
+			}
+		}));
 		System.out.println("test");
 		File yourFile = new File("done.txt");
 		yourFile.createNewFile(); // if file already exists will do nothing
-		main_package = new PackageData();
-		URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
-    	FXMLLoader fxmlloader = new FXMLLoader();
-    	fxmlloader.setLocation(url);
-    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
-        Parent root;
-    	root = fxmlloader.load();
-    	Scene scene = new Scene(root);
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
-		primaryStage.setTitle("Image Optical Flow - Bem Vindo");
-		primaryStage.setMaximized(true);
-		primaryStage.setScene(scene);
-		primaryStage.show();
+		
+		File tmpDir = new File(getInitialDirectory().toFile().getAbsolutePath() + "/preferences.pref");
+		boolean exists = tmpDir.exists();
+		
+		if (exists == true) {
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Plot Configurations File Detected");
+			alert.setHeaderText("Load Plot Configurations File?");
+			alert.setContentText("Choose your option:");
+			ButtonType buttonTypeOne = new ButtonType("Load & Start");
+			ButtonType buttonTypeTwo = new ButtonType("Do not Load & Start");
+			ButtonType buttonTypeThree= new ButtonType("Delete Config & Start");
+			ButtonType buttonTypeFour= new ButtonType("Quit");
+			alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeTwo, buttonTypeThree, buttonTypeFour);
+			alert.getDialogPane().setPrefWidth(700);
+//			alert.getDialogPane().setPrefWidth(value);
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() == buttonTypeOne){
+				main_package = new PackageData(true);
+				URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
+		    	FXMLLoader fxmlloader = new FXMLLoader();
+		    	fxmlloader.setLocation(url);
+		    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+		        Parent root;
+		    	root = fxmlloader.load();
+		    	Scene scene = new Scene(root);
+				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
+				primaryStage.setTitle("Image Optical Flow - Bem Vindo");
+				primaryStage.setMaximized(true);
+				primaryStage.setScene(scene);
+				primaryStage.show();	
+			} else if (result.get() == buttonTypeTwo) {
+				main_package = new PackageData(false);
+				URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
+		    	FXMLLoader fxmlloader = new FXMLLoader();
+		    	fxmlloader.setLocation(url);
+		    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+		        Parent root;
+		    	root = fxmlloader.load();
+		    	Scene scene = new Scene(root);
+				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
+				primaryStage.setTitle("Image Optical Flow - Bem Vindo");
+				primaryStage.setMaximized(true);
+				primaryStage.setScene(scene);
+				primaryStage.show();	
+			} else if (result.get() == buttonTypeThree) {
+				tmpDir.delete();
+				main_package = new PackageData(false);
+				URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
+		    	FXMLLoader fxmlloader = new FXMLLoader();
+		    	fxmlloader.setLocation(url);
+		    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+		        Parent root;
+		    	root = fxmlloader.load();
+		    	Scene scene = new Scene(root);
+				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
+				primaryStage.setTitle("Image Optical Flow - Bem Vindo");
+				primaryStage.setMaximized(true);
+				primaryStage.setScene(scene);
+				primaryStage.show();	
+			} else {
+			    super.stop(); //To change body of generated methods, choose Tools | Templates.
+			    if (main_package != null) {
+			    	main_package.getExec().shutdown();
+			    	main_package.getExec().shutdownNow();
+			    }
+			    System.exit(0);
+			}
+		} else {
+			main_package = new PackageData(false);
+			URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
+	    	FXMLLoader fxmlloader = new FXMLLoader();
+	    	fxmlloader.setLocation(url);
+	    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+	        Parent root;
+	    	root = fxmlloader.load();
+	    	Scene scene = new Scene(root);
+			((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
+			primaryStage.setTitle("Image Optical Flow - Bem Vindo");
+			primaryStage.setMaximized(true);
+			primaryStage.setScene(scene);
+			primaryStage.show();	
+		}
 	}
 	
 	@Override

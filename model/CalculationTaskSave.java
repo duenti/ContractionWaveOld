@@ -52,7 +52,8 @@ public class CalculationTaskSave extends Task<Void>{
     
 	public void calculateFlowImage(int from, int to, int step){
 		ImageGroup g1 = (ImageGroup) this.thisgroup;
-		for(int i = from; i < to-1; i=i+step){
+//		for(int i = from; i < to-1; i=i+step){
+		for(int i = from; i < to; i=i+step){
 			File file1 = g1.getImages().get(i);
 			File file2 = g1.getImages().get(i+1);
 			Mat img1 = imread(file1.getAbsolutePath());

@@ -64,18 +64,23 @@
                            <items>
                               <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentJPG" text="Current JPG" />
                               <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentPNG" text="Current PNG" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentTIFF" text="Current TIFF" />
                            </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="All Quiver">
                            <items>
                               <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverJPG" text="JPG" />
                               <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverPNG" text="PNG" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverTIFF" text="TIFF" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverAVI" text="MP4" />
                            </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="All Jet">
                            <items>
                               <MenuItem mnemonicParsing="false" onAction="#handleExportJetJPG" text="JPG" />
                               <MenuItem mnemonicParsing="false" onAction="#handleExportJetPNG" text="PNG" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportJetTIFF" text="TIFF" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportJetAVI" text="MP4" />
                            </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="All Merge">
@@ -84,24 +89,32 @@
                                  <items>
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetJPG" text="JPG" />
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetPNG" text="PNG" />
+                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetTIFF" text="TIFF" />
+                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetAVI" text="MP4" />
                                  </items>
                               </Menu>
                               <Menu mnemonicParsing="false" text="Quiver">
                                  <items>
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeQuiverJPG" text="JPG" />
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeQuiverPNG" text="PNG" />
+                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeQuiverTIFF" text="TIFF" />
+                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeQuiverAVI" text="MP4" />
                                  </items>
                               </Menu>
                               <Menu mnemonicParsing="false" text="Both">
                                  <items>
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeBothJPG" text="JPG" />
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeBothPNG" text="PNG" />
+                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeBothTIFF" text="TIFF" />
+                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeBothAVI" text="MP4" />
                                  </items>
                               </Menu>
                               <Menu mnemonicParsing="false" text="Jet and Quiver only">
                                  <items>
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportJetQuiverJPG" text="Jet and Quiver JPG" />
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportJetQuiverPNG" text="Jet and Quiver PNG" />
+                                    <MenuItem mnemonicParsing="false" onAction="#handleExportJetQuiverTIFF" text="Jet and Quiver TIFF" />
+                                    <MenuItem mnemonicParsing="false" onAction="#handleExportJetQuiverAVI" text="Jet and Quiver MP4" />
                                  </items>
                               </Menu>
                            </items>
@@ -164,8 +177,24 @@
                </font>
             </Label>
             <Button id="glass-grey" fx:id="cmdBack" mnemonicParsing="false" onAction="#back" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="19" />
-            <ImageView fx:id="imgview1" fitHeight="200.0" fitWidth="640.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.columnSpan="9" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.rowSpan="8" GridPane.valignment="CENTER" />
-            <HBox maxHeight="200.0" maxWidth="640.0" prefHeight="200.0" prefWidth="640.0" GridPane.columnIndex="1" GridPane.columnSpan="9" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.rowSpan="4" GridPane.valignment="BOTTOM">
+            <HBox maxHeight="200.0" maxWidth="640.0" prefHeight="200.0" prefWidth="640.0" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.rowSpan="8" GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS">
+               <children>
+                  <GridPane HBox.hgrow="ALWAYS">
+                     <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" />
+                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <ImageView fx:id="scaleImgView" fitHeight="150.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.hgrow="SOMETIMES" GridPane.valignment="CENTER" GridPane.vgrow="SOMETIMES" />
+                        <ImageView fx:id="imgview1" fitHeight="200.0" fitWidth="640.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                     </children>
+                  </GridPane>
+               </children>
+            </HBox>
+            <HBox maxHeight="200.0" maxWidth="640.0" prefHeight="200.0" prefWidth="640.0" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.rowSpan="4" GridPane.valignment="BOTTOM">
                <children>
                   <GridPane HBox.hgrow="ALWAYS">
                     <columnConstraints>
@@ -202,20 +231,20 @@
                         <RowConstraints vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label prefWidth="150.0" text="Mask Threshold: (μm/s)" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.valignment="CENTER">
+                        <Label prefWidth="150.0" text="Mask Threshold (μm/s):" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.valignment="CENTER">
                            <font>
                               <Font size="12.0" />
                            </font>
                         </Label>
                         <Spinner fx:id="spinnerMask" GridPane.columnIndex="1" />
-                        <Label prefHeight="16.0" prefWidth="150.0" text="Color Scale Start: (μm/s)" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                        <Label prefHeight="16.0" prefWidth="150.0" text="Color Scale Start (μm/s):" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                            <font>
                               <Font size="12.0" />
                            </font>
                         </Label>
                         <Spinner fx:id="spinnerScaleStart" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                         <Spinner fx:id="spinnerScaleEnd" prefHeight="20.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Label prefWidth="150.0" text="Color Scale End: (μm/s)" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="2" GridPane.valignment="CENTER">
+                        <Label prefWidth="150.0" text="Color Scale End (μm/s):" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                            <font>
                               <Font size="12.0" />
                            </font>
@@ -238,6 +267,11 @@
                   <Insets left="5.0" />
                </GridPane.margin>
             </Spinner>
+            <HBox fx:id="emptyBoxSize" visible="false" GridPane.columnIndex="10" GridPane.rowIndex="20">
+               <children>
+                  <VBox visible="false" />
+               </children>
+            </HBox>
          </children>
       </GridPane>
    </center>

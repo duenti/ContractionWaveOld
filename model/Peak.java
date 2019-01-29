@@ -67,7 +67,36 @@ public class Peak {
 		area_c = area_c1;
 		area_r = area_r1;
 	}
-
+	
+	private boolean micro = false;
+	public void convertPeakTime(boolean to_micro) {
+		if (to_micro == true) {
+			if (micro == false) {
+				tcr *= 1000;
+				tc  *= 1000;
+				tr *= 1000;
+				tc_vmc *= 1000 ;
+				tc_vmc_min *= 1000;
+				tr_vmr *= 1000;
+				tr_vmr_b *= 1000;
+				t_vmc_vmr *= 1000;
+				micro = true;
+			}
+		} else  {
+			if (micro == true) {
+				tcr /= 1000;
+				tc  /= 1000;
+				tr /= 1000;
+				tc_vmc /= 1000 ;
+				tc_vmc_min /= 1000;
+				tr_vmr /= 1000;
+				tr_vmr_b /= 1000;
+				t_vmc_vmr /= 1000;
+				micro = false;
+			}
+		}
+	}
+	
 	public int getF_point() {
 		return f_point;
 	}

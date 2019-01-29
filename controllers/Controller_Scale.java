@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
@@ -47,7 +48,7 @@ public class Controller_Scale implements Initializable{
 	private double scale_end;
 	private int width = 30;
 	private int height = 450;
-	private int spacing = 10;
+	private double spacing = 10;
 	private int font_size = 15;
 	public static final IndexColorModel JET = ColorMap.getJet();
 	private ColorMap this_jet;
@@ -80,7 +81,7 @@ public class Controller_Scale implements Initializable{
     	Stage primaryStage;
     	primaryStage = (Stage) tickCheck.getScene().getWindow();
         File chosenDir = chooser.showDialog(primaryStage);
-    	String current_filename = chosenDir.getAbsolutePath().toString() + "/" + "scale" +".jpg";
+    	String current_filename = chosenDir.getAbsolutePath().toString() + "/" + "scale" +".tiff";
         File file = new File(current_filename);
     	BufferedImage bImage1 = generateCanvasScale();
     	Mat jetLayer = Java2DFrameUtils.toMat(bImage1);
@@ -95,17 +96,7 @@ public class Controller_Scale implements Initializable{
         channels2.put(1, greenCh);
         channels2.put(2, blueCh);
         org.bytedeco.javacpp.opencv_core.merge(channels2, jetLayerRGB);
-        BufferedImage bImage = Java2DFrameUtils.toBufferedImage(jetLayerRGB);
-    	if (bImage == null) {
-    		System.out.println("Null Buffer");
-    	}
-    	try {
-    		System.out.println("Saving....");
-    		ImageIO.write(bImage, "jpg", file);
-    	} catch (IOException e) {
-    		throw new RuntimeException(e);
-    	}
-		
+		imwrite(current_filename, jetLayerRGB);		
 	}
 	
 	@Override
@@ -149,7 +140,7 @@ public class Controller_Scale implements Initializable{
 		        	spacingInput.setText(newValue.replaceAll("[^\\d]", ""));
 		        }
 	        	if (spacing < height && spacing < width) {
-	        		spacing = Integer.valueOf(newValue);
+	        		spacing = Double.valueOf(newValue);
 	        	}
 		    }
 		});
@@ -189,6 +180,10 @@ public class Controller_Scale implements Initializable{
 		return ((x*a)+b);
 	}
 	
+	public static String rightPadZeros(String str, int num) {
+		return String.format("%1$-" + num + "s", str).replace(' ', '0');
+	}
+	
 	private final int ARR_SIZE = 8;
 	
 	void drawArrow(GraphicsContext gc, int x1, int y1, int x2, int y2) {
@@ -202,8 +197,10 @@ public class Controller_Scale implements Initializable{
 	    transform = transform.createConcatenation(Transform.rotate(Math.toDegrees(angle), 0, 0));
 	    gc.setTransform(new Affine(transform));
 	    gc.strokeLine(0, 0, len, 0);
-	    gc.fillPolygon(new double[]{len, len - ARR_SIZE, len - ARR_SIZE, len}, new double[]{0, -ARR_SIZE, ARR_SIZE, 0},
-	            4);
+	    gc.strokeLine(len, 0, len - ARR_SIZE, -ARR_SIZE);
+	    gc.strokeLine(len, 0, len - ARR_SIZE, ARR_SIZE);
+//	    gc.strokeLine(len, 0, len + ARR_SIZE, ARR_SIZE);
+//	    gc.fillPolygon(new double[]{len, len - ARR_SIZE, len - ARR_SIZE, len}, new double[]{0, -ARR_SIZE, ARR_SIZE, 0}, 4);
 	}
 	
 	private BufferedImage generateCanvasScale() {
@@ -235,6 +232,7 @@ public class Controller_Scale implements Initializable{
 	        gc.setFont(new Font("Arial", font_size));
 
 	        int tick_number = (int) (scale_end / spacing);
+	        System.out.println(tick_number);
 	        if (tick_number * spacing < scale_end) {
 	        	tick_number++;
 	        }
@@ -245,7 +243,16 @@ public class Controller_Scale implements Initializable{
 				//normal
 //				gc.fillText(String.valueOf((t_i) * spacing), x, y);
 				//inverse
-				gc.fillText(String.valueOf((t_i) * spacing), x, ((int)canvas1.getHeight()-30-y) );
+				int currentpad = 5;
+				String current_print_a = String.valueOf((t_i) * spacing);
+				if (!current_print_a.contains(".")) {
+					current_print_a += ".";
+				} else {
+					int dot_after = current_print_a.split("\\.")[0].length();
+					currentpad = currentpad - dot_after;
+				}
+				current_print_a = rightPadZeros(current_print_a, currentpad);
+				gc.fillText(current_print_a, x, ((int)canvas1.getHeight()-30-y) );
 			}
 	        
 	        //inverse
@@ -257,9 +264,29 @@ public class Controller_Scale implements Initializable{
 			int x = width+20; //tick width to write
 			int y = ((int) convertScaleToHeight(scale_end)) + 20;
 //			gc.fillText(String.valueOf(scale_end), x, y);
-			gc.fillText(String.valueOf(scale_end), x, ((int)canvas1.getHeight()-30-y));
+			int currentpad_f = 5;
+			String current_print_f = String.valueOf(scale_end);
+			if (!current_print_f.contains(".")) {
+				current_print_f += ".";
+			} else {
+				int dot_after = current_print_f.split("\\.")[0].length();
+				currentpad_f = currentpad_f - dot_after;
+			}
+			current_print_f = rightPadZeros(current_print_f, currentpad_f);
+			
+			int currentpad_s = 5;
+			String current_print_s = String.valueOf(scale_start);
+			if (!current_print_s.contains(".")) {
+				current_print_s += ".";
+			} else {
+				int dot_after = current_print_s.split("\\.")[0].length();
+				currentpad_s = currentpad_s - dot_after;
+			}
+			current_print_s = rightPadZeros(current_print_s, currentpad_s);
+			
+			gc.fillText(current_print_f, x, ((int)canvas1.getHeight()-30-y));
 			y = ((int) convertScaleToHeight(scale_start)) + 20;
-			gc.fillText(String.valueOf(scale_start), x, ((int)canvas1.getHeight()-30-y));
+			gc.fillText(current_print_s, x, ((int)canvas1.getHeight()-30-y));
 //			
 		}
 		gc.setFill(Color.BLACK);
@@ -268,16 +295,21 @@ public class Controller_Scale implements Initializable{
         gc.setFont(new Font("Arial", 15));
 	    Transform transform = Transform.rotate(-90.0, (int)canvas1.getWidth()-25, (int)(canvas1.getHeight()/2));
 	    gc.setTransform(new Affine(transform));
-	    gc.fillText("Speed(\u00B5m/s)", (int)canvas1.getWidth()-25, (int)(canvas1.getHeight()/2));
+	    gc.fillText("Speed (\u00B5m/s)", (int)canvas1.getWidth()-25, (int)(canvas1.getHeight()/2));
 	    gc.restore();
 	    
 	    int x_arrow = (int)canvas1.getWidth()-45;
-    	int y_arrow_init = (int)(canvas1.getHeight()/2) - (height/10);
-    	int y_arrow_end = (int)(canvas1.getHeight()/2) + (height/10);
-	    if (y_arrow_end - y_arrow_init  < 30) {
-	    	y_arrow_init = (int)(canvas1.getHeight()/2) - 15;
-	    	y_arrow_end = (int)(canvas1.getHeight()/2) + 15;
-	    }
+//    	int y_arrow_init = (int)(canvas1.getHeight()/2) - (height/10);
+//    	int y_arrow_end = (int)(canvas1.getHeight()/2) + (height/10);
+//	    if (y_arrow_end - y_arrow_init  < 30) {
+//	    	y_arrow_init = (int)(canvas1.getHeight()/2) - 15;
+//	    	y_arrow_end = (int)(canvas1.getHeight()/2) + 15;
+//	    }
+	    int y_arrow_init = (int)(canvas1.getHeight()/2) - 41;
+	    int y_arrow_end = (int)(canvas1.getHeight()/2) + 41;
+	    
+	    
+	    
 //		drawArrow(gc, x_arrow, y_arrow_init, x_arrow, y_arrow_end);
 		drawArrow(gc, x_arrow, y_arrow_end, x_arrow, y_arrow_init);
 		

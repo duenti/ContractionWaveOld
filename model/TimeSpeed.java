@@ -1,11 +1,19 @@
 package model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class TimeSpeed implements Serializable {
 	/**
 	 * 
 	 */
+	
+	public static double round(double d, int decimalPlace) {
+	    BigDecimal bd = new BigDecimal(Double.toString(d));
+	    bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+	    return bd.doubleValue();
+	}
+	
 	private static final long serialVersionUID = 1L;
 	private double time;
 	private double time1;
@@ -15,7 +23,7 @@ public class TimeSpeed implements Serializable {
 		setIndex(index);
 		setTime((time / time_conv));
 		setTime1((time / time_conv) * 1000.0);
-		setSpeed(speed * time_conv * speed_conv);
+		setSpeed( round((speed * time_conv * speed_conv),3) );
 	}
 	public int getIndex() {
 		return index;
