@@ -56,8 +56,6 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import controllers.Controller_3b2_DisplayResults.IncrementHandler;
-
 import org.jfree.chart.ui.Layer;
 
 import javafx.fxml.Initializable;
@@ -179,7 +177,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -345,34 +343,45 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	dialogJet.setResizable(true);
     	Label label1 = new Label("Marker Alpha: ");
     	Spinner<Double> xwindowSpin = new Spinner<Double>();
-    	xwindowSpin.setValueFactory(facGen(0.0, 1.0, (double) main_package.getPlot_preferences().getMarkerAlpha(), 0.01));
+    	SpinnerValueFactory<Double> dobGen = facGen(0.0, 1.0, (double) main_package.getPlot_preferences().getMarkerAlpha(), 0.01);
     	xwindowSpin.setEditable(true);
-		IncrementHandler handler2 = new IncrementHandler();
-		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, handler2);
-		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                    handler2.stop();
-	                }
-	        }
-	    });
-		xwindowSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-			try {
-				main_package.getPlot_preferences().setMarkerAlpha(Float.valueOf(newValue));
-				for (IntervalMarker m : intervalsList) {
-					m.setAlpha(Float.valueOf(newValue));
-				}
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
+		TextFormatter<Double> formatter1 = new TextFormatter<Double>(dobGen.getConverter(), dobGen.getValue());
+		xwindowSpin.getEditor().setTextFormatter(formatter1);
+		dobGen.valueProperty().bindBidirectional(formatter1.valueProperty());
+		formatter1.valueProperty().addListener((s, ov, nv) -> {
+			main_package.getPlot_preferences().setMarkerAlpha((float)nv.doubleValue());
+			for (IntervalMarker m : intervalsList) {
+	        	m.setAlpha((float)nv.doubleValue());
 			}
-	    });
-		xwindowSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	xwindowSpin.increment(0);
-	        } 
-	    });
+		});
+//    	xwindowSpin.setValueFactory(facGen(0.0, 1.0, (double) main_package.getPlot_preferences().getMarkerAlpha(), 0.01));
+//    	xwindowSpin.setEditable(true);
+//		IncrementHandler handler2 = new IncrementHandler();
+//		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, handler2);
+//		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                    handler2.stop();
+//	                }
+//	        }
+//	    });
+//		xwindowSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				main_package.getPlot_preferences().setMarkerAlpha(Float.valueOf(newValue));
+//				for (IntervalMarker m : intervalsList) {
+//					m.setAlpha(Float.valueOf(newValue));
+//				}
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		xwindowSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	xwindowSpin.increment(0);
+//	        } 
+//	    });
     	GridPane grid = new GridPane();
     	grid.add(label1, 1, 1);
     	grid.add(xwindowSpin, 2, 1);
@@ -679,34 +688,28 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	Dialog<Boolean> dialogAverageSet= new Dialog<>();
 		dialogAverageSet.setHeaderText("Set Average Value:");
 		dialogAverageSet.setResizable(true);
-		Label label1 = new Label("Average Value: ");
+		Label label1 = new Label("Average Value (µ/s): ");
 		Spinner<Double> averageSetSpin = new Spinner<Double>();
-		averageSetSpin.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE, average_value, 0.01));
+		SpinnerValueFactory<Double> dobFacN = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE, average_value, 0.01);
+		averageSetSpin.setValueFactory(dobFacN);
 		averageSetSpin.setEditable(true);
-		IncrementHandler handler_x = new IncrementHandler();
-		averageSetSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, handler_x);
-		averageSetSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, evt -> {
-			Node node = evt.getPickResult().getIntersectedNode();
-			if (node.getStyleClass().contains("increment-arrow-button") ||
-					node.getStyleClass().contains("decrement-arrow-button")) {
-				if (evt.getButton() == MouseButton.PRIMARY) {
-					handler_x.stop();
-				}
-			}
-		});
-		averageSetSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		TextFormatter<Double> formatter1n = new TextFormatter<Double>(dobFacN.getConverter(), dobFacN.getValue());
+		averageSetSpin.getEditor().setTextFormatter(formatter1n);
+		dobFacN.valueProperty().bindBidirectional(formatter1n.valueProperty());
+		formatter1n.valueProperty().addListener((s, ov, nv) -> {
 			try {
-				average_value = Double.valueOf(newValue);
+				average_value = nv.doubleValue();
 				maximum_list.clear();
 				minimum_list.clear();
 				valid_maximum_list.clear();
 				valid_minimum_list.clear();
 				first_points.clear();
 				fifth_points.clear();
-				writeLinePlotPop();
+				//writeLinePlotPop();
+				rewriteLinePlotPop();
 				//redraw markers to avoid caos
 				XYPlot fplot = (XYPlot) currentChart.getPlot();
-//				intervalsList.clear();
+	//			intervalsList.clear();
 				for (IntervalMarker az : intervalsList) {
 					az.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
 					az.setAlpha(main_package.getPlot_preferences().getMarkerAlpha());
@@ -714,17 +717,56 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 				}
 				writeFlowLinePlotZoom(last_min_zoom, last_max_zoom, last_addition);
 				//reset previous zoom
-				
 				main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
 			} catch (java.lang.Exception e) {
 				e.printStackTrace();
 			}
 		});
-		averageSetSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-			if (newValue == false) {
-				averageSetSpin.increment(0);
-			} 
-		});
+		
+//		averageSetSpin.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE, average_value, 0.01));
+//		averageSetSpin.setEditable(true);
+//		IncrementHandler handler_x = new IncrementHandler();
+//		averageSetSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, handler_x);
+//		averageSetSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, evt -> {
+//			Node node = evt.getPickResult().getIntersectedNode();
+//			if (node.getStyleClass().contains("increment-arrow-button") ||
+//					node.getStyleClass().contains("decrement-arrow-button")) {
+//				if (evt.getButton() == MouseButton.PRIMARY) {
+//					handler_x.stop();
+//				}
+//			}
+//		});
+//		averageSetSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				average_value = Double.valueOf(newValue);
+//				maximum_list.clear();
+//				minimum_list.clear();
+//				valid_maximum_list.clear();
+//				valid_minimum_list.clear();
+//				first_points.clear();
+//				fifth_points.clear();
+//				writeLinePlotPop();
+//				//redraw markers to avoid caos
+//				XYPlot fplot = (XYPlot) currentChart.getPlot();
+////				intervalsList.clear();
+//				for (IntervalMarker az : intervalsList) {
+//					az.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
+//					az.setAlpha(main_package.getPlot_preferences().getMarkerAlpha());
+//					fplot.addDomainMarker(az,Layer.BACKGROUND);
+//				}
+//				writeFlowLinePlotZoom(last_min_zoom, last_max_zoom, last_addition);
+//				//reset previous zoom
+//				
+//				main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//		});
+//		averageSetSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//			if (newValue == false) {
+//				averageSetSpin.increment(0);
+//			} 
+//		});
 
 		GridPane grid = new GridPane();
 		grid.add(label1, 1, 1);
@@ -821,10 +863,10 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		double delta1 = main_package.getDelta() * fps_val * pixel_val;
 		double inter1 = main_package.getInter();
 		double intra1 = main_package.getIntra();
+		resetAndRun();
 		spinnerDelta.getValueFactory().setValue(delta1);
 		spinnerInter.getValueFactory().setValue(inter1);
 		spinnerIntra.getValueFactory().setValue(intra1);
-		resetAndRun();
 	}
 	
 	public void resetAndRun() {
@@ -889,7 +931,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 			valid_minimum_list.clear();
 			first_points.clear();
 			fifth_points.clear();
-			writeLinePlotPop();
+			//writeLinePlotPop();
+			rewriteLinePlotPop();
 			//redraw markers to avoid caos
 			XYPlot fplot = (XYPlot) currentChart.getPlot();
 //			intervalsList.clear();
@@ -969,7 +1012,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 			valid_minimum_list.clear();
 			first_points.clear();
 			fifth_points.clear();
-			writeLinePlotPop();
+//			writeLinePlotPop();
+			rewriteLinePlotPop();
 			//redraw markers to avoid caos
 			XYPlot fplot = (XYPlot) currentChart.getPlot();
 //			intervalsList.clear();
@@ -1046,7 +1090,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 			valid_minimum_list.clear();
 			first_points.clear();
 			fifth_points.clear();
-			writeLinePlotPop();
+//			writeLinePlotPop();
+			rewriteLinePlotPop();
 			//redraw markers to avoid caos
 			XYPlot fplot = (XYPlot) currentChart.getPlot();
 //			intervalsList.clear();
@@ -1481,9 +1526,12 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     }
 	
 	
-	private void writeLinePlotPop() {
-		ChartPanel linepanel2 = new ChartPanel(createChart(createDataset()));
-
+	private void rewriteLinePlotPop() {
+		ChartPanel linepanel2 = (ChartPanel) swgChart.getContent();
+		JFreeChart new_chart = createChart(createDataset());
+//		linepanel2.setChart(null);
+//		linepanel2.remove(0);
+		linepanel2.setChart(new_chart);
 		JCheckBoxMenuItem gridLinesmenuItem2 = new JCheckBoxMenuItem();
 		gridLinesmenuItem2.setSelected(true);
 		gridLinesmenuItem2.setText("Gridlines on/off");
@@ -1498,7 +1546,37 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 
 		linepanel2.setRangeZoomable(false);
 		linepanel2.setDomainZoomable(false);
-		MouseMarker this_mouse_marker = new MouseMarker(linepanel2,intervalsList);
+		this_mouse_marker.setNewStuff(linepanel2);
+		linepanel2.addMouseListener(this_mouse_marker);
+		linepanel2.addMouseMotionListener(this_mouse_marker);
+        Border border = BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(4, 4, 4, 4),
+                BorderFactory.createEtchedBorder()
+        );
+        linepanel2.setBorder(border);
+        linepanel2.setMouseWheelEnabled(true);
+	}
+	
+	
+	private MouseMarker this_mouse_marker;
+	private void writeLinePlotPop() {
+		ChartPanel linepanel2 = new ChartPanel(createChart(createDataset()));
+		JCheckBoxMenuItem gridLinesmenuItem2 = new JCheckBoxMenuItem();
+		gridLinesmenuItem2.setSelected(true);
+		gridLinesmenuItem2.setText("Gridlines on/off");
+		GridLinesSwitch gridLinesZoomAction2 = new GridLinesSwitch(linepanel2); 
+		gridLinesmenuItem2.addActionListener(gridLinesZoomAction2);
+		linepanel2.getPopupMenu().add(gridLinesmenuItem2);		
+		JCheckBoxMenuItem showSpline = new JCheckBoxMenuItem();
+		showSpline.setText("Render Splines on/off");
+		SplineShow splineRendering = new SplineShow(linepanel2);
+		showSpline.addActionListener(splineRendering);
+		linepanel2.getPopupMenu().add(showSpline);
+
+		linepanel2.setRangeZoomable(false);
+		linepanel2.setDomainZoomable(false);
+//		MouseMarker this_mouse_marker = new MouseMarker(linepanel2,intervalsList);
+		this_mouse_marker = new MouseMarker(linepanel2,intervalsList);
 		linepanel2.addMouseListener(this_mouse_marker);
 		linepanel2.addMouseMotionListener(this_mouse_marker);
         Border border = BorderFactory.createCompoundBorder(
@@ -1522,9 +1600,9 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	    private List<IntervalMarker> markers;
 	    private Double markerStart = Double.NaN;
 	    private Double markerEnd = Double.NaN;
-	    private final XYPlot plot;
-	    private final JFreeChart chart;
-	    private final ChartPanel panel;
+	    private XYPlot plot;
+	    private JFreeChart chart;
+	    private ChartPanel panel;
 	    private Double x_start = Double.NaN;
 	    private Double x_end = Double.NaN;
 	    private Double y_start = Double.NaN;
@@ -1536,6 +1614,12 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	        this.chart = panel.getChart();
 	        this.plot = (XYPlot) chart.getPlot();
 	        this.markers = new ArrayList<IntervalMarker>();
+	    }
+	    
+	    public void setNewStuff(ChartPanel panel) {
+	        this.panel = panel;
+	        this.chart = panel.getChart();
+	        this.plot = (XYPlot) chart.getPlot();
 	    }
 
 	    private void updateMarker(){
@@ -1975,83 +2059,87 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		return dblFactory;
 	}
 	
-    private static final PseudoClass PRESSED = PseudoClass.getPseudoClass("pressed");
-    
-    class IncrementHandler implements EventHandler<javafx.scene.input.MouseEvent> {
-        private Spinner spinner;
-        private boolean increment;
-        private long startTimestamp;
-        private int currentFrame = 0;
-        private int previousFrame = 0;  
-
-        private long initialDelay = 1000l * 1000L * 750L; // 0.75 sec
-        private Node button;
-
-        private final AnimationTimer timer = new AnimationTimer() {
-
-            @Override
-            public void handle(long now) {
-            	if (currentFrame == previousFrame || currentFrame % 10 == 0) {
-	                if (now - startTimestamp >= initialDelay) {
-	                    // trigger updates every frame once the initial delay is over
-	                    if (increment) {
-	                        spinner.increment();
-	                    } else {
-	                        spinner.decrement();
-	                    }
-	                }
-            	}
-            	++currentFrame;
-            }
-        };
-
-        @Override
-        public void handle(javafx.scene.input.MouseEvent event) {
-            if (event.getButton() == MouseButton.PRIMARY) {
-                Spinner source = (Spinner) event.getSource();
-                Node node = event.getPickResult().getIntersectedNode();
-
-                Boolean increment = null;
-                // find which kind of button was pressed and if one was pressed
-                while (increment == null && node != source) {
-                    if (node.getStyleClass().contains("increment-arrow-button")) {
-                        increment = Boolean.TRUE;
-                    } else if (node.getStyleClass().contains("decrement-arrow-button")) {
-                        increment = Boolean.FALSE;
-                    } else {
-                        node = node.getParent();
-                    }
-                }
-                if (increment != null) {
-                    event.consume();
-                    source.requestFocus();
-                    spinner = source;
-                    this.increment = increment;
-
-                    // timestamp to calculate the delay
-                    startTimestamp = System.nanoTime();
-
-                    button = node;
-
-                    // update for css styling
-                    node.pseudoClassStateChanged(PRESSED, true);
-
-                    // first value update
-                    timer.handle(startTimestamp + initialDelay);
-
-                    // trigger timer for more updates later
-                    timer.start();
-                }
-            }
-        }
-
-        public void stop() {
-            timer.stop();
-            button.pseudoClassStateChanged(PRESSED, false);
-            button = null;
-            spinner = null;
-            previousFrame = currentFrame;
-        }
-    }
+//    private static final PseudoClass PRESSED = PseudoClass.getPseudoClass("pressed");
+//    
+//    class IncrementHandler implements EventHandler<javafx.scene.input.MouseEvent> {
+//        private Spinner spinner;
+//        private boolean increment;
+//        private long startTimestamp;
+//        private int currentFrame = 0;
+//        private int previousFrame = 0;  
+//
+//        private long initialDelay = 1000l * 1000L * 750L; // 0.75 sec
+//        private Node button;
+//
+//        private final AnimationTimer timer = new AnimationTimer() {
+//
+//            @Override
+//            public void handle(long now) {
+//            	if (currentFrame == previousFrame || currentFrame % 10 == 0) {
+//	                if (now - startTimestamp >= initialDelay) {
+//	                    // trigger updates every frame once the initial delay is over
+//	                    if (increment) {
+//	                        spinner.increment();
+//	                    } else {
+//	                        spinner.decrement();
+//	                    }
+//	                }
+//            	}
+//            	++currentFrame;
+//            }
+//        };
+//
+//        @Override
+//        public void handle(javafx.scene.input.MouseEvent event) {
+//        	
+////        	Node node = evt.getPickResult().getIntersectedNode();
+////			if (node.getStyleClass().contains("increment-arrow-button") ||
+////					node.getStyleClass().contains("decrement-arrow-button")) {
+//            if (event.getButton() == MouseButton.PRIMARY) {
+//                Spinner source = (Spinner) event.getSource();
+//                Node node = event.getPickResult().getIntersectedNode();
+//
+//                Boolean increment = null;
+//                // find which kind of button was pressed and if one was pressed
+//                while (increment == null && node != source) {
+//                    if (node.getStyleClass().contains("increment-arrow-button")) {
+//                        increment = Boolean.TRUE;
+//                    } else if (node.getStyleClass().contains("decrement-arrow-button")) {
+//                        increment = Boolean.FALSE;
+//                    } else {
+//                        node = node.getParent();
+//                    }
+//                }
+//                if (increment != null) {
+//                    event.consume();
+//                    source.requestFocus();
+//                    spinner = source;
+//                    this.increment = increment;
+//
+//                    // timestamp to calculate the delay
+//                    startTimestamp = System.nanoTime();
+//
+//                    button = node;
+//
+//                    // update for css styling
+//                    node.pseudoClassStateChanged(PRESSED, true);
+//
+//                    // first value update
+//                    timer.handle(startTimestamp + initialDelay);
+//
+//                    // trigger timer for more updates later
+//                    timer.start();
+//                }
+//            }
+//        }
+//
+//        public void stop() {
+//            timer.stop();
+//            button.pseudoClassStateChanged(PRESSED, false);
+//            button = null;
+//            spinner = null;
+//            previousFrame = currentFrame;
+//        }
+//    }
 
 }

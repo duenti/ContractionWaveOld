@@ -11,6 +11,8 @@ import static org.bytedeco.javacpp.opencv_video.calcOpticalFlowFarneback;
 import java.io.File;
 import java.nio.FloatBuffer;
 
+import javax.swing.JOptionPane;
+
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
@@ -152,24 +154,31 @@ public class CalculationTaskSave extends Task<Void>{
 	
 	@Override
 	protected Void call() throws Exception {
-		String name = this.thisgroup.getName();
-		updateMessage(name);
-		int type = this.thisgroup.getType();
-		System.out.print("TIPO: ");
-		System.out.println(type);
-		if (type == 0) {
-			calculateFlowImage(this.from, this.to, this.step);
-		} else {
-			calculateFlowVideo(this.from, this.to, this.step);
-		}
-		Group localgroup = this.thisgroup;
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				localgroup.setSavestatus("Done");
-//				parent.setCurrentGroup(name);
+		try {
+			String name = this.thisgroup.getName();
+			updateMessage(name);
+			int type = this.thisgroup.getType();
+			System.out.print("TIPO: ");
+			System.out.println(type);
+			if (type == 0) {
+				calculateFlowImage(this.from, this.to, this.step);
+			} else {
+				calculateFlowVideo(this.from, this.to, this.step);
 			}
-        });
+			Group localgroup = this.thisgroup;
+			Platform.runLater(new Runnable() {
+				@Override
+				public void run() {
+					localgroup.setSavestatus("Done");
+	//				parent.setCurrentGroup(name);
+				}
+	        });
+		} catch(Exception ex) {
+			System.out.println("Marcelo erro teste 4");
+			ex.getCause().printStackTrace();
+			System.out.println("Marcelo erro teste 5");
+			JOptionPane.showMessageDialog(null, "Could not run flow. Please try again", "Error", JOptionPane.ERROR_MESSAGE);
+		}
 		return null;
 	}
 

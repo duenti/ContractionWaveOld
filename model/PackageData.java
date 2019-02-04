@@ -28,6 +28,7 @@ public class PackageData  implements Serializable {
 	private List<Mat> listFlows;
 	private List<float[]> listMags;
 	private int cores = 1;
+	private boolean load_preferences;
 
 	private double delta = 1.0;
 
@@ -39,12 +40,21 @@ public class PackageData  implements Serializable {
 	private static final String DEFAULT_DIRECTORY =
             System.getProperty("user.dir"); //  or "user.home"
 	
+	public boolean isLoad_preferences() {
+		return load_preferences;
+	}
+
+	public void setLoad_preferences(boolean load_preferences) {
+		this.load_preferences = load_preferences;
+	}
+
 	private static Path getInitialDirectory() {
         return (rootDir == null) ? Paths.get(DEFAULT_DIRECTORY) : rootDir;
     }
 	
 	public PackageData(Boolean load_pref) throws IOException, ClassNotFoundException {
 		exec = Executors.newFixedThreadPool(cores);
+		this.setLoad_preferences(load_pref);
 		/*
 		exec = Executors.newSingleThreadExecutor(r -> {
 			Thread t = new Thread(r);
@@ -96,8 +106,11 @@ public class PackageData  implements Serializable {
 				
 				new_task.setOnFailed(e -> {
 //					String group_name = e.getSource().getMessage();
+					System.out.println("Mistake occured");
 					Throwable thingThatWentWrong = new_task.getException();
 					thingThatWentWrong.getCause().printStackTrace();
+					System.out.println("Mistake occured");
+					System.out.println("Teste Marcelo");
 				});
 				exec.execute(new_task);
 			}

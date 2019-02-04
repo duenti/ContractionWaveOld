@@ -102,7 +102,7 @@ public class Controller_2c_ImagesNew implements Initializable {
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);

@@ -74,7 +74,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableView;
@@ -252,7 +251,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -301,7 +300,12 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	    Writer writer = null;
 	    try {
 	        writer = new BufferedWriter(new FileWriter(file));
-	        String text2 = "Time(s)\tSpeed(\u00B5/s)\n";
+	        String time_str = "Time (s)";
+			if (checkSeconds.isSelected() == false) {
+				time_str = "Time (ms)";
+			}
+	        
+	        String text2 = time_str+"\tSpeed (\u00B5/s)\n";
 	        writer.write(text2);
 	        
 //	        for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
@@ -328,11 +332,15 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     @FXML
     void handleExportXLS(ActionEvent event) throws IOException{
     	Workbook workbook = new HSSFWorkbook();
-		Sheet spreadsheet = workbook.createSheet("sample");
+		Sheet spreadsheet = workbook.createSheet("time_speed");
 		Row row = spreadsheet.createRow(0);
 		
-		row.createCell(0).setCellValue("Time(s)");
-		row.createCell(1).setCellValue("Speed(\u00B5/s)");
+        String time_str = "Time (s)";
+		if (checkSeconds.isSelected() == false) {
+			time_str = "Time (ms)";
+		}
+		row.createCell(0).setCellValue(time_str);
+		row.createCell(1).setCellValue("Speed (\u00B5/s)");
 		
 //		for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
 		for (int i = start; i < stop; i++) {
@@ -343,6 +351,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 //			row.createCell(1).setCellValue(average * fps_val * pixel_val);
 			row.createCell(1).setCellValue((average * fps_val * pixel_val) - average_value);
 		}
+		spreadsheet.autoSizeColumn(0);
+		spreadsheet.autoSizeColumn(1);
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName("time-speed.xls");
         Stage primaryStage;
@@ -655,32 +665,27 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 					try {
 						fout = new FileOutputStream(file);
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					ObjectOutputStream oos = null;
 					try {
 						oos = new ObjectOutputStream(fout);
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					try {
 						oos.writeObject(continue_obj);
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					try {
 						oos.close();
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					try {
 						fout.close();
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 //					Stage buttonTypeOk = (Stage) cmdNext.getScene().getWindow();
@@ -880,9 +885,82 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 				}
 			}
 		}
+		for (int j = 0; j < viewResultsTable.getColumns().size(); j++) {
+			spreadsheet.autoSizeColumn(j);
+		}
+	}
+	
+	void createAverageSheet(Sheet spreadsheet, TableView thistable) {
+		Row row = spreadsheet.createRow(0);
+		row.createCell((int)thistable.getColumns().size()/2).setCellValue("Averages:");
+		row = spreadsheet.createRow(1);
+		for (int j = 0; j < thistable.getColumns().size(); j++) {
+			if (j == 0) {
+				row.createCell(j).setCellValue(((TableColumn<Peak, String>) thistable.getColumns().get(j)).getText());
+			} else {
+				TableColumn<Peak, Double> a = (TableColumn<Peak, Double>) thistable.getColumns().get(j);
+				Label b = (Label) a.getGraphic();
+				row.createCell(j).setCellValue(b.getText());
+			}
+		}
+		row = spreadsheet.createRow(2);
+		List<Double> avgs = new ArrayList<Double>();
+		for (int j = 1; j < thistable.getColumns().size(); j++) {
+			double avg = 0.0;
+			double row_number = 0.0;
+			for (int i = 0; i < thistable.getItems().size(); i++) {
+				Double result = ((TableColumnBase<Peak, Double>) thistable.getColumns().get(j)).getCellData(i);
+				if (result != null) {
+					avg += result.doubleValue();
+					row_number += 1.0;
+				}
+			}
+			avg /= row_number;
+			avgs.add(avg);
+			row.createCell(j).setCellValue(avg);
+		}
+		row = spreadsheet.createRow(4);
+		row.createCell((int)thistable.getColumns().size()/2).setCellValue("Standard Deviation:");
+		row = spreadsheet.createRow(5);
+		for (int j = 1; j < thistable.getColumns().size(); j++) {
+			double dev = 0.0;
+			int row_number = 0;
+			for (int i = 0; i < thistable.getItems().size(); i++) {
+				Double result = ((TableColumnBase<Peak, Double>) thistable.getColumns().get(j)).getCellData(i);
+				if (result != null) {
+					double value = result.doubleValue() - avgs.get(j-1);
+					dev += Math.pow(value, 2);
+					row_number += 1;
+				}
+			}
+//			System.out.println(dev);
+			dev /= row_number;
+//			System.out.println(dev);
+			dev = Math.sqrt(dev);
+			System.out.println(dev);
+			row.createCell(j).setCellValue(dev);
+		}
+		for (int j = 0; j < thistable.getColumns().size(); j++) {
+			spreadsheet.autoSizeColumn(j);
+		}
 	}
 	
 	void exportTables(String filename) throws IOException {
+
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		// TODO Auto-generated catch block
+		//include average and st deviation table
 		Workbook workbook = new HSSFWorkbook();
 		Sheet spreadsheet = workbook.createSheet("time");
 		createNewSheet(spreadsheet, timeTableView);
@@ -890,6 +968,12 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		createNewSheet(spreadsheet2, speedTableView);
 		Sheet spreadsheet3 = workbook.createSheet("area");
 		createNewSheet(spreadsheet3, areaTableView);
+		Sheet spreadsheet4 = workbook.createSheet("time_stats");
+		createAverageSheet(spreadsheet4, timeTableView);
+		Sheet spreadsheet5 = workbook.createSheet("speed_stats");
+		createAverageSheet(spreadsheet5, speedTableView);
+		Sheet spreadsheet6 = workbook.createSheet("area_stats");
+		createAverageSheet(spreadsheet6, areaTableView);
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setInitialFileName(filename);
 	    Stage primaryStage;
@@ -905,7 +989,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     void exportTable(TableView viewResultsTable, int type, String filename) throws Exception {
 		if (type == 0){
 			Workbook workbook = new HSSFWorkbook();
-			Sheet spreadsheet = workbook.createSheet("sample");
+			String f_sheet_name = filename.split("\\-")[0];
+			Sheet spreadsheet = workbook.createSheet(f_sheet_name);
 			Row row = spreadsheet.createRow(0);
 			
 			for (int j = 0; j < viewResultsTable.getColumns().size(); j++) {
@@ -939,6 +1024,12 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 					}
 				}
 			}
+			for (int j = 0; j < viewResultsTable.getColumns().size(); j++) {
+				spreadsheet.autoSizeColumn(j);
+			}
+			String type_tb = filename.split("\\-")[0] + "_stats";
+			Sheet spreadsheet5 = workbook.createSheet(type_tb);
+			createAverageSheet(spreadsheet5, viewResultsTable);
 			FileChooser fileChooser = new FileChooser();
 			fileChooser.setInitialFileName(filename);
 	        Stage primaryStage;
@@ -1618,7 +1709,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	private JFreeChart createChart(XYDataset dataset, int min) {
 		String time_str =  "Time (s)";
 		if (checkSeconds.isSelected() == false) {
-			time_str = "Time (\u00B5s)";
+			time_str = "Time (ms)";
 		}
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Main Plot",

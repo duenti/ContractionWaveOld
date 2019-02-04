@@ -176,7 +176,7 @@
                   </HBox>
                   <Button id="glass-grey" fx:id="cmdBack" mnemonicParsing="false" onAction="#back" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="13" />
                   <Button id="glass-grey" fx:id="cmdNext" mnemonicParsing="false" onAction="#nextPageNavigate" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.rowIndex="13" />
-                  <CheckBox fx:id="checkSeconds" mnemonicParsing="false" selected="true" text="Microseconds to Seconds" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="CENTER">
+                  <CheckBox fx:id="checkSeconds" mnemonicParsing="false" selected="true" text="Milliseconds to Seconds" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="CENTER">
                      <font>
                         <Font size="10.0" />
                      </font>

@@ -115,11 +115,11 @@
                   <Font size="21.0" />
                </font>
             </Label>
-            <Label text="Delta:" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
+            <Label text="Delta (µ/s):" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
             <Spinner fx:id="spinnerDelta" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            <Label text="Min. IntraPeaks" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label text="Min. IntraPeaks (s):" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
             <Spinner fx:id="spinnerIntra" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-            <Label text="Min. InterPeaks" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label text="Min. InterPeaks (s):" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
             <Spinner fx:id="spinnerInter" GridPane.columnIndex="8" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
             <SwingNode fx:id="swgChart" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="5" GridPane.valignment="CENTER" />
             <SwingNode fx:id="swgNodeBig" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.rowSpan="6" GridPane.valignment="CENTER" />

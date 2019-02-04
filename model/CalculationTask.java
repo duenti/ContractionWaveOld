@@ -19,6 +19,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
@@ -119,6 +121,14 @@ public class CalculationTask extends Task<Void> {
 						time_end = Long.valueOf(time_end / 1000);
 						ending = " seconds";
 					}
+					if (time_end > 60) {
+						time_end = Long.valueOf(time_end / 60);
+						ending = " minutes";
+					}
+					if (time_end > 60) {
+						time_end = Long.valueOf(time_end / 60);
+						ending = " hours";
+					}
 
 					String timeAvg = String.valueOf(time_end) + ending;
 //					parent.setTimeAvg(timeAvg);
@@ -195,6 +205,14 @@ public class CalculationTask extends Task<Void> {
 								time_end = Long.valueOf(time_end / 1000);
 								ending = " seconds";
 							}
+							if (time_end > 60) {
+								time_end = Long.valueOf(time_end / 60);
+								ending = " minutes";
+							}
+							if (time_end > 60) {
+								time_end = Long.valueOf(time_end / 60);
+								ending = " hours";
+							}
 							String timeAvg = String.valueOf(time_end) + ending;
 //							parent.setTimeAvg(timeAvg);
 							thisgroup.setRemainingTime(timeAvg);
@@ -255,7 +273,10 @@ public class CalculationTask extends Task<Void> {
 				}
 	        });
 		} catch (Exception ex) {
+			   System.out.println("Marcelo erro teste 2");
 			   ex.getCause().printStackTrace();
+			   System.out.println("Marcelo erro teste 3");
+			   JOptionPane.showMessageDialog(null, "Could not run flow. Please try again", "Error", JOptionPane.ERROR_MESSAGE);
 		}
 		return null;
 	}

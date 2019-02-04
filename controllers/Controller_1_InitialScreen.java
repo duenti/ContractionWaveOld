@@ -98,7 +98,7 @@ public class Controller_1_InitialScreen implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -159,7 +159,7 @@ public class Controller_1_InitialScreen implements Initializable {
     }
 
     @FXML
-    void handleStartAnalysis(ActionEvent event) throws IOException {
+    void handleStartAnalysis(ActionEvent event) throws IOException, ClassNotFoundException {
 		Stage primaryStage = (Stage) cmdCheckProgress.getScene().getWindow();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();

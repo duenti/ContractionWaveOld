@@ -30,6 +30,11 @@
                         <MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
                      </items>
                   </Menu>
+                  <Menu mnemonicParsing="false" text="Advanced">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#handleDialogMicroscope" text="Set Microscope Settings" />
+                     </items>
+                  </Menu>
                   <Menu mnemonicParsing="false" text="Help">
                      <items>
                         <MenuItem mnemonicParsing="false" onAction="#handleAbout" text="About" />

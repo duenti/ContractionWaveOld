@@ -59,7 +59,7 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import controllers.Controller_3b2_DisplayResults.IncrementHandler;
+//import controllers.Controller_3b2_DisplayResults.IncrementHandler;
 import edu.mines.jtk.awt.ColorMap;
 import io.humble.video.Codec;
 import io.humble.video.Encoder;
@@ -103,6 +103,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
@@ -238,7 +239,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 		main_package.getListFlows().clear();
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -921,32 +922,41 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	dialogJet.setResizable(true);
     	Label label1 = new Label("Marker Alpha: ");
     	Spinner<Double> xwindowSpin = new Spinner<Double>();
-    	xwindowSpin.setValueFactory(facGen(0.0, 1.0, (double) main_package.getPlot_preferences().getMarkerAlpha(), 0.01));
+    	SpinnerValueFactory<Double> dobGen = facGen(0.0, 1.0, (double) main_package.getPlot_preferences().getMarkerAlpha(), 0.01);
     	xwindowSpin.setEditable(true);
-		IncrementHandler handler2 = new IncrementHandler();
-		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, handler2);
-		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                    handler2.stop();
-	                }
-	        }
-	    });
-		xwindowSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-			try {
-				main_package.getPlot_preferences().setMarkerAlpha(Float.valueOf(newValue));
-				marker.setAlpha(Float.valueOf(newValue));
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
-			}
-	    });
-		xwindowSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	xwindowSpin.increment(0);
-	        } 
-	    });
+		TextFormatter<Double> formatter1 = new TextFormatter<Double>(dobGen.getConverter(), dobGen.getValue());
+		xwindowSpin.getEditor().setTextFormatter(formatter1);
+		dobGen.valueProperty().bindBidirectional(formatter1.valueProperty());
+		formatter1.valueProperty().addListener((s, ov, nv) -> {
+			main_package.getPlot_preferences().setMarkerAlpha((float)nv.doubleValue());
+			marker.setAlpha((float)nv.doubleValue());
+		});
+//    	xwindowSpin.setValueFactory(facGen(0.0, 1.0, (double) main_package.getPlot_preferences().getMarkerAlpha(), 0.01));
+//    	xwindowSpin.setEditable(true);
+//		IncrementHandler handler2 = new IncrementHandler();
+//		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, handler2);
+//		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                    handler2.stop();
+//	                }
+//	        }
+//	    });
+//		xwindowSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				main_package.getPlot_preferences().setMarkerAlpha(Float.valueOf(newValue));
+//				marker.setAlpha(Float.valueOf(newValue));
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		xwindowSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	xwindowSpin.increment(0);
+//	        } 
+//	    });
     	GridPane grid = new GridPane();
     	grid.add(label1, 1, 1);
     	grid.add(xwindowSpin, 2, 1);
@@ -1186,66 +1196,97 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	Label label2 = new Label("Y Window: ");
     	Spinner<Integer> xwindowSpin = new Spinner<Integer>();
     	Spinner<Integer> ywindowSpin= new Spinner<Integer>();
-    	xwindowSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, xwindow, 1));
+    	
+    	SpinnerValueFactory<Integer> dobX = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, xwindow, 1);
+    	xwindowSpin.setValueFactory(dobX);
     	xwindowSpin.setEditable(true);
-		IncrementHandler handler12 = new IncrementHandler();
-		xwindowSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler12);
-		xwindowSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                    handler12.stop();
-	                }
-	        }
-	    });
-		xwindowSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		TextFormatter<Integer> formatterX = new TextFormatter<Integer>(dobX.getConverter(), dobX.getValue());
+		xwindowSpin.getEditor().setTextFormatter(formatterX);
+		dobX.valueProperty().bindBidirectional(formatterX.valueProperty());
+		formatterX.valueProperty().addListener((s, ov, nv) -> {
+			xwindow = nv;
 			try {
-				xwindow = Integer.valueOf(newValue);
 				renderImageView(current_index, currentRenderType, false);
-			} catch (java.lang.Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		xwindowSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	xwindowSpin.increment(0);
-	        } 
-	    });
+		});
+    	
+//    	xwindowSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, xwindow, 1));
+//    	xwindowSpin.setEditable(true);
+//		IncrementHandler handler12 = new IncrementHandler();
+//		xwindowSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler12);
+//		xwindowSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                    handler12.stop();
+//	                }
+//	        }
+//	    });
+//		xwindowSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				xwindow = Integer.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType, false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		xwindowSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	xwindowSpin.increment(0);
+//	        } 
+//	    });
 		
-    	ywindowSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, ywindow, 1));
+    	SpinnerValueFactory<Integer> dobY = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, ywindow, 1);
+    	ywindowSpin.setValueFactory(dobY);
     	ywindowSpin.setEditable(true);
-		IncrementHandler handler11 = new IncrementHandler();
-		ywindowSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler11);
-		ywindowSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                    handler11.stop();
-	                }
-	        }
-	    });
-		ywindowSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		TextFormatter<Integer> formatterY = new TextFormatter<Integer>(dobY.getConverter(), dobY.getValue());
+		ywindowSpin.getEditor().setTextFormatter(formatterY);
+		dobY.valueProperty().bindBidirectional(formatterY.valueProperty());
+		formatterY.valueProperty().addListener((s, ov, nv) -> {
+			ywindow = nv;
 			try {
-				ywindow = Integer.valueOf(newValue);
 				renderImageView(current_index, currentRenderType, false);
-			} catch (java.lang.Exception e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		ywindowSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	ywindowSpin.increment(0);
-	        } 
-	    });
+		});
+		
+//    	ywindowSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, ywindow, 1));
+//    	ywindowSpin.setEditable(true);
+//		IncrementHandler handler11 = new IncrementHandler();
+//		ywindowSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler11);
+//		ywindowSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                    handler11.stop();
+//	                }
+//	        }
+//	    });
+//		ywindowSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				ywindow = Integer.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType, false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		ywindowSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	ywindowSpin.increment(0);
+//	        } 
+//	    });
     	GridPane grid = new GridPane();
     	grid.add(label1, 1, 1);
     	grid.add(xwindowSpin, 2, 1);
     	grid.add(label2, 1, 2);
     	grid.add(ywindowSpin, 2, 2);
     	dialogJet.getDialogPane().setContent(grid);
-    	ButtonType buttonTypeOk = new ButtonType("Okay", ButtonData.OK_DONE);
+    	ButtonType buttonTypeOk = new ButtonType("Ok", ButtonData.OK_DONE);
     	dialogJet.getDialogPane().getButtonTypes().add(buttonTypeOk);
     	dialogJet.show();
     }
@@ -1283,275 +1324,429 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	Spinner<Double> alphaforeSpin = new Spinner<Double>();
     	Spinner<Double> alphaback2Spin = new Spinner<Double>();
     	Spinner<Double> alphafore2Spin = new Spinner<Double>();
-    	blurSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, blur_size, 1));
+    	
+    	SpinnerValueFactory<Integer> intB = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, blur_size, 1);
+    	blurSpin.setValueFactory(intB);
     	blurSpin.setEditable(true);
-		IncrementHandler handler_0 = new IncrementHandler();
-		blurSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_0);
-		blurSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                	handler_0.stop();
-	                }
-	        }
-	    });
-		blurSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		TextFormatter<Integer> formatterB = new TextFormatter<Integer>(intB.getConverter(), intB.getValue());
+		blurSpin.getEditor().setTextFormatter(formatterB);
+		intB.valueProperty().bindBidirectional(formatterB.valueProperty());
+		formatterB.valueProperty().addListener((s, ov, nv) -> {
+			blur_size = nv;
 			try {
-				blur_size = Integer.valueOf(newValue);
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
+				renderImageView(current_index, currentRenderType, false);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		blurSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	blurSpin.increment(0);
-	        } 
-	    });
-
-    	dilationSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_dilation, 1));
+		});
+//    	blurSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, blur_size, 1));
+//    	blurSpin.setEditable(true);
+//		IncrementHandler handler_0 = new IncrementHandler();
+//		blurSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_0);
+//		blurSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                	handler_0.stop();
+//	                }
+//	        }
+//	    });
+//		blurSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				blur_size = Integer.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		blurSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	blurSpin.increment(0);
+//	        } 
+//	    });
+		
+		
+    	SpinnerValueFactory<Integer> intD = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_dilation, 1);
+    	dilationSpin.setValueFactory(intD);
     	dilationSpin.setEditable(true);
-		IncrementHandler handler_1 = new IncrementHandler();
-		dilationSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_1);
-		dilationSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                	handler_1.stop();
-	                }
-	        }
-	    });
-		dilationSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		TextFormatter<Integer> formatterD = new TextFormatter<Integer>(intD.getConverter(), intD.getValue());
+		dilationSpin.getEditor().setTextFormatter(formatterD);
+		intD.valueProperty().bindBidirectional(formatterD.valueProperty());
+		formatterD.valueProperty().addListener((s, ov, nv) -> {
+			kernel_dilation = nv;
 			try {
-				kernel_dilation = Integer.valueOf(newValue);
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
+				renderImageView(current_index, currentRenderType, false);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		dilationSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	dilationSpin.increment(0);
-	        } 
-	    });
+		});
+//    	dilationSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_dilation, 1));
+//    	dilationSpin.setEditable(true);
+//		IncrementHandler handler_1 = new IncrementHandler();
+//		dilationSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_1);
+//		dilationSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                	handler_1.stop();
+//	                }
+//	        }
+//	    });
+//		dilationSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				kernel_dilation = Integer.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		dilationSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	dilationSpin.increment(0);
+//	        } 
+//	    });
 		
-    	erosionSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_erosion, 1));
+    	SpinnerValueFactory<Integer> intE = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_erosion, 1);
+    	erosionSpin.setValueFactory(intE);
     	erosionSpin.setEditable(true);
-		IncrementHandler handler_2 = new IncrementHandler();
-		erosionSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_2);
-		erosionSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                	handler_2.stop();
-	                }
-	        }
-	    });
-		erosionSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		TextFormatter<Integer> formatterE = new TextFormatter<Integer>(intE.getConverter(), intE.getValue());
+		erosionSpin.getEditor().setTextFormatter(formatterE);
+		intE.valueProperty().bindBidirectional(formatterE.valueProperty());
+		formatterE.valueProperty().addListener((s, ov, nv) -> {
+			kernel_erosion = nv;
 			try {
-				kernel_erosion = Integer.valueOf(newValue);
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
+				renderImageView(current_index, currentRenderType, false);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		erosionSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	erosionSpin.increment(0);
-	        } 
-	    });
+		});
+//    	erosionSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_erosion, 1));
+//    	erosionSpin.setEditable(true);
+//		IncrementHandler handler_2 = new IncrementHandler();
+//		erosionSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_2);
+//		erosionSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                	handler_2.stop();
+//	                }
+//	        }
+//	    });
+//		erosionSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				kernel_erosion = Integer.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		erosionSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	erosionSpin.increment(0);
+//	        } 
+//	    });
 		
-	   	smoothingSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_smoothing_contours, 1));
-	   	smoothingSpin.setEditable(true);
-		IncrementHandler handler_3 = new IncrementHandler();
-		smoothingSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_3);
-		smoothingSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                	handler_3.stop();
-	                }
-	        }
-	    });
-		smoothingSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-			try {
-				kernel_smoothing_contours = Integer.valueOf(newValue);
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
-			}
-	    });
-		smoothingSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	smoothingSpin.increment(0);
-	        } 
-	    });
 		
-	   	borderSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, border_value, 1));
-	   	borderSpin.setEditable(true);
-		IncrementHandler handler_4 = new IncrementHandler();
-		borderSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_4);
-		borderSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                	handler_4.stop();
-	                }
-	        }
-	    });
-		borderSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+    	SpinnerValueFactory<Integer> intS = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_smoothing_contours, 1);
+    	smoothingSpin.setValueFactory(intS);
+    	smoothingSpin.setEditable(true);
+		TextFormatter<Integer> formatterS = new TextFormatter<Integer>(intS.getConverter(), intS.getValue());
+		smoothingSpin.getEditor().setTextFormatter(formatterS);
+		intS.valueProperty().bindBidirectional(formatterS.valueProperty());
+		formatterS.valueProperty().addListener((s, ov, nv) -> {
+			kernel_smoothing_contours = nv;
 			try {
-				border_value = Integer.valueOf(newValue);
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
+				renderImageView(current_index, currentRenderType, false);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		borderSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	borderSpin.increment(0);
-	        } 
-	    });
+		});
+//	   	smoothingSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_smoothing_contours, 1));
+//	   	smoothingSpin.setEditable(true);
+//		IncrementHandler handler_3 = new IncrementHandler();
+//		smoothingSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_3);
+//		smoothingSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                	handler_3.stop();
+//	                }
+//	        }
+//	    });
+//		smoothingSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				kernel_smoothing_contours = Integer.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		smoothingSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	smoothingSpin.increment(0);
+//	        } 
+//	    });
+		//TODO
+		//TODO
+		//TODO
+		//TODO
+		//TODO
+		//TODO
+		//TODO
 		
-	   	sigmaSpin.setValueFactory(facGen(0, Double.MAX_VALUE, sigma, 0.01));
-	   	sigmaSpin.setEditable(true);
-		IncrementHandler handler_5 = new IncrementHandler();
-		sigmaSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_5);
-		sigmaSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                	handler_5.stop();
-	                }
-	        }
-	    });
-		sigmaSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		SpinnerValueFactory<Integer> intBor = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, border_value, 1);
+		borderSpin.setValueFactory(intBor);
+		borderSpin.setEditable(true);
+		TextFormatter<Integer> formatterBor = new TextFormatter<Integer>(intBor.getConverter(), intBor.getValue());
+		borderSpin.getEditor().setTextFormatter(formatterBor);
+		intBor.valueProperty().bindBidirectional(formatterBor.valueProperty());
+		formatterBor.valueProperty().addListener((s, ov, nv) -> {
+			border_value = nv;
 			try {
-				sigma = Double.valueOf(newValue);
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
+				renderImageView(current_index, currentRenderType, false);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		sigmaSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	sigmaSpin.increment(0);
-	        } 
-	    });
+		});
 		
-	   	alphabackSpin.setValueFactory(facGen(0, 1.0, alpha_under_two, 0.01));
-	   	alphabackSpin.setEditable(true);
-		IncrementHandler handler_6 = new IncrementHandler();
-		alphabackSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_6);
-		alphabackSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                	handler_6.stop();
-	                }
-	        }
-	    });
-		alphabackSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-			try {
-				alpha_under_two = Double.valueOf(newValue);
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
-			}
-	    });
-		alphabackSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	alphabackSpin.increment(0);
-	        } 
-	    });
+//	   	borderSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, border_value, 1));
+//	   	borderSpin.setEditable(true);
+//		IncrementHandler handler_4 = new IncrementHandler();
+//		borderSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_4);
+//		borderSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                	handler_4.stop();
+//	                }
+//	        }
+//	    });
+//		borderSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				border_value = Integer.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		borderSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	borderSpin.increment(0);
+//	        } 
+//	    });
 		
-	   	alphaback2Spin.setValueFactory(facGen(0, 1.0, alpha_under_three, 0.01));
-	   	alphaback2Spin.setEditable(true);
-		IncrementHandler handler_7 = new IncrementHandler();
-		alphaback2Spin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_7);
-		alphaback2Spin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                	handler_7.stop();
-	                }
-	        }
-	    });
-		alphaback2Spin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-			try {
-				alpha_under_three = Double.valueOf(newValue);
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
-			}
-	    });
-		alphaback2Spin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	alphaback2Spin.increment(0);
-	        } 
-	    });
 		
-	   	alphaforeSpin.setValueFactory(facGen(0, 1.0, alpha_above_two, 0.01));
-	   	alphaforeSpin.setEditable(true);
-		IncrementHandler handler_8 = new IncrementHandler();
-		alphaforeSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_8);
-		alphaforeSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                	handler_8.stop();
-	                }
-	        }
-	    });
-		alphaforeSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		SpinnerValueFactory<Double> intSig = facGen(0, Double.MAX_VALUE, sigma, 0.01);
+		sigmaSpin.setValueFactory(intSig);
+		sigmaSpin.setEditable(true);
+		TextFormatter<Double> formatterSig = new TextFormatter<Double>(intSig.getConverter(), intSig.getValue());
+		sigmaSpin.getEditor().setTextFormatter(formatterSig);
+		intSig.valueProperty().bindBidirectional(formatterSig.valueProperty());
+		formatterSig.valueProperty().addListener((s, ov, nv) -> {
+			sigma = nv;
 			try {
-				alpha_above_two = Double.valueOf(newValue);
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
+				renderImageView(current_index, currentRenderType, false);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		alphaforeSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	alphaforeSpin.increment(0);
-	        } 
-	    });
+		});
+//	   	sigmaSpin.setValueFactory(facGen(0, Double.MAX_VALUE, sigma, 0.01));
+//	   	sigmaSpin.setEditable(true);
+//		IncrementHandler handler_5 = new IncrementHandler();
+//		sigmaSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_5);
+//		sigmaSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                	handler_5.stop();
+//	                }
+//	        }
+//	    });
+//		sigmaSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				sigma = Double.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		sigmaSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	sigmaSpin.increment(0);
+//	        } 
+//	    });
 		
-	   	alphafore2Spin.setValueFactory(facGen(0, 1.0, alpha_above_three, 0.01));
-	   	alphafore2Spin.setEditable(true);
-		IncrementHandler handler_9 = new IncrementHandler();
-		alphafore2Spin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_9);
-		alphafore2Spin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                	handler_9.stop();
-	                }
-	        }
-	    });
-		alphafore2Spin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		
+		SpinnerValueFactory<Double> intAlp = facGen(0, 1.0, alpha_under_two, 0.01);
+		alphabackSpin.setValueFactory(intAlp);
+		alphabackSpin.setEditable(true);
+		TextFormatter<Double> formatterAlp = new TextFormatter<Double>(intAlp.getConverter(), intAlp.getValue());
+		alphabackSpin.getEditor().setTextFormatter(formatterAlp);
+		intAlp.valueProperty().bindBidirectional(formatterAlp.valueProperty());
+		formatterAlp.valueProperty().addListener((s, ov, nv) -> {
+			alpha_under_two = nv;
 			try {
-				alpha_above_three = Double.valueOf(newValue);
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
+				renderImageView(current_index, currentRenderType, false);
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		alphafore2Spin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	alphafore2Spin.increment(0);
-	        } 
-	    });
+		});
+//	   	alphabackSpin.setValueFactory(facGen(0, 1.0, alpha_under_two, 0.01));
+//	   	alphabackSpin.setEditable(true);
+//		IncrementHandler handler_6 = new IncrementHandler();
+//		alphabackSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_6);
+//		alphabackSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                	handler_6.stop();
+//	                }
+//	        }
+//	    });
+//		alphabackSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				alpha_under_two = Double.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		alphabackSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	alphabackSpin.increment(0);
+//	        } 
+//	    });
+		SpinnerValueFactory<Double> intAlp2 = facGen(0, 1.0, alpha_under_three, 0.01);
+		alphaback2Spin.setValueFactory(intAlp2);
+		alphaback2Spin.setEditable(true);
+		TextFormatter<Double> formatterAlp2 = new TextFormatter<Double>(intAlp2.getConverter(), intAlp2.getValue());
+		alphaback2Spin.getEditor().setTextFormatter(formatterAlp2);
+		intAlp2.valueProperty().bindBidirectional(formatterAlp2.valueProperty());
+		formatterAlp2.valueProperty().addListener((s, ov, nv) -> {
+			alpha_under_three = nv;
+			try {
+				renderImageView(current_index, currentRenderType, false);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+//	   	alphaback2Spin.setValueFactory(facGen(0, 1.0, alpha_under_three, 0.01));
+//	   	alphaback2Spin.setEditable(true);
+//		IncrementHandler handler_7 = new IncrementHandler();
+//		alphaback2Spin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_7);
+//		alphaback2Spin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                	handler_7.stop();
+//	                }
+//	        }
+//	    });
+//		alphaback2Spin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				alpha_under_three = Double.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		alphaback2Spin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	alphaback2Spin.increment(0);
+//	        } 
+//	    });
+		
+		SpinnerValueFactory<Double> intAlp3 = facGen(0, 1.0, alpha_above_two, 0.01);
+		alphaforeSpin.setValueFactory(intAlp3);
+		alphaforeSpin.setEditable(true);
+		TextFormatter<Double> formatterAlp3 = new TextFormatter<Double>(intAlp3.getConverter(), intAlp3.getValue());
+		alphaforeSpin.getEditor().setTextFormatter(formatterAlp3);
+		intAlp3.valueProperty().bindBidirectional(formatterAlp3.valueProperty());
+		formatterAlp3.valueProperty().addListener((s, ov, nv) -> {
+			alpha_above_two = nv;
+			try {
+				renderImageView(current_index, currentRenderType, false);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		
+//	   	alphaforeSpin.setValueFactory(facGen(0, 1.0, alpha_above_two, 0.01));
+//	   	alphaforeSpin.setEditable(true);
+//		IncrementHandler handler_8 = new IncrementHandler();
+//		alphaforeSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_8);
+//		alphaforeSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                	handler_8.stop();
+//	                }
+//	        }
+//	    });
+//		alphaforeSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				alpha_above_two = Double.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		alphaforeSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	alphaforeSpin.increment(0);
+//	        } 
+//	    });
+		
+		SpinnerValueFactory<Double> intAlp4 = facGen(0, 1.0, alpha_above_three, 0.01);
+		alphafore2Spin.setValueFactory(intAlp4);
+		alphafore2Spin.setEditable(true);
+		TextFormatter<Double> formatterAlp4 = new TextFormatter<Double>(intAlp4.getConverter(), intAlp4.getValue());
+		alphafore2Spin.getEditor().setTextFormatter(formatterAlp4);
+		intAlp4.valueProperty().bindBidirectional(formatterAlp4.valueProperty());
+		formatterAlp4.valueProperty().addListener((s, ov, nv) -> {
+			alpha_above_three = nv;
+			try {
+				renderImageView(current_index, currentRenderType, false);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+		
+//	   	alphafore2Spin.setValueFactory(facGen(0, 1.0, alpha_above_three, 0.01));
+//	   	alphafore2Spin.setEditable(true);
+//		IncrementHandler handler_9 = new IncrementHandler();
+//		alphafore2Spin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_9);
+//		alphafore2Spin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                	handler_9.stop();
+//	                }
+//	        }
+//	    });
+//		alphafore2Spin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				alpha_above_three = Double.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		alphafore2Spin.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	alphafore2Spin.increment(0);
+//	        } 
+//	    });
 		
     	GridPane grid = new GridPane();
     	grid.add(label1, 1, 1);
@@ -1743,113 +1938,172 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		
 		createSliderAnimation(1);
 		
-		spinnerFPS.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1, 1));
-		spinnerFPS.getEditor().textProperty().addListener((obs,oldValue,newValue) ->{
-			if (!"".equals(newValue)) {
-				int newFPS = Integer.valueOf(newValue);
-				frameRate = newFPS;
-				double frameSeconds = 1.0/(double)newFPS;
-				sliderState = false;
-				sliderTimer.stop();
-				createSliderAnimation(frameSeconds);
-				if(cmdSliderPlay.getText().equals("Stop")){
-					sliderState = true;
-					sliderTimer.play();
-				}				
-			}
+		SpinnerValueFactory<Integer> intFPS = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1, 1);
+		spinnerFPS.setValueFactory(intFPS);
+		spinnerFPS.setEditable(true);
+		TextFormatter<Integer> formatterFPS = new TextFormatter<Integer>(intFPS.getConverter(), intFPS.getValue());
+		spinnerFPS.getEditor().setTextFormatter(formatterFPS);
+		intFPS.valueProperty().bindBidirectional(formatterFPS.valueProperty());
+		formatterFPS.valueProperty().addListener((s, ov, nv) -> {
+			int newFPS = nv;
+			frameRate = newFPS;
+			double frameSeconds = 1.0/(double)newFPS;
+			sliderState = false;
+			sliderTimer.stop();
+			createSliderAnimation(frameSeconds);
+			if(cmdSliderPlay.getText().equals("Stop")){
+				sliderState = true;
+				sliderTimer.play();
+			}	
 		});
-		spinnerFPS.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	spinnerFPS.increment(0);
-	        } 
-	    });
+//		spinnerFPS.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1, 1));
+//		spinnerFPS.getEditor().textProperty().addListener((obs,oldValue,newValue) ->{
+//			if (!"".equals(newValue)) {
+//				int newFPS = Integer.valueOf(newValue);
+//				frameRate = newFPS;
+//				double frameSeconds = 1.0/(double)newFPS;
+//				sliderState = false;
+//				sliderTimer.stop();
+//				createSliderAnimation(frameSeconds);
+//				if(cmdSliderPlay.getText().equals("Stop")){
+//					sliderState = true;
+//					sliderTimer.play();
+//				}				
+//			}
+//		});
+//		spinnerFPS.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	spinnerFPS.increment(0);
+//	        } 
+//	    });
 		
-		spinnerMask.setValueFactory(facGen(0.0, 10000.0, mask_value, 0.1));
+		SpinnerValueFactory<Double> intMask = facGen(0.0, 10000.0, mask_value, 0.1);
+		spinnerMask.setValueFactory(intMask);
 		spinnerMask.setEditable(true);
-		IncrementHandler handler1 = new IncrementHandler();
-		spinnerMask.addEventFilter(MouseEvent.MOUSE_PRESSED, handler1);
-		spinnerMask.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                    handler1.stop();
-	                }
-	        }
-	    });
-		spinnerMask.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		TextFormatter<Double> formatterMask = new TextFormatter<Double>(intMask.getConverter(), intMask.getValue());
+		spinnerMask.getEditor().setTextFormatter(formatterMask);
+		intMask.valueProperty().bindBidirectional(formatterMask.valueProperty());
+		formatterMask.valueProperty().addListener((s, ov, nv) -> {
 			try {
-				mask_value = Double.valueOf(newValue);
+				mask_value = nv;
 				renderImageView(current_index, currentRenderType , false);
 			} catch (java.lang.Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		spinnerMask.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	spinnerMask.increment(0);
-	        } 
-	    });
+		});
+//		spinnerMask.setValueFactory(facGen(0.0, 10000.0, mask_value, 0.1));
+//		spinnerMask.setEditable(true);
+//		IncrementHandler handler1 = new IncrementHandler();
+//		spinnerMask.addEventFilter(MouseEvent.MOUSE_PRESSED, handler1);
+//		spinnerMask.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                    handler1.stop();
+//	                }
+//	        }
+//	    });
+//		spinnerMask.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				mask_value = Double.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		spinnerMask.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	spinnerMask.increment(0);
+//	        } 
+//	    });
 		
-		spinnerScaleStart.setValueFactory(facGen(0.0, 10000.0, scale_start, 0.1));
+		SpinnerValueFactory<Double> intScaleStart = facGen(0.0, 10000.0, scale_start, 0.1);
+		spinnerScaleStart.setValueFactory(intScaleStart);
 		spinnerScaleStart.setEditable(true);
-		IncrementHandler handler2 = new IncrementHandler();
-		spinnerScaleStart.addEventFilter(MouseEvent.MOUSE_PRESSED, handler2);
-		spinnerScaleStart.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                    handler2.stop();
-	                }
-	        }
-	    });
-		spinnerScaleStart.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		TextFormatter<Double> formatterScaleStart = new TextFormatter<Double>(intScaleStart.getConverter(), intScaleStart.getValue());
+		spinnerScaleStart.getEditor().setTextFormatter(formatterScaleStart);
+		intScaleStart.valueProperty().bindBidirectional(formatterScaleStart.valueProperty());
+		formatterScaleStart.valueProperty().addListener((s, ov, nv) -> {
 			try {
-				scale_start = Double.valueOf(newValue);
+				scale_start = nv;
 				renderImageView(current_index, currentRenderType , false);
 			} catch (java.lang.Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		spinnerScaleStart.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	spinnerScaleStart.increment(0);
-	        } 
 		});
-		
-		spinnerScaleEnd.setValueFactory(facGen(0.0, 10000.0, scale_end, 1.0));
+//		spinnerScaleStart.setValueFactory(facGen(0.0, 10000.0, scale_start, 0.1));
+//		spinnerScaleStart.setEditable(true);
+//		IncrementHandler handler2 = new IncrementHandler();
+//		spinnerScaleStart.addEventFilter(MouseEvent.MOUSE_PRESSED, handler2);
+//		spinnerScaleStart.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                    handler2.stop();
+//	                }
+//	        }
+//	    });
+//		spinnerScaleStart.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				scale_start = Double.valueOf(newValue);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		spinnerScaleStart.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	spinnerScaleStart.increment(0);
+//	        } 
+//		});
+		SpinnerValueFactory<Double> intScaleEnd = facGen(0.0, 10000.0, scale_start, 0.1);
+		spinnerScaleEnd.setValueFactory(intScaleEnd);
 		spinnerScaleEnd.setEditable(true);
-		IncrementHandler handler3 = new IncrementHandler();
-		spinnerScaleEnd.addEventFilter(MouseEvent.MOUSE_PRESSED, handler3);
-		spinnerScaleEnd.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-	        Node node = evt.getPickResult().getIntersectedNode();
-	        if (node.getStyleClass().contains("increment-arrow-button") ||
-	            node.getStyleClass().contains("decrement-arrow-button")) {
-	                if (evt.getButton() == MouseButton.PRIMARY) {
-	                    handler3.stop();
-	        			try {
-	        				renderImageView(current_index, currentRenderType , false);
-	        			} catch (java.lang.Exception e) {
-	        				e.printStackTrace();
-	        			}
-	                }
-	        }
-	    });
-		spinnerScaleEnd.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+		TextFormatter<Double> formatterScaleEnd = new TextFormatter<Double>(intScaleEnd.getConverter(), intScaleEnd.getValue());
+		spinnerScaleEnd.getEditor().setTextFormatter(formatterScaleEnd);
+		intScaleEnd.valueProperty().bindBidirectional(formatterScaleEnd.valueProperty());
+		formatterScaleEnd.valueProperty().addListener((s, ov, nv) -> {
 			try {
-				scale_end = Double.valueOf(newValue);
-				//scale_end = Double.valueOf(newValue) *  (1/fps_value) * (1/pixel_value);
+				scale_end = nv;
 				renderImageView(current_index, currentRenderType , false);
 			} catch (java.lang.Exception e) {
 				e.printStackTrace();
 			}
-	    });
-		spinnerScaleEnd.focusedProperty().addListener((obs, oldValue, newValue) -> {
-	        if (newValue == false) {
-	        	spinnerScaleEnd.increment(0);
-	        } 
 		});
+//		spinnerScaleEnd.setValueFactory(facGen(0.0, 10000.0, scale_end, 1.0));
+//		spinnerScaleEnd.setEditable(true);
+//		IncrementHandler handler3 = new IncrementHandler();
+//		spinnerScaleEnd.addEventFilter(MouseEvent.MOUSE_PRESSED, handler3);
+//		spinnerScaleEnd.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
+//	        Node node = evt.getPickResult().getIntersectedNode();
+//	        if (node.getStyleClass().contains("increment-arrow-button") ||
+//	            node.getStyleClass().contains("decrement-arrow-button")) {
+//	                if (evt.getButton() == MouseButton.PRIMARY) {
+//	                    handler3.stop();
+//	        			try {
+//	        				renderImageView(current_index, currentRenderType , false);
+//	        			} catch (java.lang.Exception e) {
+//	        				e.printStackTrace();
+//	        			}
+//	                }
+//	        }
+//	    });
+//		spinnerScaleEnd.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
+//			try {
+//				scale_end = Double.valueOf(newValue);
+//				//scale_end = Double.valueOf(newValue) *  (1/fps_value) * (1/pixel_value);
+//				renderImageView(current_index, currentRenderType , false);
+//			} catch (java.lang.Exception e) {
+//				e.printStackTrace();
+//			}
+//	    });
+//		spinnerScaleEnd.focusedProperty().addListener((obs, oldValue, newValue) -> {
+//	        if (newValue == false) {
+//	        	spinnerScaleEnd.increment(0);
+//	        } 
+//		});
 		
 		ChangeListener<Number> gridSizeListenerWidth = new ChangeListener<Number>() {
             @Override
@@ -1936,7 +2190,6 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			                });
 			            	
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 		            }
@@ -3048,83 +3301,83 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     }
     
       
-    private static final PseudoClass PRESSED = PseudoClass.getPseudoClass("pressed");
-  
-    class IncrementHandler implements EventHandler<MouseEvent> {
-        private Spinner spinner;
-        private boolean increment;
-        private long startTimestamp;
-        private int currentFrame = 0;
-        private int previousFrame = 0;  
-
-        private long initialDelay = 1000l * 1000L * 750L; // 0.75 sec
-        private Node button;
-
-        private final AnimationTimer timer = new AnimationTimer() {
-
-            @Override
-            public void handle(long now) {
-            	if (currentFrame == previousFrame || currentFrame % 10 == 0) {
-	                if (now - startTimestamp >= initialDelay) {
-	                    // trigger updates every frame once the initial delay is over
-	                    if (increment) {
-	                        spinner.increment();
-	                    } else {
-	                        spinner.decrement();
-	                    }
-	                }
-            	}
-            	++currentFrame;
-            }
-        };
-
-        @Override
-        public void handle(MouseEvent event) {
-            if (event.getButton() == MouseButton.PRIMARY) {
-                Spinner source = (Spinner) event.getSource();
-                Node node = event.getPickResult().getIntersectedNode();
-
-                Boolean increment = null;
-                // find which kind of button was pressed and if one was pressed
-                while (increment == null && node != source) {
-                    if (node.getStyleClass().contains("increment-arrow-button")) {
-                        increment = Boolean.TRUE;
-                    } else if (node.getStyleClass().contains("decrement-arrow-button")) {
-                        increment = Boolean.FALSE;
-                    } else {
-                        node = node.getParent();
-                    }
-                }
-                if (increment != null) {
-                    event.consume();
-                    source.requestFocus();
-                    spinner = source;
-                    this.increment = increment;
-
-                    // timestamp to calculate the delay
-                    startTimestamp = System.nanoTime();
-
-                    button = node;
-
-                    // update for css styling
-                    node.pseudoClassStateChanged(PRESSED, true);
-
-                    // first value update
-                    timer.handle(startTimestamp + initialDelay);
-
-                    // trigger timer for more updates later
-                    timer.start();
-                }
-            }
-        }
-
-        public void stop() {
-            timer.stop();
-            button.pseudoClassStateChanged(PRESSED, false);
-            button = null;
-            spinner = null;
-            previousFrame = currentFrame;
-        }
-    }
+//    private static final PseudoClass PRESSED = PseudoClass.getPseudoClass("pressed");
+//  
+//    class IncrementHandler implements EventHandler<MouseEvent> {
+//        private Spinner spinner;
+//        private boolean increment;
+//        private long startTimestamp;
+//        private int currentFrame = 0;
+//        private int previousFrame = 0;  
+//
+//        private long initialDelay = 1000l * 1000L * 750L; // 0.75 sec
+//        private Node button;
+//
+//        private final AnimationTimer timer = new AnimationTimer() {
+//
+//            @Override
+//            public void handle(long now) {
+//            	if (currentFrame == previousFrame || currentFrame % 10 == 0) {
+//	                if (now - startTimestamp >= initialDelay) {
+//	                    // trigger updates every frame once the initial delay is over
+//	                    if (increment) {
+//	                        spinner.increment();
+//	                    } else {
+//	                        spinner.decrement();
+//	                    }
+//	                }
+//            	}
+//            	++currentFrame;
+//            }
+//        };
+//
+//        @Override
+//        public void handle(MouseEvent event) {
+//            if (event.getButton() == MouseButton.PRIMARY) {
+//                Spinner source = (Spinner) event.getSource();
+//                Node node = event.getPickResult().getIntersectedNode();
+//
+//                Boolean increment = null;
+//                // find which kind of button was pressed and if one was pressed
+//                while (increment == null && node != source) {
+//                    if (node.getStyleClass().contains("increment-arrow-button")) {
+//                        increment = Boolean.TRUE;
+//                    } else if (node.getStyleClass().contains("decrement-arrow-button")) {
+//                        increment = Boolean.FALSE;
+//                    } else {
+//                        node = node.getParent();
+//                    }
+//                }
+//                if (increment != null) {
+//                    event.consume();
+//                    source.requestFocus();
+//                    spinner = source;
+//                    this.increment = increment;
+//
+//                    // timestamp to calculate the delay
+//                    startTimestamp = System.nanoTime();
+//
+//                    button = node;
+//
+//                    // update for css styling
+//                    node.pseudoClassStateChanged(PRESSED, true);
+//
+//                    // first value update
+//                    timer.handle(startTimestamp + initialDelay);
+//
+//                    // trigger timer for more updates later
+//                    timer.start();
+//                }
+//            }
+//        }
+//
+//        public void stop() {
+//            timer.stop();
+//            button.pseudoClassStateChanged(PRESSED, false);
+//            button = null;
+//            spinner = null;
+//            previousFrame = currentFrame;
+//        }
+//    }
     
 }

@@ -13,6 +13,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -60,6 +61,9 @@ public class Controller_2d_FlowParametrization implements Initializable {
 //	
     @FXML
     private Button cmdParametrize;
+    
+    @FXML
+    private Button btnSaveSet;
 
     @FXML
     private Label lblInfo, lblGroupId;
@@ -120,7 +124,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
 
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(true));
+		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
 		primaryStage.setTitle("Image Optical Flow");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
@@ -287,6 +291,20 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		
 		return true;
 	}
+	
+	@FXML
+	void handleForAllSave(ActionEvent event) {
+		for (int initial = 0; initial < groups.size(); initial++) {
+			
+			pyrScaleList.set(initial, Double.valueOf(txtPyrScale.getText()));
+        	polySigmaList.set(initial, Double.valueOf(txtPolySigma.getText()));
+			levelsList.set(initial, Integer.valueOf(txtLevels.getText()));
+			winSizeList.set(initial, Integer.valueOf(txtWinSize.getText()));
+			iterationsList.set(initial, Integer.valueOf(txtIterations.getText()));
+			polySigmaList.set(initial, Double.valueOf(txtPolySigma.getText()));
+			polyNList.set(initial, Integer.valueOf(cmbPolyN.getSelectionModel().getSelectedItem().toString()));
+		}
+	}
     
 	
 	private int groupIndex = 0;
@@ -327,9 +345,9 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		winSizeList.set(groupIndex, Integer.valueOf(txtWinSize.getText()));
 		txtIterations.setText(String.valueOf(iterationsList.get(groupIndex)));
 		iterationsList.set(groupIndex, Integer.valueOf(txtIterations.getText()));
-		txtPolySigma.setText(String.valueOf(polyNList.get(groupIndex)));
-		polySigmaList.set(groupIndex, Double.valueOf(txtPolySigma.getText()));
-		
+//		txtPolySigma.setText(String.valueOf(polyNList.get(groupIndex)));
+//		polySigmaList.set(groupIndex, Double.valueOf(txtPolySigma.getText()));
+//		
 		
 		//this.lblGroup.setText("Group: " + groups.get(0).getName());
 	
@@ -431,29 +449,39 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		
 		sliderGroups.valueProperty().addListener(new ChangeListener<Number>() {
 			public void changed(ObservableValue<? extends Number> ov,Number old_val, Number new_val) {
-				int groupIndex = new_val.intValue()-1;
-				lblGroupId.setText(String.valueOf(groupIndex+1));
-				
-				groupLabelProperty.set(groups.get(groupIndex).getName());
-//				groupPyrProperty.set(String.valueOf(pyrScaleList.get(groupIndex)));
-//				groupPolySigmaProperty.set(String.valueOf(polySigmaList.get(groupIndex)));
-//				groupLevelsProperty.set(String.valueOf(levelsList.get(groupIndex)));
-//				groupWinSizeProperty.set(String.valueOf(winSizeList.get(groupIndex)));
-//				groupIterationsProperty.set(String.valueOf(iterationsList.get(groupIndex)));
-//				groupPolyNProperty.set(String.valueOf(polyNList.get(groupIndex)));
-//				
-				txtPyrScale.setText(String.valueOf(pyrScaleList.get(groupIndex)));
+
 				pyrScaleList.set(groupIndex, Double.valueOf(txtPyrScale.getText()));
-				txtPolySigma.setText(String.valueOf(polySigmaList.get(groupIndex)));
 	        	polySigmaList.set(groupIndex, Double.valueOf(txtPolySigma.getText()));
-				txtLevels.setText((String.valueOf(levelsList.get(groupIndex))));
 				levelsList.set(groupIndex, Integer.valueOf(txtLevels.getText()));
-				txtWinSize.setText(String.valueOf(winSizeList.get(groupIndex)));
 				winSizeList.set(groupIndex, Integer.valueOf(txtWinSize.getText()));
-				txtIterations.setText(String.valueOf(iterationsList.get(groupIndex)));
 				iterationsList.set(groupIndex, Integer.valueOf(txtIterations.getText()));
-				txtPolySigma.setText(String.valueOf(polyNList.get(groupIndex)));
-				polySigmaList.set(groupIndex, Double.valueOf(txtPolySigma.getText()));
+				polyNList.set(groupIndex, Integer.valueOf(cmbPolyN.getSelectionModel().getSelectedItem().toString()));
+				//first save changes
+				
+				//then get group index
+				groupIndex = new_val.intValue()-1;
+				
+				//then renew screen values
+				lblGroupId.setText(String.valueOf(groupIndex+1));
+				groupLabelProperty.set(groups.get(groupIndex).getName());
+				txtPyrScale.setText(String.valueOf(pyrScaleList.get(groupIndex)));
+				txtPolySigma.setText(String.valueOf(polySigmaList.get(groupIndex)));
+				txtLevels.setText((String.valueOf(levelsList.get(groupIndex))));
+				txtWinSize.setText(String.valueOf(winSizeList.get(groupIndex)));
+				txtIterations.setText(String.valueOf(iterationsList.get(groupIndex)));
+				
+				String current_val = polyNList.get(groupIndex).toString();
+				
+				//f
+				ObservableList<String> datacmb = cmbPolyN.getItems();
+				for (String z : datacmb) {
+					System.out.println(z);
+					if (z.equals(current_val) == true) {
+						cmbPolyN.setValue(current_val);
+						break;
+					}
+				}
+				
 			}
 		});
 	}

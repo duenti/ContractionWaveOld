@@ -1,5 +1,7 @@
 package model;
 
+import java.math.BigDecimal;
+
 import org.jfree.chart.plot.IntervalMarker;
 
 import javafx.beans.property.SimpleBooleanProperty;
@@ -40,6 +42,12 @@ public class Peak {
 		this.selectedStatus.set(selected);
 	}
 	
+	public static double round(double d, int decimalPlace) {
+	    BigDecimal bd = new BigDecimal(Double.toString(d));
+	    bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+	    return bd.doubleValue();
+	}
+	
 	public Peak(int f_point1, int end_point1, int mid_point1, int sec_point1, int fourth_point1, double start_value1, double end_value1, double tcr1, double tc1, double tr1, double tc_vmc1, double tc_vmc_min1, double tr_vmr1, double tr_vmr_b1, double t_vmc_vmr1, double vmc1, double vmin1, double vmr1, double d_vmc_vmr1, double area_t1, double area_c1, double area_r1, IntervalMarker e) {
 		this.setSelected(false);
 		f_point = f_point1;
@@ -51,21 +59,21 @@ public class Peak {
 		setStart_value(start_value1);
 		setEnd_value(end_value1);
 		setPos(String.valueOf((int) start_value) + "-" + String.valueOf((int) end_value));
-		tcr = tcr1;
-		tc = tc1;
-		tr = tr1;
-		tc_vmc = tc_vmc1;
-		tc_vmc_min = tc_vmc_min1;
-		tr_vmr = tr_vmr1;
-		tr_vmr_b = tr_vmr_b1;
-		t_vmc_vmr = t_vmc_vmr1;
-		vmc = vmc1;
-		vmin = vmin1;
-		vmr = vmr1;
-		d_vmc_vmr = d_vmc_vmr1;
-		area_t = area_t1;
-		area_c = area_c1;
-		area_r = area_r1;
+		tcr = round(tcr1, 3);
+		tc = round(tc1, 3);
+		tr = round(tr1, 3);
+		tc_vmc = round(tc_vmc1, 3);
+		tc_vmc_min = round(tc_vmc_min1, 3);
+		tr_vmr = round(tr_vmr1, 3);
+		tr_vmr_b = round(tr_vmr_b1, 3);
+		t_vmc_vmr = round(t_vmc_vmr1, 3);
+		vmc = round(vmc1,3);
+		vmin = round(vmin1,3);
+		vmr = round(vmr1,3);
+		d_vmc_vmr = round(d_vmc_vmr1,3);
+		area_t = round(area_t1,3);
+		area_c = round(area_c1,3);
+		area_r = round(area_r1,3);
 	}
 	
 	private boolean micro = false;

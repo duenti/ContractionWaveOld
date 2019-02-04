@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -100,7 +101,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label alignment="CENTER" prefHeight="16.0" prefWidth="867.0" text="Select area between a Peak set:" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER">
+            <Label alignment="CENTER" prefHeight="16.0" prefWidth="867.0" text="Select an area between a Peak set:" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER">
                <font>
                   <Font size="21.0" />
                </font>
@@ -109,7 +110,13 @@
             <Button id="glass-grey" fx:id="cmdBack" mnemonicParsing="false" onAction="#back" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="12" />
             <Button id="glass-grey" fx:id="cmdNext" mnemonicParsing="false" onAction="#nextPageNavigate" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
             <TextField fx:id="txtAverage" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
-            <Label alignment="CENTER_RIGHT" prefHeight="16.0" prefWidth="107.0" text="Average value:" GridPane.columnIndex="4" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
+            <Label alignment="CENTER_RIGHT" text="Selected area Max value (µ/s):" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
+            <HBox GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="10" GridPane.vgrow="SOMETIMES">
+               <children>
+                  <Button fx:id="btnZoomMode" mnemonicParsing="false" onAction="#handleZoomMode" text="Z" HBox.hgrow="NEVER" />
+                  <Button fx:id="btnSelectMode" mnemonicParsing="false" onAction="#handleSelectMode" text="S" HBox.hgrow="NEVER" />
+               </children>
+            </HBox>
          </children>
       </GridPane>
    </center>
