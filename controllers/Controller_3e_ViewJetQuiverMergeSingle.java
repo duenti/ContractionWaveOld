@@ -16,6 +16,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.FloatBuffer;
 import java.nio.file.Path;
@@ -115,6 +116,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
@@ -1810,7 +1812,100 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		height = currentGroup.getHeight();
 		ask_saved = saved;
     	current_index = 0;
+    	//go around flow list and get maximum value
+    	int done_a = 0;
+    	double maximum_value = 0.0;
+    	for (int i = 0; i < main_package.getListFlows().size(); i++) {
+    		done_a = 0;
+    		for(int x = 0; x < height; x++){
+    			for(int y = 0; y < width; y++){
+                	double final_float = 0.0;
+                	final_float = main_package.getListMags().get(i)[done_a];
+                	final_float = final_float * pixel_value * fps_value;
+                	if (final_float > maximum_value) {
+                		maximum_value = final_float;
+                	}
+                	done_a += 1;
+    			}
+    			
+    		}
+		}
+    	System.out.println(maximum_value);
+    	System.out.println(average_value);
+    	mask_value = average_value * pixel_value * fps_value;
+    	scale_start = average_value * pixel_value * fps_value;
+    	scale_end = maximum_value;
+    	System.out.println(scale_end);
+    	
+		
+		SpinnerValueFactory<Double> intMask = facGen(0.0, 10000.0, mask_value, 0.1);
+		spinnerMask.setValueFactory(intMask);
+		spinnerMask.setEditable(true);
+		TextFormatter<Double> formatterMask = new TextFormatter<Double>(intMask.getConverter(), intMask.getValue());
+		spinnerMask.getEditor().setTextFormatter(formatterMask);
+		intMask.valueProperty().bindBidirectional(formatterMask.valueProperty());
+		formatterMask.valueProperty().addListener((s, ov, nv) -> {
+			try {
+				mask_value = nv;
+				renderImageView(current_index, currentRenderType , false);
+			} catch (java.lang.Exception e) {
+				e.printStackTrace();
+			}
+		});
+		SpinnerValueFactory<Double> intScaleStart = facGen(0.0, 10000.0, scale_start, 0.1);
+		spinnerScaleStart.setValueFactory(intScaleStart);
+		spinnerScaleStart.setEditable(true);
+		TextFormatter<Double> formatterScaleStart = new TextFormatter<Double>(intScaleStart.getConverter(), intScaleStart.getValue());
+		spinnerScaleStart.getEditor().setTextFormatter(formatterScaleStart);
+		intScaleStart.valueProperty().bindBidirectional(formatterScaleStart.valueProperty());
+		formatterScaleStart.valueProperty().addListener((s, ov, nv) -> {
+			try {
+				scale_start = nv;
+				renderImageView(current_index, currentRenderType , false);
+			} catch (java.lang.Exception e) {
+				e.printStackTrace();
+			}
+		});
+		SpinnerValueFactory<Double> intScaleEnd = facGen(0.0, 10000.0, scale_end, 0.1);
+		spinnerScaleEnd.setValueFactory(intScaleEnd);
+		spinnerScaleEnd.setEditable(true);
+		TextFormatter<Double> formatterScaleEnd = new TextFormatter<Double>(intScaleEnd.getConverter(), intScaleEnd.getValue());
+		spinnerScaleEnd.getEditor().setTextFormatter(formatterScaleEnd);
+		intScaleEnd.valueProperty().bindBidirectional(formatterScaleEnd.valueProperty());
+		formatterScaleEnd.valueProperty().addListener((s, ov, nv) -> {
+			try {
+				scale_end = nv;
+				renderImageView(current_index, currentRenderType , false);
+			} catch (java.lang.Exception e) {
+				e.printStackTrace();
+			}
+		});
+		
+		
+		createSliderAnimation(1);
+		
+		SpinnerValueFactory<Integer> intFPS = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1, 1);
+		spinnerFPS.setValueFactory(intFPS);
+		spinnerFPS.setEditable(true);
+		TextFormatter<Integer> formatterFPS = new TextFormatter<Integer>(intFPS.getConverter(), intFPS.getValue());
+		spinnerFPS.getEditor().setTextFormatter(formatterFPS);
+		intFPS.valueProperty().bindBidirectional(formatterFPS.valueProperty());
+		formatterFPS.valueProperty().addListener((s, ov, nv) -> {
+			int newFPS = nv;
+			frameRate = newFPS;
+			double frameSeconds = 1.0/(double)newFPS;
+			sliderState = false;
+			sliderTimer.stop();
+			createSliderAnimation(frameSeconds);
+			if(cmdSliderPlay.getText().equals("Stop")){
+				sliderState = true;
+				sliderTimer.play();
+			}	
+		});
+		
     	writeLinePlot(start, stop);
+    	
+    	//set default minimum as the maximum buffer zone value
 		sliderGroups.setMin(1);
 //		sliderGroups.setMax(main_package.getListFlows().size() + 1);
 		sliderGroups.setMax(main_package.getListFlows().size());
@@ -1935,175 +2030,6 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 				}
 			}	
 		});
-		
-		createSliderAnimation(1);
-		
-		SpinnerValueFactory<Integer> intFPS = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1, 1);
-		spinnerFPS.setValueFactory(intFPS);
-		spinnerFPS.setEditable(true);
-		TextFormatter<Integer> formatterFPS = new TextFormatter<Integer>(intFPS.getConverter(), intFPS.getValue());
-		spinnerFPS.getEditor().setTextFormatter(formatterFPS);
-		intFPS.valueProperty().bindBidirectional(formatterFPS.valueProperty());
-		formatterFPS.valueProperty().addListener((s, ov, nv) -> {
-			int newFPS = nv;
-			frameRate = newFPS;
-			double frameSeconds = 1.0/(double)newFPS;
-			sliderState = false;
-			sliderTimer.stop();
-			createSliderAnimation(frameSeconds);
-			if(cmdSliderPlay.getText().equals("Stop")){
-				sliderState = true;
-				sliderTimer.play();
-			}	
-		});
-//		spinnerFPS.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 100, 1, 1));
-//		spinnerFPS.getEditor().textProperty().addListener((obs,oldValue,newValue) ->{
-//			if (!"".equals(newValue)) {
-//				int newFPS = Integer.valueOf(newValue);
-//				frameRate = newFPS;
-//				double frameSeconds = 1.0/(double)newFPS;
-//				sliderState = false;
-//				sliderTimer.stop();
-//				createSliderAnimation(frameSeconds);
-//				if(cmdSliderPlay.getText().equals("Stop")){
-//					sliderState = true;
-//					sliderTimer.play();
-//				}				
-//			}
-//		});
-//		spinnerFPS.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//	        if (newValue == false) {
-//	        	spinnerFPS.increment(0);
-//	        } 
-//	    });
-		
-		SpinnerValueFactory<Double> intMask = facGen(0.0, 10000.0, mask_value, 0.1);
-		spinnerMask.setValueFactory(intMask);
-		spinnerMask.setEditable(true);
-		TextFormatter<Double> formatterMask = new TextFormatter<Double>(intMask.getConverter(), intMask.getValue());
-		spinnerMask.getEditor().setTextFormatter(formatterMask);
-		intMask.valueProperty().bindBidirectional(formatterMask.valueProperty());
-		formatterMask.valueProperty().addListener((s, ov, nv) -> {
-			try {
-				mask_value = nv;
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
-			}
-		});
-//		spinnerMask.setValueFactory(facGen(0.0, 10000.0, mask_value, 0.1));
-//		spinnerMask.setEditable(true);
-//		IncrementHandler handler1 = new IncrementHandler();
-//		spinnerMask.addEventFilter(MouseEvent.MOUSE_PRESSED, handler1);
-//		spinnerMask.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-//	        Node node = evt.getPickResult().getIntersectedNode();
-//	        if (node.getStyleClass().contains("increment-arrow-button") ||
-//	            node.getStyleClass().contains("decrement-arrow-button")) {
-//	                if (evt.getButton() == MouseButton.PRIMARY) {
-//	                    handler1.stop();
-//	                }
-//	        }
-//	    });
-//		spinnerMask.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				mask_value = Double.valueOf(newValue);
-//				renderImageView(current_index, currentRenderType , false);
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//	    });
-//		spinnerMask.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//	        if (newValue == false) {
-//	        	spinnerMask.increment(0);
-//	        } 
-//	    });
-		
-		SpinnerValueFactory<Double> intScaleStart = facGen(0.0, 10000.0, scale_start, 0.1);
-		spinnerScaleStart.setValueFactory(intScaleStart);
-		spinnerScaleStart.setEditable(true);
-		TextFormatter<Double> formatterScaleStart = new TextFormatter<Double>(intScaleStart.getConverter(), intScaleStart.getValue());
-		spinnerScaleStart.getEditor().setTextFormatter(formatterScaleStart);
-		intScaleStart.valueProperty().bindBidirectional(formatterScaleStart.valueProperty());
-		formatterScaleStart.valueProperty().addListener((s, ov, nv) -> {
-			try {
-				scale_start = nv;
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
-			}
-		});
-//		spinnerScaleStart.setValueFactory(facGen(0.0, 10000.0, scale_start, 0.1));
-//		spinnerScaleStart.setEditable(true);
-//		IncrementHandler handler2 = new IncrementHandler();
-//		spinnerScaleStart.addEventFilter(MouseEvent.MOUSE_PRESSED, handler2);
-//		spinnerScaleStart.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-//	        Node node = evt.getPickResult().getIntersectedNode();
-//	        if (node.getStyleClass().contains("increment-arrow-button") ||
-//	            node.getStyleClass().contains("decrement-arrow-button")) {
-//	                if (evt.getButton() == MouseButton.PRIMARY) {
-//	                    handler2.stop();
-//	                }
-//	        }
-//	    });
-//		spinnerScaleStart.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				scale_start = Double.valueOf(newValue);
-//				renderImageView(current_index, currentRenderType , false);
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//	    });
-//		spinnerScaleStart.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//	        if (newValue == false) {
-//	        	spinnerScaleStart.increment(0);
-//	        } 
-//		});
-		SpinnerValueFactory<Double> intScaleEnd = facGen(0.0, 10000.0, scale_start, 0.1);
-		spinnerScaleEnd.setValueFactory(intScaleEnd);
-		spinnerScaleEnd.setEditable(true);
-		TextFormatter<Double> formatterScaleEnd = new TextFormatter<Double>(intScaleEnd.getConverter(), intScaleEnd.getValue());
-		spinnerScaleEnd.getEditor().setTextFormatter(formatterScaleEnd);
-		intScaleEnd.valueProperty().bindBidirectional(formatterScaleEnd.valueProperty());
-		formatterScaleEnd.valueProperty().addListener((s, ov, nv) -> {
-			try {
-				scale_end = nv;
-				renderImageView(current_index, currentRenderType , false);
-			} catch (java.lang.Exception e) {
-				e.printStackTrace();
-			}
-		});
-//		spinnerScaleEnd.setValueFactory(facGen(0.0, 10000.0, scale_end, 1.0));
-//		spinnerScaleEnd.setEditable(true);
-//		IncrementHandler handler3 = new IncrementHandler();
-//		spinnerScaleEnd.addEventFilter(MouseEvent.MOUSE_PRESSED, handler3);
-//		spinnerScaleEnd.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-//	        Node node = evt.getPickResult().getIntersectedNode();
-//	        if (node.getStyleClass().contains("increment-arrow-button") ||
-//	            node.getStyleClass().contains("decrement-arrow-button")) {
-//	                if (evt.getButton() == MouseButton.PRIMARY) {
-//	                    handler3.stop();
-//	        			try {
-//	        				renderImageView(current_index, currentRenderType , false);
-//	        			} catch (java.lang.Exception e) {
-//	        				e.printStackTrace();
-//	        			}
-//	                }
-//	        }
-//	    });
-//		spinnerScaleEnd.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				scale_end = Double.valueOf(newValue);
-//				//scale_end = Double.valueOf(newValue) *  (1/fps_value) * (1/pixel_value);
-//				renderImageView(current_index, currentRenderType , false);
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//	    });
-//		spinnerScaleEnd.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//	        if (newValue == false) {
-//	        	spinnerScaleEnd.increment(0);
-//	        } 
-//		});
 		
 		ChangeListener<Number> gridSizeListenerWidth = new ChangeListener<Number>() {
             @Override
@@ -2287,7 +2213,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
           JFreeChart chart = ChartFactory.createXYLineChart(
               "",
               time_str,
-              "Speed(\u00B5m/s)",
+              "Speed (\u00B5m/s)",
               dataset,
               PlotOrientation.VERTICAL,
               true,
@@ -2456,7 +2382,52 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		Image finalImage = null;
 		if (rendertype.equals("Jet")) {
 			Boolean to_merge = false;
-			finalImage = writeJetImage(index, to_merge);
+	        if (contour_state == false) {
+	        	finalImage = writeJetImage(index, to_merge);
+	        } else {
+	        	WritableImage myWritableImage = writeJetImage(index, to_merge);
+		        Mat img_src = null;
+		        if (currentGroup.getType() == 0) {
+		            ImageGroup g3 = (ImageGroup) currentGroup;
+		            File path_img  = g3.getImages().get(main_package.getListPoints().get(index));
+		            img_src = imread(path_img.getCanonicalPath());
+		        } else {
+		            VideoGroup g3 = (VideoGroup) currentGroup;
+		        	FFmpegFrameGrabber frameGrabber = new FFmpegFrameGrabber(g3.getVideo().getAbsolutePath());
+		    		OpenCVFrameConverter.ToMat converterToMat = new OpenCVFrameConverter.ToMat();
+		    		frameGrabber.start();
+		    		int N = frameGrabber.getLengthInFrames();
+		    		for(int j = 0; j<N; j++){
+		    			Frame frame = frameGrabber.grab();
+		    			Mat img = converterToMat.convert(frame);
+		    			if(j ==index){
+		    				img_src = img.clone();
+		    				break;
+		    			}
+		    		}
+		    		frameGrabber.close();
+		        }
+		        BufferedImage overlay = SwingFXUtils.fromFXImage(myWritableImage, null);
+		        Mat jetLayer = Java2DFrameUtils.toMat(overlay);
+		        MatVector channels = new MatVector();
+		        Mat jetLayerRGB = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
+		        org.bytedeco.javacpp.opencv_core.split(jetLayer, channels);
+		        Mat blueCh = channels.get(1);
+		        Mat greenCh = channels.get(2);
+		        Mat redCh = channels.get(3);
+		        MatVector channels2 = new MatVector(3);
+		        channels2.put(0, redCh);
+		        channels2.put(1, greenCh);
+		        channels2.put(2, blueCh);
+		        org.bytedeco.javacpp.opencv_core.merge(channels2, jetLayerRGB);
+	        	img_src.convertTo(img_src, CV_8U);
+	        	jetLayerRGB.convertTo(jetLayerRGB, CV_8U);
+	        	Mat mask2 = generateContour(img_src);	        	
+	        	Mat combinedImage2 = new Mat();
+	        	jetLayerRGB.copyTo(combinedImage2, mask2);
+				BufferedImage combined = Java2DFrameUtils.toBufferedImage(combinedImage2);
+				finalImage = SwingFXUtils.toFXImage(combined, null);
+	        }
 		}
 		else if (rendertype.equals("JetMerge")) {
 			Boolean to_merge = true;
@@ -2525,8 +2496,54 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        }
 		}
 		else if (rendertype.equals("Quiver")) {
-			Boolean to_merge = false;
-			finalImage = writeCanvas(index, to_merge);
+        	Boolean to_merge = false;
+	        if (contour_state == false) {
+	        	finalImage = writeCanvas(index, to_merge);
+	        } else {
+	    		WritableImage writableImage = writeCanvas(index, to_merge);
+				ToMat converter = new OpenCVFrameConverter.ToMat();
+		        Mat img_src = null;
+		        if (currentGroup.getType() == 0) {
+		            ImageGroup g3 = (ImageGroup) currentGroup;
+		            File path_img  = g3.getImages().get(main_package.getListPoints().get(index));
+		            img_src = imread(path_img.getCanonicalPath());
+		        } else {
+		            VideoGroup g3 = (VideoGroup) currentGroup;
+		        	FFmpegFrameGrabber frameGrabber = new FFmpegFrameGrabber(g3.getVideo().getAbsolutePath());
+		    		OpenCVFrameConverter.ToMat converterToMat = new OpenCVFrameConverter.ToMat();
+		    		frameGrabber.start();
+		    		int N = frameGrabber.getLengthInFrames();
+		    		for(int j = 0; j<N; j++){
+		    			Frame frame = frameGrabber.grab();
+		    			Mat img = converterToMat.convert(frame);
+		    			if(j ==index){
+		    				img_src = img.clone();
+		    				break;
+		    			}
+		    		}
+		    		frameGrabber.close();
+		        }
+		        BufferedImage overlay = SwingFXUtils.fromFXImage(writableImage, null);
+		        Mat quiverLayer = Java2DFrameUtils.toMat(overlay);
+		        MatVector channels = new MatVector();
+		        Mat quiverLayerRGB = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
+		        org.bytedeco.javacpp.opencv_core.split(quiverLayer, channels);
+		        Mat blueCh = channels.get(1);
+		        Mat greenCh = channels.get(2);
+		        Mat redCh = channels.get(3);
+		        MatVector channels2 = new MatVector(3);
+		        channels2.put(0, redCh);
+		        channels2.put(1, greenCh);
+		        channels2.put(2, blueCh);
+		        org.bytedeco.javacpp.opencv_core.merge(channels2, quiverLayerRGB);
+	        	img_src.convertTo(img_src, CV_8U);
+	        	quiverLayerRGB.convertTo(quiverLayerRGB, CV_8U);
+	        	Mat mask2 = generateContour(img_src);	        	
+	        	Mat combinedImage2 = new Mat();
+	        	quiverLayerRGB.copyTo(combinedImage2, mask2);
+				BufferedImage combined = Java2DFrameUtils.toBufferedImage(combinedImage2);
+				finalImage = SwingFXUtils.toFXImage(combined, null);
+	        }
 		} else if (rendertype.equals("QuiverMerge")) {
 			Boolean to_merge = true;
 			WritableImage writableImage = writeCanvas(index, to_merge);
@@ -2853,15 +2870,18 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		return ((x*a)+b);
 	}
 	
+	
 	public static String rightPadZeros(String str, int num) {
 		return String.format("%1$-" + num + "s", str).replace(' ', '0');
 	}
 	
-	private final int SCALE_ARR_SIZE = 8;
+	
+	private final int SCALE_ARR_SIZE = 4;
 	
 	void drawScaleArrow(GraphicsContext gc, int x1, int y1, int x2, int y2) {
 	    gc.setFill(Color.BLACK);
-
+	    gc.setLineWidth(2.0);
+	    
 	    double dx = x2 - x1, dy = y2 - y1;
 	    double angle = Math.atan2(dy, dx);
 	    int len = (int) Math.sqrt(dx * dx + dy * dy);
@@ -2879,6 +2899,12 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	@FXML
 	ImageView scaleImgView;
 	
+	public static double round(double d, int decimalPlace) {
+	    BigDecimal bd = new BigDecimal(Double.toString(d));
+	    bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+	    return bd.doubleValue();
+	}
+	
 	private BufferedImage generateCanvasScale() {
 		//emptyBoxSize.widthProperty()
 		
@@ -2891,8 +2917,12 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //		System.out.println(scale_width);
 //		int scale_height = (int)(emptyBoxSize.getHeight() * 8);
 		int scale_height = (int) imgview1.getFitHeight();
+		if (scale_height < imgview1.getFitHeight()) {
+			scale_height += 1;
+		}
 		System.out.println(scale_height);
-		scaleImgView.setFitHeight(scale_height);
+		scaleImgView.setFitHeight(imgview1.getFitHeight());
+		//scaleImgView.setFitHeight(height);
 		scaleImgView.setFitWidth(scale_width);
 		//Calculate: width, height, spacing, font-size dynamically by using the grid
 		//set imageview fitheight and width
@@ -2903,58 +2933,68 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		gc.save();
 		PixelWriter pixel_writing = canvas1.getGraphicsContext2D().getPixelWriter();
 		for (int x = 0; x < scale_width - 50; x++) {
-			for (int y = 0; y < scale_height; y++) {
+			//for (int y = 0; y < scale_height; y++) {
+			for (int y = scale_height; y > 0; y--) {
 				int y_new = y;
         		java.awt.Color a = this_jet.getColor(convertToMag(y_new));
         		Color this_color = new Color( (Double.valueOf(a.getRed()) / 255.0), (Double.valueOf(a.getGreen()) / 255.0 ) , (Double.valueOf(a.getBlue()) / 255.0), 1.0);
-				pixel_writing.setColor( x, ((int)canvas1.getHeight()-y), this_color);
-				
+				//pixel_writing.setColor( x, ((int)canvas1.getHeight()-y), this_color);
+				pixel_writing.setColor( x, (int)canvas1.getHeight()-y, this_color);
 			}
+			//}
 		}
 		//write tick labels
 		gc.setFill(Color.BLACK);
 		gc.setTextAlign(TextAlignment.CENTER);
 		gc.setTextBaseline(VPos.CENTER);
-		gc.setFont(new javafx.scene.text.Font("Arial", 12));
+        javafx.scene.text.Font number_font = javafx.scene.text.Font.font("Arial",FontWeight.BOLD, 12);
+		gc.setFont(number_font);
 
 		int x = (int) scale_width - 30; //tick width to write
 		int y = ((int) convertScaleToHeight(scale_end));
 		//			gc.fillText(String.valueOf(scale_end), x, y);
 		int currentpad_f = 5;
-		String current_print_f = String.valueOf(scale_end);
-		if (!current_print_f.contains(".")) {
-			current_print_f += ".";
-		} else {
-			int dot_after = current_print_f.split("\\.")[0].length();
-			currentpad_f = currentpad_f - dot_after;
-		}
-		current_print_f = rightPadZeros(current_print_f, currentpad_f);
+		String current_print_f = String.valueOf(round(scale_end,2));
+//		if (!current_print_f.contains(".")) {
+//			current_print_f += ".";
+//		} else {
+//			int dot_after = current_print_f.split("\\.")[0].length();
+//			currentpad_f = currentpad_f - dot_after;
+//		}
+//		current_print_f = rightPadZeros(current_print_f, currentpad_f);
 
 		int currentpad_s = 5;
-		String current_print_s = String.valueOf(scale_start);
-		if (!current_print_s.contains(".")) {
-			current_print_s += ".";
-		} else {
-			int dot_after = current_print_s.split("\\.")[0].length();
-			currentpad_s = currentpad_s - dot_after;
-		}
-		current_print_s = rightPadZeros(current_print_s, currentpad_s);
-
+		String current_print_s = String.valueOf(round(scale_start,2));
+//		if (!current_print_s.contains(".")) {
+//			current_print_s += ".";
+//		} else {
+//			int dot_after = current_print_s.split("\\.")[0].length();
+//			currentpad_s = currentpad_s - dot_after;
+//		}
+//		current_print_s = rightPadZeros(current_print_s, currentpad_s);
+		
 		gc.fillText(current_print_f, x, ((int)canvas1.getHeight()-y+10));
 		y = ((int) convertScaleToHeight(scale_start));
 		gc.fillText(current_print_s, x, ((int)canvas1.getHeight()-y-10));
+		
+		
+		
 		gc.setFill(Color.BLACK);
 		gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
-        gc.setFont(new javafx.scene.text.Font("Arial", 15));
-	    Transform transform = Transform.rotate(-90.0, (int)canvas1.getWidth()-20, (int)(canvas1.getHeight()/2));
+        javafx.scene.text.Font subtitle_font = javafx.scene.text.Font.font("Arial",FontWeight.BOLD, 15);
+        gc.setFont(subtitle_font);
+        
+	    Transform transform = Transform.rotate(-90.0, (int)canvas1.getWidth()-35, (int)(canvas1.getHeight()/2));
 	    gc.setTransform(new Affine(transform));
-	    gc.fillText("Speed (\u00B5m/s)", (int)canvas1.getWidth()-20, (int)(canvas1.getHeight()/2));
+//	    gc.fillText("Speed (\u00B5m/s)", (int)canvas1.getWidth()-20, (int)(canvas1.getHeight()/2));
+	    gc.fillText("Speed (\u00B5m/s)", (int)canvas1.getWidth()-35, (int)(canvas1.getHeight()/2));
 	    gc.restore();
 	    
-	    int x_arrow = (int)canvas1.getWidth()-35;
-	    int y_arrow_init = (int)(canvas1.getHeight()/2) - 41;
-	    int y_arrow_end = (int)(canvas1.getHeight()/2) + 41;
+//	    int x_arrow = (int)canvas1.getWidth()-35;
+	    int x_arrow = (int)canvas1.getWidth()-20;
+	    int y_arrow_init = (int)(canvas1.getHeight()/2) - 46;
+	    int y_arrow_end = (int)(canvas1.getHeight()/2) + 46;
 	    
 		drawScaleArrow(gc, x_arrow, y_arrow_end, x_arrow, y_arrow_init);
 		
@@ -2970,6 +3010,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		//render imgviewscale Image
 		BufferedImage final_scale = generateCanvasScale();
 		scaleImgView.setImage(SwingFXUtils.toFXImage(final_scale, null));
+		System.out.println("Dif:");
+		System.out.println(scaleImgView.getFitHeight() - imgview1.getFitHeight());
 		//Controller_Scale.
 	}
 	

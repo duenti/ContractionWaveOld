@@ -110,11 +110,11 @@
             <Button id="glass-grey" fx:id="cmdBack" mnemonicParsing="false" onAction="#back" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="12" />
             <Button id="glass-grey" fx:id="cmdNext" mnemonicParsing="false" onAction="#nextPageNavigate" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
             <TextField fx:id="txtAverage" GridPane.columnIndex="6" GridPane.halignment="CENTER" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
-            <Label alignment="CENTER_RIGHT" text="Selected area Max value (µ/s):" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
-            <HBox GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="10" GridPane.vgrow="SOMETIMES">
+            <Label alignment="CENTER_RIGHT" text="Selected area Max value (µm/s):" GridPane.columnIndex="2" GridPane.columnSpan="4" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER" />
+            <HBox GridPane.columnIndex="8" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="10" GridPane.vgrow="SOMETIMES">
                <children>
-                  <Button fx:id="btnZoomMode" mnemonicParsing="false" onAction="#handleZoomMode" text="Z" HBox.hgrow="NEVER" />
-                  <Button fx:id="btnSelectMode" mnemonicParsing="false" onAction="#handleSelectMode" text="S" HBox.hgrow="NEVER" />
+                  <Button fx:id="btnZoomMode" mnemonicParsing="false" onAction="#handleZoomMode" text="Zoom" HBox.hgrow="NEVER" />
+                  <Button fx:id="btnSelectMode" mnemonicParsing="false" onAction="#handleSelectMode" text="Select" HBox.hgrow="NEVER" />
                </children>
             </HBox>
          </children>

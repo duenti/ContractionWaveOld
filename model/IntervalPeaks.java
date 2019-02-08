@@ -35,7 +35,10 @@ public class IntervalPeaks implements Serializable{
 	public void addIntervalPeak(IntervalPeak e) {
 		listIntervalPeaks.add(e);
 		for (Peak f : e.getThesePeaks()) {
-			listPeaks.add(f);
+			if(!listPeaks.contains(f)) {
+				System.out.println("Added new peak 2");
+				listPeaks.add(f);
+			}
 		}
 	}
 	

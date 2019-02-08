@@ -66,7 +66,7 @@ public class IntervalPeak {
 		for (int f = 0; f < first_points.size(); f++) {
 			int first_point = first_points.get(f);
 			if (first_point >= start && first_point <= end) {
-				System.out.println("Found point!");
+				System.out.println("Found first point!");
 				System.out.println(first_point);
 				//look for second, third, fourth and fifth points
 				int possible_second = -1;
@@ -139,7 +139,12 @@ public class IntervalPeak {
 				//allow border redefinition in plot
 				//TODO generate new parker by changing start and end of marker to first_point - 1 to last_point + 1, check if next graphs are gen correct
 				Peak v = new Peak(first_point, possible_fifth, possible_third, possible_second, possible_fourth, e.getStartValue() , e.getEndValue() , tcr, tc, tr, tc_vmc, tc_vmc_min, tr_vmr, tr_vmr_b, t_vmc_vmr, vmc, vmin, vmr, d_vmc_vmr, area_t, area_c, area_r, thisMarker);
-				thesePeaks.add(v);
+				if(!this.getThesePeaks().contains(v)) {
+					System.out.println("Added new peak");
+					this.getThesePeaks().add(v);
+				}
+				System.out.println("Found fifth point!");
+				System.out.println(possible_fifth);
 			}
 		}
 		

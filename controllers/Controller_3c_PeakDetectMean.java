@@ -233,7 +233,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	    Writer writer = null;
 	    try {
 	        writer = new BufferedWriter(new FileWriter(file));
-	        String text2 = "Time(s)\tSpeed(\u00B5/s)\n";
+	        String text2 = "Time (s)\tSpeed (\u00B5/s)\n";
 	        writer.write(text2);
 	        
 	        for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
@@ -258,8 +258,8 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 		Sheet spreadsheet = workbook.createSheet("sample");
 		Row row = spreadsheet.createRow(0);
 		
-		row.createCell(0).setCellValue("Time(s)");
-		row.createCell(1).setCellValue("Speed(\u00B5/s)");
+		row.createCell(0).setCellValue("Time (s)");
+		row.createCell(1).setCellValue("Speed (\u00B5/s)");
 		
 		for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
 			double average = currentGroup.getMagnitudeListValue(i);
@@ -703,8 +703,8 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	private JFreeChart createChart(XYDataset dataset) {			
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Main Plot",
-            "Time(s)",
-            "Speed(\u00B5m/s)",
+            "Time (s)",
+            "Speed (\u00B5m/s)",
             dataset,
             PlotOrientation.VERTICAL,
             true,

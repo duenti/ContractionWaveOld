@@ -1143,9 +1143,12 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		
     	System.out.println("intervalsList.size()");
     	System.out.println(intervalsList.size());
+    	int zix = 0;
       	for (IntervalMarker e : intervalsList) {
+      		System.out.println("IntervalMarker:" + zix);
     		IntervalPeak f = new IntervalPeak(currentGroup, average_value, fps_val, pixel_val, e, maximum_list, minimum_list, first_points, fifth_points);
     		intervalPeaks.addIntervalPeak(f);
+    		zix+=1;
     	}
     	System.out.println("intervalPeaks.getListPeaks().size()");
     	System.out.println(intervalPeaks.getListPeaks().size());

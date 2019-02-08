@@ -1,6 +1,7 @@
 package model;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import org.jfree.chart.plot.IntervalMarker;
 
@@ -103,6 +104,26 @@ public class Peak {
 				micro = false;
 			}
 		}
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+	    // self check
+	    if (this == o)
+	        return true;
+	    // null check
+	    if (o == null)
+	        return false;
+	    // type check and cast
+	    if (getClass() != o.getClass())
+	        return false;
+	    Peak person = (Peak) o;
+	    // field comparison	    
+	    return Objects.equals(this.getF_point(), person.getF_point())
+	    		&& Objects.equals(this.getSec_point(), person.getSec_point())
+	    		&& Objects.equals(this.getMid_point(), person.getMid_point())
+	    		&& Objects.equals(this.getFourth_point(), person.getFourth_point())
+	            && Objects.equals(this.getEnd_point(), person.getEnd_point());
 	}
 	
 	public int getF_point() {

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
@@ -226,7 +227,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	    Writer writer = null;
 	    try {
 	        writer = new BufferedWriter(new FileWriter(file));
-	        String text2 = "Time(s)\tSpeed(\u00B5/s)\n";
+	        String text2 = "Time (s)\tSpeed (\u00B5/s)\n";
 	        writer.write(text2);
 	        
 	        for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
@@ -251,8 +252,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		Sheet spreadsheet = workbook.createSheet("sample");
 		Row row = spreadsheet.createRow(0);
 		
-		row.createCell(0).setCellValue("Time(s)");
-		row.createCell(1).setCellValue("Speed(\u00B5/s)");
+		row.createCell(0).setCellValue("Time (s)");
+		row.createCell(1).setCellValue("Speed (\u00B5/s)");
 		
 		for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
 			double average = currentGroup.getMagnitudeListValue(i);
@@ -823,7 +824,10 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     
     @FXML
 	void nextPageNavigate(ActionEvent event) throws IOException, ClassNotFoundException {
-		if(intervalsList.size() == 0) return;
+		if(intervalsList.size() == 0) {
+			JOptionPane.showMessageDialog(null, "Please select a Cycle in the Upper Plot by clicking and dragging.");
+			return;
+		}
     	Stage primaryStage = (Stage) cmdNext.getScene().getWindow();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
@@ -1422,8 +1426,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		System.out.println("Creating new chart!");
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Main Plot",
-            "Time(s)",
-            "Speed(\u00B5m/s)",
+            "Time (s)",
+            "Speed (\u00B5m/s)",
             dataset,
             PlotOrientation.VERTICAL,
             true,
@@ -1637,26 +1641,32 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	                
 		        	if ( v2 > v1 && v2-v1 > (plot.getDataset().getXValue(0, 1) - plot.getDataset().getXValue(0, 0))*5  ){
 		                IntervalMarker marker = new IntervalMarker(markerStart, markerEnd);
-		                swgNodeBig.setContent(null);
-		                int addition = 0;
-		                for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
-		                	double time = i / fps_val;
-		                	if (time > v1) {
-		                		addition = i;
-		                		break;
-		                	}
+		                if(!markers.contains(marker)) {
+
+			                swgNodeBig.setContent(null);
+			                int addition = 0;
+			                for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
+			                	double time = i / fps_val;
+			                	if (time > v1) {
+			                		addition = i;
+			                		break;
+			                	}
+			                }
+			                currentMarker += 1;
+			                last_min_zoom = v1;
+			                last_max_zoom = v2;
+			                last_addition = addition;
+			                writeFlowLinePlotZoom(v1, v2, addition);
+			                //marker.setPaint(new java.awt.Color(0xDD, 0xFF, 0xDD, 0x80));
+			                marker.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
+			                marker.setAlpha(main_package.getPlot_preferences().getMarkerAlpha());
+			                plot.addDomainMarker(marker,Layer.BACKGROUND);
+			                markers.add(marker);
+			                System.out.println("added new marker: " + markers.size());
+		    				intervalsList = markers.stream().collect(Collectors.toList());
+	//		                intervalsList = markers;
+		    				
 		                }
-		                currentMarker += 1;
-		                last_min_zoom = v1;
-		                last_max_zoom = v2;
-		                last_addition = addition;
-		                writeFlowLinePlotZoom(v1, v2, addition);
-		                //marker.setPaint(new java.awt.Color(0xDD, 0xFF, 0xDD, 0x80));
-		                marker.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
-		                marker.setAlpha(main_package.getPlot_preferences().getMarkerAlpha());
-		                plot.addDomainMarker(marker,Layer.BACKGROUND);
-		                markers.add(marker);
-		                intervalsList = markers;
 		            }
 	        	}
 	        }
@@ -1784,6 +1794,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	    				}
 	    				markers.remove(i);
 //	    				intervalsList = markers;
+	    				intervalsList = markers.stream().collect(Collectors.toList());
 	    				plot.removeDomainMarker(im,Layer.BACKGROUND);
 	    				return;
 	    			}
@@ -1819,8 +1830,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 //    	System.out.println(minIndVal);
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Zoom Plot",
-            "Time(s)",
-            "Speed(\u00B5m/s)",
+            "Time (s)",
+            "Speed (\u00B5m/s)",
             dataset,
             PlotOrientation.VERTICAL,
             true,

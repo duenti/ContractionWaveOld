@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,6 +36,7 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
@@ -110,8 +112,8 @@ public class Controller_Scale implements Initializable{
 		        	heightInput.setText(newValue.replaceAll("[^\\d]", ""));
 		        }
 				height = Integer.valueOf(newValue);			        	
-				if (height < 50) {
-					height = 50;
+				if (height < 80) {
+					height = 80;
 					heightInput.setText(String.valueOf(height));
 				}	        	
 		    }
@@ -184,10 +186,17 @@ public class Controller_Scale implements Initializable{
 		return String.format("%1$-" + num + "s", str).replace(' ', '0');
 	}
 	
-	private final int ARR_SIZE = 8;
+	public static double round(double d, int decimalPlace) {
+	    BigDecimal bd = new BigDecimal(Double.toString(d));
+	    bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
+	    return bd.doubleValue();
+	}
+	
+	private final int ARR_SIZE = 4;
 	
 	void drawArrow(GraphicsContext gc, int x1, int y1, int x2, int y2) {
 	    gc.setFill(Color.BLACK);
+	    gc.setLineWidth(2.0);
 
 	    double dx = x2 - x1, dy = y2 - y1;
 	    double angle = Math.atan2(dy, dx);
@@ -229,7 +238,9 @@ public class Controller_Scale implements Initializable{
 			gc.setFill(Color.BLACK);
 			gc.setTextAlign(TextAlignment.CENTER);
 	        gc.setTextBaseline(VPos.CENTER);
-	        gc.setFont(new Font("Arial", font_size));
+	        javafx.scene.text.Font number_font = javafx.scene.text.Font.font("Arial",FontWeight.BOLD, font_size);
+	        
+	        gc.setFont(number_font);
 
 	        int tick_number = (int) (scale_end / spacing);
 	        System.out.println(tick_number);
@@ -265,24 +276,24 @@ public class Controller_Scale implements Initializable{
 			int y = ((int) convertScaleToHeight(scale_end)) + 20;
 //			gc.fillText(String.valueOf(scale_end), x, y);
 			int currentpad_f = 5;
-			String current_print_f = String.valueOf(scale_end);
-			if (!current_print_f.contains(".")) {
-				current_print_f += ".";
-			} else {
-				int dot_after = current_print_f.split("\\.")[0].length();
-				currentpad_f = currentpad_f - dot_after;
-			}
-			current_print_f = rightPadZeros(current_print_f, currentpad_f);
+			String current_print_f = String.valueOf(round(scale_end,2));
+//			if (!current_print_f.contains(".")) {
+//				current_print_f += ".";
+//			} else {
+//				int dot_after = current_print_f.split("\\.")[0].length();
+//				currentpad_f = currentpad_f - dot_after;
+//			}
+//			current_print_f = rightPadZeros(current_print_f, currentpad_f);
 			
 			int currentpad_s = 5;
-			String current_print_s = String.valueOf(scale_start);
-			if (!current_print_s.contains(".")) {
-				current_print_s += ".";
-			} else {
-				int dot_after = current_print_s.split("\\.")[0].length();
-				currentpad_s = currentpad_s - dot_after;
-			}
-			current_print_s = rightPadZeros(current_print_s, currentpad_s);
+			String current_print_s = String.valueOf(round(scale_start,2));
+//			if (!current_print_s.contains(".")) {
+//				current_print_s += ".";
+//			} else {
+//				int dot_after = current_print_s.split("\\.")[0].length();
+//				currentpad_s = currentpad_s - dot_after;
+//			}
+//			current_print_s = rightPadZeros(current_print_s, currentpad_s);
 			
 			gc.fillText(current_print_f, x, ((int)canvas1.getHeight()-30-y));
 			y = ((int) convertScaleToHeight(scale_start)) + 20;
@@ -292,21 +303,23 @@ public class Controller_Scale implements Initializable{
 		gc.setFill(Color.BLACK);
 		gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
-        gc.setFont(new Font("Arial", 15));
-	    Transform transform = Transform.rotate(-90.0, (int)canvas1.getWidth()-25, (int)(canvas1.getHeight()/2));
+        javafx.scene.text.Font subtitle_font = javafx.scene.text.Font.font("Arial",FontWeight.BOLD, 15);
+        gc.setFont(subtitle_font);
+	    Transform transform = Transform.rotate(-90.0, (int)canvas1.getWidth()-35, (int)(canvas1.getHeight()/2));
 	    gc.setTransform(new Affine(transform));
-	    gc.fillText("Speed (\u00B5m/s)", (int)canvas1.getWidth()-25, (int)(canvas1.getHeight()/2));
+	    gc.fillText("Speed (\u00B5m/s)", (int)canvas1.getWidth()-35, (int)(canvas1.getHeight()/2));
 	    gc.restore();
 	    
-	    int x_arrow = (int)canvas1.getWidth()-45;
+//	    int x_arrow = (int)canvas1.getWidth()-45;
+	    int x_arrow = (int)canvas1.getWidth()-20;
 //    	int y_arrow_init = (int)(canvas1.getHeight()/2) - (height/10);
 //    	int y_arrow_end = (int)(canvas1.getHeight()/2) + (height/10);
 //	    if (y_arrow_end - y_arrow_init  < 30) {
 //	    	y_arrow_init = (int)(canvas1.getHeight()/2) - 15;
 //	    	y_arrow_end = (int)(canvas1.getHeight()/2) + 15;
 //	    }
-	    int y_arrow_init = (int)(canvas1.getHeight()/2) - 41;
-	    int y_arrow_end = (int)(canvas1.getHeight()/2) + 41;
+	    int y_arrow_init = (int)(canvas1.getHeight()/2) - 46;
+	    int y_arrow_end = (int)(canvas1.getHeight()/2) + 46;
 	    
 	    
 	    
