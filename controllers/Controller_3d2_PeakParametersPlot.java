@@ -2,13 +2,11 @@ package controllers;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,7 +15,6 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -25,7 +22,6 @@ import java.util.ResourceBundle;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.border.Border;
 
@@ -54,7 +50,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener.Change;
-import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -63,21 +58,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.geometry.HPos;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumnBase;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TableView.TableViewSelectionModel;
 import javafx.scene.control.Toggle;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
@@ -86,18 +78,13 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import model.CalculationTaskSave;
 import model.ContinueData;
 import model.Group;
@@ -119,7 +106,6 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	private static Group currentGroup;
 	private JFreeChart currentChart;
 	private Peak currentPeak;
-	private static boolean zoomGridLinesState = true;
 	private List<IntervalMarker> intervalsList;
 	private List<Integer> maximum_list;
 	private List<Integer> minimum_list;
@@ -133,11 +119,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	private int step = 1;
 	private int global_min;
 	private List<TimeSpeed> timespeedlist;
-	private double delta;
-	private double intra;
-	private double inter;
-	
-    @FXML
+	@FXML
     private Button cmdBack;
 
     @FXML
@@ -252,7 +234,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
-		primaryStage.setTitle("Image Optical Flow");
+		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -266,7 +248,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	Stage stage = new Stage();
     	Parent root = FXMLLoader.load(getClass().getResource("FXML_About.fxml"));
     	stage.setScene(new Scene(root));
-    	stage.setTitle("Image Optical Flow");
+    	stage.setTitle("ContractionWave");
 		stage.initModality(Modality.APPLICATION_MODAL);
 		//stage.initOwner(((Node)event.getSource()).getScene().getWindow());
     	stage.show();
@@ -623,10 +605,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	System.out.println(ask_saved);
     	if (ask_saved == false) {
 
-            Stage primaryStage;
-        	primaryStage = (Stage) cmdNext.getScene().getWindow();
-        	
-    		Button buttonTypeOk = new Button("Save");
+            Button buttonTypeOk = new Button("Save");
     		Button buttonTypeSkip = new Button("Skip");
     		Button buttonTypeCancel = new Button("Cancel");
     		
@@ -708,8 +687,6 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	        });
         	dialogMicroscope.setScene(new Scene(grid));
 	    	dialogMicroscope.show();
-	    	
-	    	Boolean return_bool;
 		} else {
             navigation();
 		}
@@ -762,7 +739,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	Group g1 = currentGroup;
     	commitColors();
 		((Controller_3d_MagnitudeFirstCharts)fxmlloader.getController()).setContext(main_package, g1, fps_val, pixel_val, average_value, upper_limit, timespeedlist);	
-		primaryStage.setTitle("Image Optical Flow - Subset Main Chart");
+		primaryStage.setTitle("ContractionWave - Subset Main Chart");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -947,19 +924,6 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	
 	void exportTables(String filename) throws IOException {
 
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
-		// TODO Auto-generated catch block
 		//include average and st deviation table
 		Workbook workbook = new HSSFWorkbook();
 		Sheet spreadsheet = workbook.createSheet("time");
@@ -1068,7 +1032,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	commitColors();
 //    	((Controller_3e_ViewJetQuiverMerge)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, use_double, start, stop, step, timespeedlist);
     	((Controller_3e_ViewJetQuiverMergeSingle)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, start, stop, step, intervalsList, maximum_list, minimum_list, first_points, fifth_points, timespeedlist, ask_saved, checkSeconds.isSelected());
-    	primaryStage.setTitle("Image Optical Flow - Peak Parameters Plot");
+    	primaryStage.setTitle("ContractionWave - Peak Parameters Plot");
 //    	primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -1106,7 +1070,6 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 				return 0;
 //			} else if (result.get() == buttonTypeTwo) {
 			    // ... user chose "Two"
-				// TODO: Write option for buffering files
 //				return 1;
 			} else {
 			    // ... user chose CANCEL or closed the dialog

@@ -2,7 +2,6 @@ package controllers;
 	
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.nio.file.Path;
@@ -91,7 +90,7 @@ public class Main extends Application {
 		    	root = fxmlloader.load();
 		    	Scene scene = new Scene(root);
 				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
-				primaryStage.setTitle("Image Optical Flow - Bem Vindo");
+				primaryStage.setTitle("ContractionWave - Welcome");
 				primaryStage.setMaximized(true);
 				primaryStage.setScene(scene);
 				primaryStage.show();	
@@ -105,7 +104,7 @@ public class Main extends Application {
 		    	root = fxmlloader.load();
 		    	Scene scene = new Scene(root);
 				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
-				primaryStage.setTitle("Image Optical Flow - Bem Vindo");
+				primaryStage.setTitle("ContractionWave - Welcome");
 				primaryStage.setMaximized(true);
 				primaryStage.setScene(scene);
 				primaryStage.show();	
@@ -120,7 +119,7 @@ public class Main extends Application {
 		    	root = fxmlloader.load();
 		    	Scene scene = new Scene(root);
 				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
-				primaryStage.setTitle("Image Optical Flow - Bem Vindo");
+				primaryStage.setTitle("ContractionWave - Welcome");
 				primaryStage.setMaximized(true);
 				primaryStage.setScene(scene);
 				primaryStage.show();	
@@ -142,7 +141,7 @@ public class Main extends Application {
 	    	root = fxmlloader.load();
 	    	Scene scene = new Scene(root);
 			((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
-			primaryStage.setTitle("Image Optical Flow - Bem Vindo");
+			primaryStage.setTitle("ContractionWave - Welcome");
 			primaryStage.setMaximized(true);
 			primaryStage.setScene(scene);
 			primaryStage.show();	

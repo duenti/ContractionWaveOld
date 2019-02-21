@@ -7,18 +7,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import javax.swing.JFileChooser;
-
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import model.PackageData;
 
@@ -97,7 +93,7 @@ public class FileReader {
     	    }
     	}); 	
 
-		primaryStage.setTitle("Image Optical Flow - Select the images path:"); 	
+		primaryStage.setTitle("ContractionWave - Select the images path:"); 	
 //    	primaryStage.setMaximized(true);
     	primaryStage.setScene(scene);
     	primaryStage.show();
@@ -150,7 +146,7 @@ public class FileReader {
     	    	primaryStage.getScene().setCursor(Cursor.DEFAULT);
     	    }
     	});
-		primaryStage.setTitle("Image Optical Flow - Select the images path:"); 	
+		primaryStage.setTitle("ContractionWave - Select the images path:"); 	
 //    	primaryStage.setMaximized(true);
     	primaryStage.setScene(scene);
     	primaryStage.show();

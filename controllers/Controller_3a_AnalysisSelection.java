@@ -18,18 +18,13 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 //import controllers.Controller_3e_ViewJetQuiverMergeSingle.IncrementHandler;
-import javafx.animation.AnimationTimer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.css.PseudoClass;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -44,18 +39,14 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.Group;
 import model.Groups;
 import model.MicroscopePreferences;
 import model.PackageData;
-import model.PlotPreferences;
 
 public class Controller_3a_AnalysisSelection implements Initializable {
 //	private static Parent root;
@@ -107,7 +98,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
-		primaryStage.setTitle("Image Optical Flow");
+		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -121,7 +112,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     	Stage stage = new Stage();
     	Parent root = FXMLLoader.load(getClass().getResource("FXML_About.fxml"));
     	stage.setScene(new Scene(root));
-    	stage.setTitle("Image Optical Flow");
+    	stage.setTitle("ContractionWave");
 		stage.initModality(Modality.APPLICATION_MODAL);
 		//stage.initOwner(((Node)event.getSource()).getScene().getWindow());
     	stage.show();
@@ -146,7 +137,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 		//((Controller_1_InitialScreen)fxmlloader.getController()).setContext(exec, queuedItems, doneItems);
 		//Pane root = FXMLLoader.load(getClass().getResource("FXML_1_InitialScreen.fxml"));
 		//Scene scene = new Scene(root, 600, 400);
-		primaryStage.setTitle("Image Optical Flow - Welcome");
+		primaryStage.setTitle("ContractionWave - Welcome");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -304,7 +295,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 	
 		try {
 			((Controller_3b2_DisplayResults)fxmlloader.getController()).setContext(main_package, selecteditem, fps_value, pixel_value);
-			primaryStage.setTitle("Image Optical Flow - Input Microscope Data");
+			primaryStage.setTitle("ContractionWave - Input Microscope Data");
 //			primaryStage.setMaximized(true);
 			primaryStage.setScene(scene);
 			primaryStage.show();
@@ -440,9 +431,6 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     	});
     	return dblFactory;
     }
-    
-      
-    private static final PseudoClass PRESSED = PseudoClass.getPseudoClass("pressed");
   
 //    class IncrementHandler implements EventHandler<MouseEvent> {
 //        private Spinner spinner;

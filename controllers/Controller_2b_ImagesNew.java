@@ -16,7 +16,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -33,7 +32,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Region;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import model.Groups;
 import model.ImageGroup;
@@ -113,7 +111,7 @@ public class Controller_2b_ImagesNew implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
-		primaryStage.setTitle("Image Optical Flow");
+		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -127,7 +125,7 @@ public class Controller_2b_ImagesNew implements Initializable {
     	Stage stage = new Stage();
     	Parent root = FXMLLoader.load(getClass().getResource("FXML_About.fxml"));
     	stage.setScene(new Scene(root));
-    	stage.setTitle("Image Optical Flow");
+    	stage.setTitle("ContractionWave");
 		stage.initModality(Modality.APPLICATION_MODAL);
 		//stage.initOwner(((Node)event.getSource()).getScene().getWindow());
     	stage.show();
@@ -149,7 +147,7 @@ public class Controller_2b_ImagesNew implements Initializable {
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
      	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
-		primaryStage.setTitle("Image Optical Flow - Welcome");
+		primaryStage.setTitle("ContractionWave - Welcome");
 //		primaryStage.setMaximized(true);
     	primaryStage.setScene(scene);
     	primaryStage.show();
@@ -186,7 +184,7 @@ public class Controller_2b_ImagesNew implements Initializable {
         	
     		((Controller_2c_ImagesNew)fxmlloader.getController()).setContext(main_package, unqueued_groups, rootDirP);
         	
-    		primaryStage.setTitle("Image Optical Flow - View Groups");
+    		primaryStage.setTitle("ContractionWave - View Groups");
         	primaryStage.setScene(scene);
         	primaryStage.show();
     		
@@ -208,7 +206,7 @@ public class Controller_2b_ImagesNew implements Initializable {
 //        	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //        	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	    ((Controller_2d_FlowParametrization)fxmlloader.getController()).setContext(main_package, unqueued_groups, rootDirP);
-    		primaryStage.setTitle("Image Optical Flow - Optical Flow Parametrization");
+    		primaryStage.setTitle("ContractionWave - Optical Flow Parametrization");
 //    		primaryStage.setMaximized(true);
     	    primaryStage.setScene(scene);
     	    primaryStage.show();

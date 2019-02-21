@@ -27,8 +27,6 @@ import java.io.Writer;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -47,8 +45,6 @@ import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacv.Java2DFrameUtils;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartMouseEvent;
-import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -64,8 +60,6 @@ import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import javafx.animation.AnimationTimer;
-import javafx.css.PseudoClass;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -73,7 +67,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -90,17 +83,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.Group;
 import model.PackageData;
 import model.TimeSpeed;
-import model.XYCircleAnnotation;
 
 public class Controller_3c_PeakDetectMean implements Initializable {
 	private PackageData main_package;
@@ -185,7 +175,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
-		primaryStage.setTitle("Image Optical Flow");
+		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -199,7 +189,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
     	Stage stage = new Stage();
     	Parent root = FXMLLoader.load(getClass().getResource("FXML_About.fxml"));
     	stage.setScene(new Scene(root));
-    	stage.setTitle("Image Optical Flow");
+    	stage.setTitle("ContractionWave");
 		stage.initModality(Modality.APPLICATION_MODAL);
 		//stage.initOwner(((Node)event.getSource()).getScene().getWindow());
     	stage.show();
@@ -453,7 +443,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	commitColors();
 		((Controller_3b2_DisplayResults)fxmlloader.getController()).setContext(main_package, currentGroup.getName(), fps_value, pixel_value);
-		primaryStage.setTitle("Image Optical Flow - View First Results");
+		primaryStage.setTitle("ContractionWave - View First Results");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -497,11 +487,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	}
 	
 	
-	private boolean zoom_mode = false;
-	
 	public void triggerSelectMode() {
-		zoom_mode = false;
-		XYPlot plot_n = (XYPlot) currentChart.getPlot();
 		ChartPanel now_linepanel2 = (ChartPanel)swgChart.getContent();
 		MouseListener[] mouseListArray = now_linepanel2.getMouseListeners();
 		for (int i = 0; i < mouseListArray.length; i++) {
@@ -523,8 +509,6 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	}
 	
 	public void triggerZoomMode() {
-		zoom_mode = true;
-		XYPlot plot_n = (XYPlot) currentChart.getPlot();
 		ChartPanel now_linepanel2 = (ChartPanel)swgChart.getContent();
 		now_linepanel2.setMouseWheelEnabled(true);
 		now_linepanel2.setRangeZoomable(true);
@@ -570,7 +554,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
     	Group g1 = currentGroup;
     	commitColors();
 		((Controller_3d_MagnitudeFirstCharts)fxmlloader.getController()).setContext(main_package, g1, fps_value, pixel_value, average_value, upper_limit, timespeedlist);	
-		primaryStage.setTitle("Image Optical Flow - First Analysis");
+		primaryStage.setTitle("ContractionWave - First Analysis");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -617,9 +601,6 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 		cmdNext.getScene().addEventFilter(KeyEvent.KEY_RELEASED, zoomKey);
 	}
 	
-	
-	private boolean previousPlot = false;
-//	private ChartPanel general_linepanel2;
 	
 	private MouseMarker mousemark;
 	
@@ -680,7 +661,6 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 		
 		
 		swgChart.setContent(linepanel2);
-		previousPlot = true;
 	}
 	
 	private XYDataset createDataset() {
@@ -764,7 +744,6 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	    private JFreeChart chart;
 	    private ChartPanel panel;
 	    private XYPlot plot;
-	    private XYDataset dataset;
 	    private XYLineAndShapeRenderer original_render;
 		private boolean is_curves_on;
 		
@@ -834,8 +813,6 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	}
 	
 	
-	private Double last_start = Double.NaN;
-	private Double last_end = Double.NaN;
 	private final class MouseMarker extends MouseAdapter{
 	    private Marker marker;
 	    private Double markerStart = Double.NaN;
@@ -871,11 +848,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	        }
 	        if (!markerStart.isNaN()) {
 	        	if(!markerEnd.isNaN()) {
-//	        	int v1 = markerStart.intValue();
-//                int v2 = markerEnd.intValue();
-	        	last_start = markerStart;
-	        	last_end = markerEnd;
-                double v1 = markerStart.doubleValue();
+double v1 = markerStart.doubleValue();
                 double v2 = markerEnd.doubleValue();
 	        	if ( v2 > v1){
 	                marker = new IntervalMarker(markerStart, markerEnd);
@@ -904,8 +877,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	        	    if (ind != -1) {
 	        	    	toField = ind;
 	        	    }
-	        	    double mean = sum / size_numbers;
-//	        	    txtAverage.setText(String.valueOf(mean));
+	        	    //	        	    txtAverage.setText(String.valueOf(mean));
 	        	    txtAverage.setText(String.valueOf(max));
 	                //marker.setPaint(new java.awt.Color(0xDD, 0xFF, 0xDD, 0x80));
 	        	    current_marker = marker;

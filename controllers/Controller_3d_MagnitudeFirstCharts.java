@@ -2,7 +2,6 @@ package controllers;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -30,7 +29,6 @@ import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.border.Border;
 
@@ -61,17 +59,12 @@ import org.jfree.chart.ui.Layer;
 
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.animation.AnimationTimer;
-import javafx.css.PseudoClass;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -84,14 +77,10 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.Group;
@@ -106,8 +95,6 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	private static Group currentGroup;
 	private JFreeChart currentChart;
 	private static JFreeChart currentZoomChart;
-	private static boolean zoomGridLinesState = true;
-	private boolean mainGridLinesState = true;
 	private double average_value;
 	private double upper_limit;
 	private List<IntervalMarker> intervalsList = new ArrayList<IntervalMarker>();
@@ -179,7 +166,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
-		primaryStage.setTitle("Image Optical Flow");
+		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -193,7 +180,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	Stage stage = new Stage();
     	Parent root = FXMLLoader.load(getClass().getResource("FXML_About.fxml"));
     	stage.setScene(new Scene(root));
-    	stage.setTitle("Image Optical Flow");
+    	stage.setTitle("ContractionWave");
 		stage.initModality(Modality.APPLICATION_MODAL);
 		//stage.initOwner(((Node)event.getSource()).getScene().getWindow());
     	stage.show();
@@ -810,7 +797,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	commitColors();
 		((Controller_3c_PeakDetectMean)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, timespeedlist);
 //		((Controller_3c_PeakDetectMean)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, timespeedlist_new);
-		primaryStage.setTitle("Image Optical Flow - Define Gap Zone");
+		primaryStage.setTitle("ContractionWave - Define Gap Zone");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -846,7 +833,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	commitColors();
     	((Controller_3d2_PeakParametersPlot)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, intervalsList, valid_maximum_list, valid_minimum_list, first_points, fifth_points, timespeedlist, saved);
 //    	((Controller_3d2_PeakParametersPlot)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, intervalsList, valid_maximum_list, valid_minimum_list, first_points, fifth_points, timespeedlist_new, saved);
-    	primaryStage.setTitle("Image Optical Flow - Peak Parameters Plot");
+    	primaryStage.setTitle("ContractionWave - Peak Parameters Plot");
 //    	primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -1370,17 +1357,12 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         System.out.println(average_corrected);
         for (int v = 0; v < valid_maximum_list.size() - 1; v=v+2) {
         	int first_maximum_index = valid_maximum_list.get(v);            
-        	int min_index = first_max_to_minimum_hash.get(first_maximum_index);
-        	double minimum_flow = dataset_general.getYValue(0, min_index);
-    		//search criteria look for first and fifth points based on simple set of rules:
+        	//search criteria look for first and fifth points based on simple set of rules:
     		//first point - movable window for first point below or equal zero whose following neighbour is positive
         	boolean first_found = false;
         	for (int b = first_maximum_index-1; b >= 1; b--) {
-        		double next_value = dataset_general.getYValue(0, b-1);
         		double previous_value = dataset_general.getYValue(0, b+1);
         		double query_value = dataset_general.getYValue(0, b);
-        		double delta_front = query_value - next_value;
-        		double delta_back = query_value - previous_value;
         		if (query_value <= 0 && previous_value > 0) {
 //        		if (delta_front < 0 && delta_back < 0 && query_value <= 0){
         			//first point found, break
@@ -2001,7 +1983,6 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	    private JFreeChart chart;
 	    private ChartPanel panel;
 	    private XYPlot plot;
-	    private XYDataset dataset;
 	    private XYLineAndShapeRenderer original_render;
 		private boolean is_curves_on;
 		

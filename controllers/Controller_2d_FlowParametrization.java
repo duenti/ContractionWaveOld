@@ -19,14 +19,11 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.SelectionModel;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
@@ -34,7 +31,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import model.Group;
 import model.Groups;
@@ -125,7 +121,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
-		primaryStage.setTitle("Image Optical Flow");
+		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -139,7 +135,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
     	Stage stage = new Stage();
     	Parent root = FXMLLoader.load(getClass().getResource("FXML_About.fxml"));
     	stage.setScene(new Scene(root));
-    	stage.setTitle("Image Optical Flow");
+    	stage.setTitle("ContractionWave");
 		stage.initModality(Modality.APPLICATION_MODAL);
 		//stage.initOwner(((Node)event.getSource()).getScene().getWindow());
     	stage.show();
@@ -166,7 +162,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
         	
     		((Controller_2c_ImagesNew)fxmlloader.getController()).setContext(main_package, groups, rootDirP);
         	
-    		primaryStage.setTitle("Image Optical Flow - Select Frames");
+    		primaryStage.setTitle("ContractionWave - Select Frames");
 //    		primaryStage.setMaximized(true);
         	primaryStage.setScene(scene);
         	primaryStage.show();
@@ -211,7 +207,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
     	
 		((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(groups, main_package);
 //		((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
-		primaryStage.setTitle("Image Optical Flow - Processing Progress");
+		primaryStage.setTitle("ContractionWave - Processing Progress");
 //		primaryStage.setMaximized(true);
     	primaryStage.setScene(scene);
 //		primaryStage.setMaximized(true);

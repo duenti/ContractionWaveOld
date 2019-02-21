@@ -15,7 +15,11 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.ui.RectangleEdge;
 
 public class XYCircleAnnotation extends AbstractXYAnnotation implements XYAnnotation {
-    private double x;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private double x;
     private double y;
     private double radius;
     private Color color;

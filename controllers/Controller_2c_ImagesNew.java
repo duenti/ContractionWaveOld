@@ -14,7 +14,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -30,7 +29,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import model.Group;
 import model.Groups;
@@ -103,7 +101,7 @@ public class Controller_2c_ImagesNew implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
-		primaryStage.setTitle("Image Optical Flow");
+		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -117,7 +115,7 @@ public class Controller_2c_ImagesNew implements Initializable {
     	Stage stage = new Stage();
     	Parent root = FXMLLoader.load(getClass().getResource("FXML_About.fxml"));
     	stage.setScene(new Scene(root));
-    	stage.setTitle("Image Optical Flow");
+    	stage.setTitle("ContractionWave");
 		stage.initModality(Modality.APPLICATION_MODAL);
 		//stage.initOwner(((Node)event.getSource()).getScene().getWindow());
     	stage.show();
@@ -167,7 +165,7 @@ public class Controller_2c_ImagesNew implements Initializable {
     	    }
     	}); 	
 
-		primaryStage.setTitle("Image Optical Flow - Select the images path:");
+		primaryStage.setTitle("ContractionWave - Select the images path:");
 //		primaryStage.setMaximized(true);
     	primaryStage.setScene(scene);
     	primaryStage.show();
@@ -195,7 +193,7 @@ public class Controller_2c_ImagesNew implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	
     	((Controller_2d_FlowParametrization)fxmlloader.getController()).setContext(main_package, groups, rootDirP);
-		primaryStage.setTitle("Image Optical Flow - Flow Parametrization");
+		primaryStage.setTitle("ContractionWave - Flow Parametrization");
 //		primaryStage.setMaximized(true);
     	primaryStage.setScene(scene);
     	primaryStage.show();
@@ -204,6 +202,7 @@ public class Controller_2c_ImagesNew implements Initializable {
 		primaryStage.setY(prior_Y);
 	}
 		
+	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 //		Image imgBack = new Image(getClass().getResourceAsStream("/left-arrow-curve-outline.png"));

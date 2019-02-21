@@ -3,14 +3,12 @@ package controllers;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
-import javax.imageio.ImageIO;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
 import org.bytedeco.javacpp.opencv_core.Mat;
@@ -31,11 +29,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
@@ -45,7 +41,6 @@ import javafx.stage.Stage;
 
 public class Controller_Scale implements Initializable{
 	
-	private double mask_value;
 	private double scale_start;
 	private double scale_end;
 	private int width = 30;
@@ -84,8 +79,7 @@ public class Controller_Scale implements Initializable{
     	primaryStage = (Stage) tickCheck.getScene().getWindow();
         File chosenDir = chooser.showDialog(primaryStage);
     	String current_filename = chosenDir.getAbsolutePath().toString() + "/" + "scale" +".tiff";
-        File file = new File(current_filename);
-    	BufferedImage bImage1 = generateCanvasScale();
+        BufferedImage bImage1 = generateCanvasScale();
     	Mat jetLayer = Java2DFrameUtils.toMat(bImage1);
         MatVector channels = new MatVector();
         Mat jetLayerRGB = new Mat(height+((height * 0.1 )+50), width+(width/2+80), org.bytedeco.javacpp.opencv_core.CV_8UC3);
@@ -164,7 +158,6 @@ public class Controller_Scale implements Initializable{
 	
 	public void setContext(double mask_value1, double scale_start1, double scale_end1) {
 		System.out.println("About to gen test scale 1");
-		mask_value = mask_value1;
 		scale_start = scale_start1;
 		scale_end = scale_end1;
 		this_jet = new ColorMap(scale_start, scale_end, JET);
@@ -274,8 +267,6 @@ public class Controller_Scale implements Initializable{
 //			}
 			int x = width+20; //tick width to write
 			int y = ((int) convertScaleToHeight(scale_end)) + 20;
-//			gc.fillText(String.valueOf(scale_end), x, y);
-			int currentpad_f = 5;
 			String current_print_f = String.valueOf(round(scale_end,2));
 //			if (!current_print_f.contains(".")) {
 //				current_print_f += ".";
@@ -285,7 +276,6 @@ public class Controller_Scale implements Initializable{
 //			}
 //			current_print_f = rightPadZeros(current_print_f, currentpad_f);
 			
-			int currentpad_s = 5;
 			String current_print_s = String.valueOf(round(scale_start,2));
 //			if (!current_print_s.contains(".")) {
 //				current_print_s += ".";

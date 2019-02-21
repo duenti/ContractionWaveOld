@@ -16,7 +16,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -29,12 +28,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import model.ContinueData;
 import model.Group;
 import model.PackageData;
-import model.PlotPreferences;
 import model.TimeSpeed;
 
 public class Controller_1_InitialScreen implements Initializable {
@@ -99,7 +96,7 @@ public class Controller_1_InitialScreen implements Initializable {
     	
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
-		primaryStage.setTitle("Image Optical Flow");
+		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -113,7 +110,7 @@ public class Controller_1_InitialScreen implements Initializable {
     	Stage stage = new Stage();
     	Parent root = FXMLLoader.load(getClass().getResource("FXML_About.fxml"));
     	stage.setScene(new Scene(root));
-    	stage.setTitle("Image Optical Flow");
+    	stage.setTitle("ContractionWave");
 		stage.initModality(Modality.APPLICATION_MODAL);
 		//stage.initOwner(((Node)event.getSource()).getScene().getWindow());
     	stage.show();
@@ -135,7 +132,7 @@ public class Controller_1_InitialScreen implements Initializable {
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
 		((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
-		primaryStage.setTitle("Image Optical Flow - Processing Progress");
+		primaryStage.setTitle("ContractionWave - Processing Progress");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -178,7 +175,7 @@ public class Controller_1_InitialScreen implements Initializable {
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
     	
 		((Controller_3a_AnalysisSelection)fxmlloader.getController()).setContext(main_package);
-		primaryStage.setTitle("Image Optical Flow - Select Group for Analysis");
+		primaryStage.setTitle("ContractionWave - Select Group for Analysis");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -245,7 +242,7 @@ public class Controller_1_InitialScreen implements Initializable {
 //	    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 	    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight()); 	
 			((Controller_3d2_PeakParametersPlot)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, intervalsList, maximum_list, minimum_list, first_points, fifth_points, timespeedlist, true);
-			primaryStage.setTitle("Image Optical Flow - Select Group for Analysis");
+			primaryStage.setTitle("ContractionWave - Select Group for Analysis");
 //			primaryStage.setMaximized(true);
 			primaryStage.setScene(scene);
 			primaryStage.show();

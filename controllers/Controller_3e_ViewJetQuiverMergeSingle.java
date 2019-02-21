@@ -1327,7 +1327,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	Spinner<Double> alphaback2Spin = new Spinner<Double>();
     	Spinner<Double> alphafore2Spin = new Spinner<Double>();
     	
-    	SpinnerValueFactory<Integer> intB = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, blur_size, 1);
+    	SpinnerValueFactory<Integer> intB = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, blur_size, 2);
     	blurSpin.setValueFactory(intB);
     	blurSpin.setEditable(true);
 		TextFormatter<Integer> formatterB = new TextFormatter<Integer>(intB.getConverter(), intB.getValue());
@@ -1336,8 +1336,14 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		formatterB.valueProperty().addListener((s, ov, nv) -> {
 			blur_size = nv;
 			try {
+				if(nv % 2 == 0){
+					blur_size++;
+					blurSpin.getValueFactory().setValue(blur_size);
+				}
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
+				blur_size = 5;
+				blurSpin.getValueFactory().setValue(blur_size);
 				e.printStackTrace();
 			}
 		});
@@ -1369,7 +1375,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //	    });
 		
 		
-    	SpinnerValueFactory<Integer> intD = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_dilation, 1);
+		SpinnerValueFactory<Integer> intD = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_dilation, 2);
     	dilationSpin.setValueFactory(intD);
     	dilationSpin.setEditable(true);
 		TextFormatter<Integer> formatterD = new TextFormatter<Integer>(intD.getConverter(), intD.getValue());
@@ -1378,8 +1384,14 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		formatterD.valueProperty().addListener((s, ov, nv) -> {
 			kernel_dilation = nv;
 			try {
+				if(nv % 2 == 0){
+					kernel_dilation++;
+					dilationSpin.getValueFactory().setValue(kernel_dilation);
+				}
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
+				kernel_dilation = 3;
+				dilationSpin.getValueFactory().setValue(kernel_dilation);
 				e.printStackTrace();
 			}
 		});
@@ -1410,7 +1422,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //	        } 
 //	    });
 		
-    	SpinnerValueFactory<Integer> intE = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_erosion, 1);
+		SpinnerValueFactory<Integer> intE = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_erosion, 2);
     	erosionSpin.setValueFactory(intE);
     	erosionSpin.setEditable(true);
 		TextFormatter<Integer> formatterE = new TextFormatter<Integer>(intE.getConverter(), intE.getValue());
@@ -1419,8 +1431,14 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		formatterE.valueProperty().addListener((s, ov, nv) -> {
 			kernel_erosion = nv;
 			try {
+				if(nv % 2 == 0){
+					kernel_erosion++;
+					erosionSpin.getValueFactory().setValue(kernel_erosion);
+				}
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
+				kernel_erosion = 11;
+				erosionSpin.getValueFactory().setValue(kernel_erosion);
 				e.printStackTrace();
 			}
 		});
@@ -1452,7 +1470,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //	    });
 		
 		
-    	SpinnerValueFactory<Integer> intS = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_smoothing_contours, 1);
+		SpinnerValueFactory<Integer> intS = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, kernel_smoothing_contours, 2);
     	smoothingSpin.setValueFactory(intS);
     	smoothingSpin.setEditable(true);
 		TextFormatter<Integer> formatterS = new TextFormatter<Integer>(intS.getConverter(), intS.getValue());
@@ -1460,9 +1478,15 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		intS.valueProperty().bindBidirectional(formatterS.valueProperty());
 		formatterS.valueProperty().addListener((s, ov, nv) -> {
 			kernel_smoothing_contours = nv;
+			if(nv % 2 == 0){
+				kernel_smoothing_contours++;
+				smoothingSpin.getValueFactory().setValue(kernel_smoothing_contours);
+			}
 			try {
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
+				kernel_smoothing_contours = 5;
+				smoothingSpin.getValueFactory().setValue(kernel_smoothing_contours);
 				e.printStackTrace();
 			}
 		});
@@ -1492,13 +1516,6 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //	        	smoothingSpin.increment(0);
 //	        } 
 //	    });
-		//TODO
-		//TODO
-		//TODO
-		//TODO
-		//TODO
-		//TODO
-		//TODO
 		
 		SpinnerValueFactory<Integer> intBor = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, border_value, 1);
 		borderSpin.setValueFactory(intBor);
@@ -1511,6 +1528,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			try {
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
+				border_value = 60;
+				borderSpin.getValueFactory().setValue(border_value);
 				e.printStackTrace();
 			}
 		});
@@ -1554,6 +1573,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			try {
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
+				sigma = 0.15;
+				sigmaSpin.getValueFactory().setValue(sigma);
 				e.printStackTrace();
 			}
 		});
@@ -1596,6 +1617,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			try {
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
+				alpha_under_two = 1.0;
+				alphabackSpin.getValueFactory().setValue(alpha_under_two);
 				e.printStackTrace();
 			}
 		});
@@ -1636,6 +1659,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			try {
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
+				alpha_under_three = 1.0;
+				alphaback2Spin.getValueFactory().setValue(alpha_under_three);
 				e.printStackTrace();
 			}
 		});
@@ -1677,6 +1702,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			try {
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
+				alpha_above_two = 0.3;
+				alphaforeSpin.getValueFactory().setValue(alpha_above_two);
 				e.printStackTrace();
 			}
 		});
@@ -1719,6 +1746,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			try {
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
+				alpha_above_three = 0.3;
+				alphafore2Spin.getValueFactory().setValue(alpha_above_three);
 				e.printStackTrace();
 			}
 		});
