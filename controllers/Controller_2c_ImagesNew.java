@@ -202,7 +202,6 @@ public class Controller_2c_ImagesNew implements Initializable {
 		primaryStage.setY(prior_Y);
 	}
 		
-	@SuppressWarnings("unchecked")
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 //		Image imgBack = new Image(getClass().getResourceAsStream("/left-arrow-curve-outline.png"));

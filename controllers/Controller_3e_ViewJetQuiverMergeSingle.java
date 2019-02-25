@@ -4,13 +4,9 @@ import static org.bytedeco.javacpp.opencv_core.CV_8U;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
-import java.awt.AWTException;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Robot;
-import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
@@ -26,7 +22,6 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JColorChooser;
@@ -68,17 +63,14 @@ import io.humble.video.MediaPacket;
 import io.humble.video.MediaPicture;
 import io.humble.video.Muxer;
 import io.humble.video.MuxerFormat;
-import io.humble.video.Property;
 import io.humble.video.Rational;
 import io.humble.video.awt.MediaPictureConverter;
 import io.humble.video.awt.MediaPictureConverterFactory;
-import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.css.PseudoClass;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.embed.swing.SwingNode;
 import javafx.event.ActionEvent;
@@ -89,7 +81,6 @@ import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.geometry.VPos;
 import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -344,7 +335,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	root = fxmlloader.load();
     	((Controller_Scale)fxmlloader.getController()).setContext(mask_value, scale_start, scale_end);
     	dialogScale.setScene(new Scene(root));
-		dialogScale.setTitle("Save Jet Scale to Figure:");		
+		dialogScale.setTitle("Save Magnitude Scale to Figure:");		
     	dialogScale.initModality(Modality.APPLICATION_MODAL);
     	dialogScale.initOwner(null);
     	dialogScale.setResizable(true);
@@ -367,7 +358,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Jet" +".jpg";
+	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Mag" +".jpg";
 	    	save_type = "jpg";
 			renderImageView(i, "Jet", true);
 		}
@@ -388,7 +379,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Jet" +".tiff";
+	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Mag" +".tiff";
 	    	save_type = "tiff";
 			renderImageView(i, "Jet", true);
 		}
@@ -406,7 +397,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Jet" +".png";
+	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Mag" +".png";
 	    	save_type = "png";
 			renderImageView(i, "Jet", true);
 		}
@@ -434,7 +425,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	Stage primaryStage;
     	primaryStage = (Stage) sliderGroups.getScene().getWindow();
         File chosenDir = chooser.showDialog(primaryStage);
-        current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() + "_" + type_do + ".mp4";
+        current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() + "_" + type_do.replace("Jet", "Mag").replace("Quiver", "Vect") + ".mp4";
         waitCursor();
         save_as_video = true;
         Rational framerate_do = Rational.make(1, (int)frameRate);
@@ -508,7 +499,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetQuiverMerge"  +".jpg";
+	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MagVectMerge"  +".jpg";
 	    	save_type = "jpg";
 			renderImageView(i, "JetQuiverMerge", true);
 		}
@@ -526,7 +517,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetQuiverMerge"  +".tiff";
+	    	current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MagVectMerge"  +".tiff";
 	    	save_type = "tiff";
 			renderImageView(i, "JetQuiverMerge", true);
 		}
@@ -544,7 +535,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetQuiverMerge" +".png";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MagVectMerge" +".png";
 	    	save_type = "png";
 			renderImageView(i, "JetQuiverMerge", true);
 		}
@@ -567,7 +558,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetMerge" +".jpg";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MagMerge" +".jpg";
 	    	save_type = "jpg";
 			renderImageView(i, "JetMerge", true);
 		}
@@ -585,7 +576,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetMerge" +".tiff";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MagMerge" +".tiff";
 	    	save_type = "tiff";
 			renderImageView(i, "JetMerge", true);
 		}
@@ -603,7 +594,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetMerge" +".png";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MagMerge" +".png";
 	    	save_type = "png";
 			renderImageView(i, "JetMerge", true);
 		}
@@ -626,7 +617,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_QuiverMerge"  +".jpg";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_VectMerge"  +".jpg";
 	    	save_type = "jpg";
 			renderImageView(i, "QuiverMerge", true);
 		}
@@ -644,7 +635,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_QuiverMerge"  +".tiff";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_VectMerge"  +".tiff";
 	    	save_type = "tiff";
 			renderImageView(i, "QuiverMerge", true);
 		}
@@ -662,7 +653,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i+ "_QuiverMerge" +".png";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i+ "_VectMerge" +".png";
 	    	save_type = "png";
 			renderImageView(i, "QuiverMerge", true);
 		}
@@ -685,7 +676,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Quiver" +".jpg";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Vect" +".jpg";
 	    	save_type = "jpg";
 			renderImageView(i, "Quiver", true);
 		}
@@ -703,7 +694,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Quiver" +".tiff";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Vect" +".tiff";
 	    	save_type = "tiff";
 			renderImageView(i, "Quiver", true);
 		}
@@ -726,7 +717,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Quiver" +".png";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_Vect" +".png";
 	    	save_type = "png";
 			renderImageView(i, "Quiver", true);
 		}
@@ -744,7 +735,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetQuiver"+".jpg";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MagVect"+".jpg";
 	    	save_type = "jpg";
 			renderImageView(i, "JetQuiver", true);
 		}
@@ -762,7 +753,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetQuiver"+".tiff";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MagVect"+".tiff";
 	    	save_type = "tiff";
 			renderImageView(i, "JetQuiver", true);
 		}
@@ -780,7 +771,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         File chosenDir = chooser.showDialog(primaryStage);
         waitCursor();
 		for (int i = 0; i < general_dataset.getItemCount(0)-1; i++) {
-			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_JetQuiver" +".png";
+			current_filename = chosenDir.getAbsolutePath().toString() + "/"+ currentGroup.getName() +  "_" +i + "_MagVect" +".png";
 	    	save_type = "png";
 			renderImageView(i, "JetQuiver", true);
 		}
@@ -911,10 +902,10 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     private JFreeChart currentChart;
 	private double lowerBoundDomain;
 	private double upperBoundDomain;
-	private double alpha_under_two = 1.0;
-	private double alpha_above_two = 0.3;
-	private double alpha_under_three = 1.0;
-	private double alpha_above_three = 0.3;
+	private double alpha_under_two = 0.7;
+//	private double alpha_above_two = 0.3;
+//	private double alpha_under_three = 1.0;
+//	private double alpha_above_three = 0.3;
 	private boolean ask_saved;
 	
     @FXML
@@ -1192,7 +1183,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     @FXML
     void showAdvancedJet(ActionEvent event) throws IOException {
     	Dialog<Boolean> dialogJet = new Dialog<>();
-    	dialogJet.setHeaderText("Quiver X and Y Window Size Options:");
+    	dialogJet.setHeaderText("Vectors X and Y Window Size Options (pixels):");
     	dialogJet.setResizable(true);
     	Label label1 = new Label("X Window: ");
     	Label label2 = new Label("Y Window: ");
@@ -1312,10 +1303,10 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	Label label4 = new Label("Kernel Smoothing: ");
     	Label label5 = new Label("Border Width: ");
     	Label label6 = new Label("Sigma Value: ");
-    	Label label7 = new Label("Bg Alpha Image: ");
-    	Label label8 = new Label("Bg Alpha Jet: ");
-    	Label label9 = new Label("Bg Alpha Image (Layer2): ");
-    	Label label10 = new Label("Bg Alpha Quiver: ");
+    	Label label7 = new Label("Magnitude Layer Alpha: ");
+//    	Label label8 = new Label("Foreground Alpha: ");
+//    	Label label9 = new Label("Bg Alpha Image (Layer2): ");
+//    	Label label10 = new Label("Bg Alpha Vectors: ");
     	Spinner<Integer> blurSpin = new Spinner<Integer>();
     	Spinner<Integer> dilationSpin= new Spinner<Integer>();
     	Spinner<Integer> erosionSpin = new Spinner<Integer>();
@@ -1323,9 +1314,9 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	Spinner<Integer> borderSpin = new Spinner<Integer>();
     	Spinner<Double> sigmaSpin = new Spinner<Double>();
     	Spinner<Double> alphabackSpin = new Spinner<Double>();
-    	Spinner<Double> alphaforeSpin = new Spinner<Double>();
-    	Spinner<Double> alphaback2Spin = new Spinner<Double>();
-    	Spinner<Double> alphafore2Spin = new Spinner<Double>();
+//    	Spinner<Double> alphaforeSpin = new Spinner<Double>();
+//    	Spinner<Double> alphaback2Spin = new Spinner<Double>();
+//    	Spinner<Double> alphafore2Spin = new Spinner<Double>();
     	
     	SpinnerValueFactory<Integer> intB = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, blur_size, 2);
     	blurSpin.setValueFactory(intB);
@@ -1648,22 +1639,24 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //	        	alphabackSpin.increment(0);
 //	        } 
 //	    });
-		SpinnerValueFactory<Double> intAlp2 = facGen(0, 1.0, alpha_under_three, 0.01);
-		alphaback2Spin.setValueFactory(intAlp2);
-		alphaback2Spin.setEditable(true);
-		TextFormatter<Double> formatterAlp2 = new TextFormatter<Double>(intAlp2.getConverter(), intAlp2.getValue());
-		alphaback2Spin.getEditor().setTextFormatter(formatterAlp2);
-		intAlp2.valueProperty().bindBidirectional(formatterAlp2.valueProperty());
-		formatterAlp2.valueProperty().addListener((s, ov, nv) -> {
-			alpha_under_three = nv;
-			try {
-				renderImageView(current_index, currentRenderType, false);
-			} catch (Exception e) {
-				alpha_under_three = 1.0;
-				alphaback2Spin.getValueFactory().setValue(alpha_under_three);
-				e.printStackTrace();
-			}
-		});
+		
+		
+//		SpinnerValueFactory<Double> intAlp2 = facGen(0, 1.0, alpha_under_three, 0.01);
+//		alphaback2Spin.setValueFactory(intAlp2);
+//		alphaback2Spin.setEditable(true);
+//		TextFormatter<Double> formatterAlp2 = new TextFormatter<Double>(intAlp2.getConverter(), intAlp2.getValue());
+//		alphaback2Spin.getEditor().setTextFormatter(formatterAlp2);
+//		intAlp2.valueProperty().bindBidirectional(formatterAlp2.valueProperty());
+//		formatterAlp2.valueProperty().addListener((s, ov, nv) -> {
+//			alpha_under_three = nv;
+//			try {
+//				renderImageView(current_index, currentRenderType, false);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		});
+		
+		
 //	   	alphaback2Spin.setValueFactory(facGen(0, 1.0, alpha_under_three, 0.01));
 //	   	alphaback2Spin.setEditable(true);
 //		IncrementHandler handler_7 = new IncrementHandler();
@@ -1691,22 +1684,20 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //	        } 
 //	    });
 		
-		SpinnerValueFactory<Double> intAlp3 = facGen(0, 1.0, alpha_above_two, 0.01);
-		alphaforeSpin.setValueFactory(intAlp3);
-		alphaforeSpin.setEditable(true);
-		TextFormatter<Double> formatterAlp3 = new TextFormatter<Double>(intAlp3.getConverter(), intAlp3.getValue());
-		alphaforeSpin.getEditor().setTextFormatter(formatterAlp3);
-		intAlp3.valueProperty().bindBidirectional(formatterAlp3.valueProperty());
-		formatterAlp3.valueProperty().addListener((s, ov, nv) -> {
-			alpha_above_two = nv;
-			try {
-				renderImageView(current_index, currentRenderType, false);
-			} catch (Exception e) {
-				alpha_above_two = 0.3;
-				alphaforeSpin.getValueFactory().setValue(alpha_above_two);
-				e.printStackTrace();
-			}
-		});
+//		SpinnerValueFactory<Double> intAlp3 = facGen(0, 1.0, alpha_above_two, 0.01);
+//		alphaforeSpin.setValueFactory(intAlp3);
+//		alphaforeSpin.setEditable(true);
+//		TextFormatter<Double> formatterAlp3 = new TextFormatter<Double>(intAlp3.getConverter(), intAlp3.getValue());
+//		alphaforeSpin.getEditor().setTextFormatter(formatterAlp3);
+//		intAlp3.valueProperty().bindBidirectional(formatterAlp3.valueProperty());
+//		formatterAlp3.valueProperty().addListener((s, ov, nv) -> {
+//			alpha_above_two = nv;
+//			try {
+//				renderImageView(current_index, currentRenderType, false);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		});
 		
 //	   	alphaforeSpin.setValueFactory(facGen(0, 1.0, alpha_above_two, 0.01));
 //	   	alphaforeSpin.setEditable(true);
@@ -1735,22 +1726,20 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //	        } 
 //	    });
 		
-		SpinnerValueFactory<Double> intAlp4 = facGen(0, 1.0, alpha_above_three, 0.01);
-		alphafore2Spin.setValueFactory(intAlp4);
-		alphafore2Spin.setEditable(true);
-		TextFormatter<Double> formatterAlp4 = new TextFormatter<Double>(intAlp4.getConverter(), intAlp4.getValue());
-		alphafore2Spin.getEditor().setTextFormatter(formatterAlp4);
-		intAlp4.valueProperty().bindBidirectional(formatterAlp4.valueProperty());
-		formatterAlp4.valueProperty().addListener((s, ov, nv) -> {
-			alpha_above_three = nv;
-			try {
-				renderImageView(current_index, currentRenderType, false);
-			} catch (Exception e) {
-				alpha_above_three = 0.3;
-				alphafore2Spin.getValueFactory().setValue(alpha_above_three);
-				e.printStackTrace();
-			}
-		});
+//		SpinnerValueFactory<Double> intAlp4 = facGen(0, 1.0, alpha_above_three, 0.01);
+//		alphafore2Spin.setValueFactory(intAlp4);
+//		alphafore2Spin.setEditable(true);
+//		TextFormatter<Double> formatterAlp4 = new TextFormatter<Double>(intAlp4.getConverter(), intAlp4.getValue());
+//		alphafore2Spin.getEditor().setTextFormatter(formatterAlp4);
+//		intAlp4.valueProperty().bindBidirectional(formatterAlp4.valueProperty());
+//		formatterAlp4.valueProperty().addListener((s, ov, nv) -> {
+//			alpha_above_three = nv;
+//			try {
+//				renderImageView(current_index, currentRenderType, false);
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//		});
 		
 //	   	alphafore2Spin.setValueFactory(facGen(0, 1.0, alpha_above_three, 0.01));
 //	   	alphafore2Spin.setEditable(true);
@@ -1794,12 +1783,12 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	grid.add(sigmaSpin, 2, 6);
     	grid.add(label7, 1, 7);
     	grid.add(alphabackSpin, 2, 7);
-    	grid.add(label8, 1, 8);
-    	grid.add(alphaforeSpin, 2, 8);
-    	grid.add(label9, 1, 9);
-    	grid.add(alphaback2Spin, 2, 9);
-    	grid.add(label10, 1, 10);
-    	grid.add(alphafore2Spin, 2, 10);
+//    	grid.add(label8, 1, 8);
+//    	grid.add(alphaforeSpin, 2, 8);
+//    	grid.add(label9, 1, 9);
+//    	grid.add(alphaback2Spin, 2, 9);
+//    	grid.add(label10, 1, 10);
+//    	grid.add(alphafore2Spin, 2, 10);
     	dialogJet.getDialogPane().setContent(grid);
     	ButtonType buttonTypeOk = new ButtonType("Okay", ButtonData.OK_DONE);
     	dialogJet.getDialogPane().getButtonTypes().add(buttonTypeOk);
@@ -1861,8 +1850,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		}
     	System.out.println(maximum_value);
     	System.out.println(average_value);
-    	mask_value = average_value * pixel_value * fps_value;
-    	scale_start = average_value * pixel_value * fps_value;
+    	mask_value = average_value;
+    	scale_start = average_value;
     	scale_end = maximum_value;
     	System.out.println(scale_end);
     	
@@ -2404,7 +2393,43 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
   	    }
   	    image.setRGB(0, 0, WIDTH, HEIGHT, pixels, 0, WIDTH);
   	    return image;
-  	}  
+  	}
+  	
+  	public static BufferedImage alphaToColor(BufferedImage raw, java.awt.Color remove) {
+  	    int WIDTH = raw.getWidth();
+  	    int HEIGHT = raw.getHeight();
+  	    BufferedImage image = new BufferedImage(WIDTH,HEIGHT,BufferedImage.TYPE_INT_ARGB);
+  	    int pixels[]=new int[WIDTH*HEIGHT];
+  	    raw.getRGB(0, 0, WIDTH, HEIGHT, pixels, 0, WIDTH);
+  	    for(int i=0; i<pixels.length;i++) {
+  	        if (pixels[i] == remove.getRGB()) {
+  	        	pixels[i] = 0xff000000;
+  	        }
+  	    }
+  	    image.setRGB(0, 0, WIDTH, HEIGHT, pixels, 0, WIDTH);
+  	    return image;
+  	}
+  	
+  	public static BufferedImage modAlpha(BufferedImage modMe, double modAmount) {
+  	    int WIDTH = modMe.getWidth();
+  	    int HEIGHT = modMe.getHeight();
+  	    BufferedImage image = new BufferedImage(WIDTH,HEIGHT,BufferedImage.TYPE_INT_ARGB);
+  	    int pixels[]=new int[WIDTH*HEIGHT];
+  	    modMe.getRGB(0, 0, WIDTH, HEIGHT, pixels, 0, WIDTH);
+  	    for(int i=0; i<pixels.length;i++) {
+  	    	int rgb_prev = pixels[i];
+  	    	int alpha = (pixels[i]>> 24) & 0xff;
+            alpha *= modAmount; //similar distortion to tape saturation (has scrunching effect, eliminates clipping)
+            alpha &= 0xff;      //keeps alpha in 0-255 range
+            pixels[i] &= 0x00ffffff; //remove old alpha info
+            pixels[i] |= (alpha << 24);  //add new alpha info
+  	        if (rgb_prev == java.awt.Color.BLACK.getRGB()) {
+  	        	pixels[i] = 0x00ffffff;
+  	        }
+  	    }
+  	    image.setRGB(0, 0, WIDTH, HEIGHT, pixels, 0, WIDTH);
+  	    return image;
+	}
     
 		
 	public void renderImageView(int index, String rendertype, boolean image_not_save) throws IOException{
@@ -2491,16 +2516,40 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        Mat greenCh = channels.get(2);
 	        Mat redCh = channels.get(3);
 	        MatVector channels2 = new MatVector(3);
-	        channels2.put(0, redCh);
+	        channels2.put(2, redCh);
 	        channels2.put(1, greenCh);
-	        channels2.put(2, blueCh);
+	        channels2.put(0, blueCh);
 	        org.bytedeco.javacpp.opencv_core.merge(channels2, jetLayerRGB);
-	        Mat combinedImage = new Mat();
 	        if (contour_state == true) {
 	        	img_src.convertTo(img_src, CV_8U);
-	        	jetLayerRGB.convertTo(jetLayerRGB, CV_8U);
+//	        	jetLayerRGB.convertTo(jetLayerRGB, CV_8U);
 	        }
-			org.bytedeco.javacpp.opencv_core.addWeighted(img_src, alpha_under_two, jetLayerRGB, alpha_above_two, 0, combinedImage);
+	        
+			BufferedImage source_buffer = Java2DFrameUtils.toBufferedImage(img_src);
+			BufferedImage jetAlpha = Java2DFrameUtils.toBufferedImage(jetLayerRGB);
+			BufferedImage jetAlphaMod = modAlpha(jetAlpha, alpha_under_two);
+//			BufferedImage jetAlphaModTransparent = colorToAlpha(jetAlphaMod, java.awt.Color.BLACK);
+			BufferedImage combinedAlphaedSrc = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+			// paint both images, preserving the alpha channels
+			Graphics gz = combinedAlphaedSrc.getGraphics();
+			gz.drawImage(source_buffer, 0, 0, null);
+			gz.drawImage(jetAlphaMod, 0, 0, null);
+			
+			//convert alphaed to Mat object
+	        Mat combinedImageA = Java2DFrameUtils.toMat(combinedAlphaedSrc);
+	        MatVector channelsz = new MatVector();
+	        Mat combinedImage = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
+	        org.bytedeco.javacpp.opencv_core.split(combinedImageA, channelsz);
+	        Mat blueChz = channelsz.get(1);
+	        Mat greenChz = channelsz.get(2);
+	        Mat redChz = channelsz.get(3);
+	        MatVector channelsz2 = new MatVector(3);
+	        channelsz2.put(0, redChz);
+	        channelsz2.put(1, greenChz);
+	        channelsz2.put(2, blueChz);
+	        org.bytedeco.javacpp.opencv_core.merge(channelsz, combinedImage);
+	        
 	        if (contour_state == true) {
 	        	Mat mask2 = generateContour(img_src);	        	
 	        	Mat combinedImage2 = new Mat();
@@ -2526,10 +2575,11 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		}
 		else if (rendertype.equals("Quiver")) {
         	Boolean to_merge = false;
+        	BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 	        if (contour_state == false) {
-	        	finalImage = writeCanvas(index, to_merge);
+	        	finalImage = writeCanvas(index, to_merge, bi);
 	        } else {
-	    		WritableImage writableImage = writeCanvas(index, to_merge);
+	    		WritableImage writableImage = writeCanvas(index, to_merge, bi);
 				ToMat converter = new OpenCVFrameConverter.ToMat();
 		        Mat img_src = null;
 		        if (currentGroup.getType() == 0) {
@@ -2575,7 +2625,6 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        }
 		} else if (rendertype.equals("QuiverMerge")) {
 			Boolean to_merge = true;
-			WritableImage writableImage = writeCanvas(index, to_merge);
 			ToMat converter = new OpenCVFrameConverter.ToMat();
 	        Mat img_src = null;
 	        if (currentGroup.getType() == 0) {
@@ -2598,6 +2647,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	    		}
 	    		frameGrabber.close();
 	        }
+	        BufferedImage srcBuf = Java2DFrameUtils.toBufferedImage(img_src);
+	        WritableImage writableImage = writeCanvas(index, to_merge, srcBuf);
 	        BufferedImage overlay = SwingFXUtils.fromFXImage(writableImage, null);
 	        Mat quiverLayer = Java2DFrameUtils.toMat(overlay);
 	        MatVector channels = new MatVector();
@@ -2616,7 +2667,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        	img_src.convertTo(img_src, CV_8U);
 	        	quiverLayerRGB.convertTo(quiverLayerRGB, CV_8U);
 	        }
-			org.bytedeco.javacpp.opencv_core.addWeighted(img_src, alpha_under_two, quiverLayerRGB, alpha_above_two, 0, combinedImage);
+	        //OLD QUIVER
+	        quiverLayerRGB.copyTo(combinedImage);
 	        if (contour_state == true) {
 	        	Mat mask2 = generateContour(img_src);	        	
 	        	Mat combinedImage2 = new Mat();
@@ -2642,7 +2694,11 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		} else if (rendertype.equals("JetQuiver")) {
 			Boolean to_merge = true;
 			WritableImage myWritableImage = writeJetImage(index, to_merge);
-			WritableImage myWritableImage2 = writeCanvas(index, to_merge);
+			//OLD QUIVER
+			//WritableImage myWritableImage2 = writeCanvas(index, to_merge);
+			
+			//OLD STILL
+//			WritableImage myWritableImage2 = writeCanvas(index, to_merge, new Mat());
 	        Mat img_src = null;
 	        if (currentGroup.getType() == 0) {
 	            ImageGroup g3 = (ImageGroup) currentGroup;
@@ -2664,10 +2720,12 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	    		}
 	    		frameGrabber.close();
 	        }
+	        
+			
+			
 	        BufferedImage overlay = SwingFXUtils.fromFXImage(myWritableImage, null);
-	        BufferedImage overlay2 = SwingFXUtils.fromFXImage(myWritableImage2, null);
+
 	        Mat jetLayer = Java2DFrameUtils.toMat(overlay);
-	        Mat quiverLayer = Java2DFrameUtils.toMat(overlay2);
 	        MatVector channels = new MatVector();
 	        Mat jetLayerRGB = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
 	        org.bytedeco.javacpp.opencv_core.split(jetLayer, channels);
@@ -2679,23 +2737,32 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        channels2.put(1, greenCh);
 	        channels2.put(2, blueCh);
 	        org.bytedeco.javacpp.opencv_core.merge(channels2, jetLayerRGB);
-	        MatVector channels3 = new MatVector();
-	        Mat quiverLayerRGB = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
-	        org.bytedeco.javacpp.opencv_core.split(quiverLayer, channels3);
-	        Mat blueCh2 = channels3.get(1);
-	        Mat greenCh2 = channels3.get(2);
-	        Mat redCh2 = channels3.get(3);
-	        MatVector channels4 = new MatVector(3);
-	        channels4.put(0, redCh2);
-	        channels4.put(1, greenCh2);
-	        channels4.put(2, blueCh2);
-	        org.bytedeco.javacpp.opencv_core.merge(channels4, quiverLayerRGB);
-	        Mat combinedImage = new Mat();
 	        if (contour_state == true) {
 	        	jetLayerRGB.convertTo(jetLayerRGB, CV_8U);
-	        	quiverLayerRGB.convertTo(quiverLayerRGB, CV_8U);
+//	        	quiverLayerRGB.convertTo(quiverLayerRGB, CV_8U);
 	        }
-			org.bytedeco.javacpp.opencv_core.addWeighted(jetLayerRGB, alpha_under_two, quiverLayerRGB, alpha_above_two, 0, combinedImage);
+	        //new method: add alpha to jet
+			BufferedImage jetBuffer = Java2DFrameUtils.toBufferedImage(jetLayerRGB);
+			BufferedImage jetBufferAlpha = modAlpha(jetBuffer, alpha_under_two);
+			//black to not alpha
+			BufferedImage jetBufferAlphaBlack = alphaToColor(jetBufferAlpha, java.awt.Color.BLACK);
+	        //draw quiver on resulting jet
+			WritableImage myWritableImage2 = writeCanvas(index, to_merge, jetBufferAlphaBlack);
+	        BufferedImage quiverImage2 = SwingFXUtils.fromFXImage(myWritableImage2, null);
+			//convert to matrix
+	        Mat overlayJetQuiver = Java2DFrameUtils.toMat(quiverImage2);
+	        MatVector channels3z = new MatVector();
+	        Mat combinedImage = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
+	        org.bytedeco.javacpp.opencv_core.split(overlayJetQuiver, channels3z);
+	        Mat blueCh2z = channels3z.get(1);
+	        Mat greenCh2z = channels3z.get(2);
+	        Mat redCh2z = channels3z.get(3);
+	        MatVector channels4z = new MatVector(3);
+	        channels4z.put(0, redCh2z);
+	        channels4z.put(1, greenCh2z);
+	        channels4z.put(2, blueCh2z);
+	        org.bytedeco.javacpp.opencv_core.merge(channels4z, combinedImage);
+			
 	        if (contour_state == true) {
 	        	Mat mask2 = generateContour(img_src);
 	        	Mat combinedImage2 = new Mat();
@@ -2709,7 +2776,10 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		} else if (rendertype.equals("JetQuiverMerge")) {
 			Boolean to_merge = true;
 			WritableImage myWritableImage = writeJetImage(index, to_merge);
-			WritableImage myWritableImage2 = writeCanvas(index, to_merge);
+			
+			//OLD QUIVER
+//			WritableImage myWritableImage2 = writeCanvas(index, to_merge);
+			
 	        Mat img_src = null;
 	        if (currentGroup.getType() == 0) {
 	            ImageGroup g3 = (ImageGroup) currentGroup;
@@ -2731,10 +2801,11 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	    		}
 	    		frameGrabber.close();
 	        }
+	        
+
+	        //OLD JET
 	        BufferedImage overlay = SwingFXUtils.fromFXImage(myWritableImage, null);
-	        BufferedImage overlay2 = SwingFXUtils.fromFXImage(myWritableImage2, null);
 	        Mat jetLayer = Java2DFrameUtils.toMat(overlay);
-	        Mat quiverLayer = Java2DFrameUtils.toMat(overlay2);
 	        MatVector channels = new MatVector();
 	        Mat jetLayerRGB = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
 	        org.bytedeco.javacpp.opencv_core.split(jetLayer, channels);
@@ -2742,10 +2813,48 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        Mat greenCh = channels.get(2);
 	        Mat redCh = channels.get(3);
 	        MatVector channels2 = new MatVector(3);
-	        channels2.put(0, redCh);
+	        channels2.put(2, redCh);
 	        channels2.put(1, greenCh);
-	        channels2.put(2, blueCh);
+	        channels2.put(0, blueCh);
 	        org.bytedeco.javacpp.opencv_core.merge(channels2, jetLayerRGB);
+	        
+	        if (contour_state == true) {
+	        	img_src.convertTo(img_src, CV_8U);
+	        	
+	        	//OLD QUIVER
+//	        	quiverLayerRGB.convertTo(quiverLayerRGB, CV_8U);
+	        	//OLD JET
+//	        	jetLayerRGB.convertTo(jetLayer, CV_8U);
+	        }
+			BufferedImage source_buffer = Java2DFrameUtils.toBufferedImage(img_src);
+			BufferedImage writableImageAlphaed2 = Java2DFrameUtils.toBufferedImage(jetLayerRGB);
+			BufferedImage writableImageAlphaedO = modAlpha(writableImageAlphaed2, alpha_under_two);
+			BufferedImage writableImageAlphaedTransparent = colorToAlpha(writableImageAlphaedO, java.awt.Color.BLACK);
+			BufferedImage combinedAlphaedSrc = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+			// paint both images, preserving the alpha channels
+			Graphics gz = combinedAlphaedSrc.getGraphics();
+			gz.drawImage(source_buffer, 0, 0, null);
+			gz.drawImage(writableImageAlphaedTransparent, 0, 0, null);
+			
+			//convert alphaed to Mat object
+	        Mat combinedImageA = Java2DFrameUtils.toMat(combinedAlphaedSrc);
+	        MatVector channelsz = new MatVector();
+	        Mat combinedImage = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
+	        org.bytedeco.javacpp.opencv_core.split(combinedImageA, channelsz);
+	        Mat blueChz = channelsz.get(1);
+	        Mat greenChz = channelsz.get(2);
+	        Mat redChz = channelsz.get(3);
+	        MatVector channelsz2 = new MatVector(3);
+	        channelsz2.put(0, redChz);
+	        channelsz2.put(1, greenChz);
+	        channelsz2.put(2, blueChz);
+	        org.bytedeco.javacpp.opencv_core.merge(channelsz, combinedImage);
+
+	        BufferedImage srcBuf = Java2DFrameUtils.toBufferedImage(combinedImage);
+			WritableImage myWritableImage2 = writeCanvas(index, to_merge, srcBuf);
+	        BufferedImage overlay2 = SwingFXUtils.fromFXImage(myWritableImage2, null);
+	        Mat quiverLayer = Java2DFrameUtils.toMat(overlay2);
 	        MatVector channels3 = new MatVector();
 	        Mat quiverLayerRGB = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
 	        org.bytedeco.javacpp.opencv_core.split(quiverLayer, channels3);
@@ -2757,14 +2866,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	        channels4.put(1, greenCh2);
 	        channels4.put(2, blueCh2);
 	        org.bytedeco.javacpp.opencv_core.merge(channels4, quiverLayerRGB);
-	        if (contour_state == true) {
-	        	img_src.convertTo(img_src, CV_8U);
-	        	quiverLayerRGB.convertTo(quiverLayerRGB, CV_8U);
-	        	jetLayerRGB.convertTo(jetLayer, CV_8U);
-	        }
-	        Mat combinedImage = new Mat();
-			org.bytedeco.javacpp.opencv_core.addWeighted(img_src, alpha_under_two, jetLayerRGB, alpha_above_two, 0, combinedImage);
-			org.bytedeco.javacpp.opencv_core.addWeighted(combinedImage, alpha_under_three, quiverLayerRGB, alpha_above_three, 0, combinedImage);
+	        quiverLayerRGB.copyTo(combinedImage);
 	        if (contour_state == true) {
 	        	Mat mask2 = generateContour(img_src);	        	
 	        	Mat combinedImage2 = new Mat();
@@ -2788,45 +2890,6 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		        finalImage = SwingFXUtils.toFXImage(combined, null);
 	        }
 		} else if (rendertype.equals("Merge")){
-//	        Mat img_src = null;
-//	        Mat img_src2 = null;
-//	        if (currentGroup.getType() == 0) {
-//	            ImageGroup g3 = (ImageGroup) currentGroup;
-//	            File path_img  = g3.getImages().get(main_package.getListPoints().get(index));
-//	            img_src = imread(path_img.getCanonicalPath());
-//	        } else {
-//	            VideoGroup g3 = (VideoGroup) currentGroup;
-//	        	FFmpegFrameGrabber frameGrabber = new FFmpegFrameGrabber(g3.getVideo().getAbsolutePath());
-//	    		OpenCVFrameConverter.ToMat converterToMat = new OpenCVFrameConverter.ToMat();
-//	    		frameGrabber.start();
-//	    		int N = frameGrabber.getLengthInFrames();
-//	    		for(int j = 0; j<N; j++){
-//	    			Frame frame = frameGrabber.grab();
-//	    			Mat img = converterToMat.convert(frame);
-//	    			if(j ==index){
-//	    				img_src = img.clone();
-//	    				break;
-//	    			}
-//	    		}
-//	    		frameGrabber.close();
-//	        }
-//            img_src2 = img_src.clone();
-//	        if (contour_state == true) {
-//	        	img_src.convertTo(img_src, CV_8U);
-//	        	img_src2.convertTo(img_src, CV_8U);
-//	        }
-//	        Mat combinedImage = new Mat();
-//			org.bytedeco.javacpp.opencv_core.addWeighted(img_src, alpha_under_two, img_src2, alpha_above_two, 0, combinedImage);
-//	        if (contour_state == true) {
-//	        	Mat mask2 = generateContour(img_src);
-//	        	Mat combinedImage2 = new Mat();
-//	        	combinedImage.copyTo(combinedImage2, mask2);
-//				BufferedImage combined = Java2DFrameUtils.toBufferedImage(combinedImage2);
-//		        finalImage = SwingFXUtils.toFXImage(combined, null);
-//	        } else {
-//				BufferedImage combined = Java2DFrameUtils.toBufferedImage(combinedImage);
-//		        finalImage = SwingFXUtils.toFXImage(combined, null);
-//	        }
 			//render image alone
 			ToMat converter = new OpenCVFrameConverter.ToMat();
 	        Mat img_src = null;
@@ -3077,8 +3140,9 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
         return myWritableImage;
 	}
 	
-	public WritableImage writeCanvas(int index, boolean to_merge) {
-		Canvas canvas1 = new Canvas((int) width, (int) height);
+	
+	public WritableImage writeCanvas(int index, boolean to_merge, BufferedImage backgroundImageBuf) {
+		Canvas canvas1 = new Canvas((int) width, (int) height);    	
 		Mat x_sqrd = new Mat();
     	Mat y_sqrd = new Mat();
     	Mat x_flow = main_package.getXflow(index);
@@ -3127,7 +3191,15 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	if (to_merge == false) {
     		gc.setFill(Color.BLACK);
     		gc.fillRect(0, 0, canvas1.getWidth(), canvas1.getHeight());
+    	} else { //new canvas writing function
+    		//first create javafx image from mat  
+
+			//BufferedImage backgroundImageBuf = Java2DFrameUtils.toBufferedImage(backgroundImageMat);
+			Image backgroundImage = SwingFXUtils.toFXImage(backgroundImageBuf , null);
+    		//backgroundImageMat;
+    		gc.drawImage(backgroundImage, 0, 0);
     	}
+    	
     	int maxx = 0;
     	for(int x = 0; x < width; x=x+ywindow){
     		maxx += 1;

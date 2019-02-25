@@ -41,7 +41,7 @@
                   </Menu>
                   <Menu mnemonicParsing="false" text="Options">
                     <items>
-                      <MenuItem mnemonicParsing="false" onAction="#showAdvancedJet" text="Quiver Size" />
+                      <MenuItem mnemonicParsing="false" onAction="#showAdvancedJet" text="Arrow Size" />
                         <MenuItem mnemonicParsing="false" onAction="#showAdvancedMerge" text="Cell Segmentation" />
                     </items>
                   </Menu>
@@ -67,7 +67,7 @@
                               <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentTIFF" text="Current TIFF" />
                            </items>
                         </Menu>
-                        <Menu mnemonicParsing="false" text="All Quiver">
+                        <Menu mnemonicParsing="false" text="All Vectors">
                            <items>
                               <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverJPG" text="JPG" />
                               <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverPNG" text="PNG" />
@@ -75,7 +75,7 @@
                               <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverAVI" text="MP4" />
                            </items>
                         </Menu>
-                        <Menu mnemonicParsing="false" text="All Jet">
+                        <Menu mnemonicParsing="false" text="All Magnitudes">
                            <items>
                               <MenuItem mnemonicParsing="false" onAction="#handleExportJetJPG" text="JPG" />
                               <MenuItem mnemonicParsing="false" onAction="#handleExportJetPNG" text="PNG" />
@@ -85,7 +85,7 @@
                         </Menu>
                         <Menu mnemonicParsing="false" text="All Merge">
                            <items>
-                              <Menu mnemonicParsing="false" text="Jet">
+                              <Menu mnemonicParsing="false" text="Magnitude">
                                  <items>
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetJPG" text="JPG" />
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetPNG" text="PNG" />
@@ -93,7 +93,7 @@
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetAVI" text="MP4" />
                                  </items>
                               </Menu>
-                              <Menu mnemonicParsing="false" text="Quiver">
+                              <Menu mnemonicParsing="false" text="Vectors">
                                  <items>
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeQuiverJPG" text="JPG" />
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeQuiverPNG" text="PNG" />
@@ -109,7 +109,7 @@
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportMergeBothAVI" text="MP4" />
                                  </items>
                               </Menu>
-                              <Menu mnemonicParsing="false" text="Jet and Quiver only">
+                              <Menu mnemonicParsing="false" text="Magnitude and Vectors only">
                                  <items>
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportJetQuiverJPG" text="Jet and Quiver JPG" />
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportJetQuiverPNG" text="Jet and Quiver PNG" />
@@ -171,7 +171,7 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Label alignment="CENTER" prefHeight="16.0" prefWidth="867.0" text="View Quiver and Jet plots:" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER">
+            <Label alignment="CENTER" prefHeight="16.0" prefWidth="867.0" text="View Vector and Magnitude Fields:" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER">
                <font>
                   <Font size="21.0" />
                </font>
@@ -210,14 +210,14 @@
                </children>
             </HBox>
             <Slider fx:id="sliderGroups" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER" GridPane.rowIndex="18" />
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" GridPane.rowSpan="3">
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0" GridPane.columnIndex="1" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="3">
                <children>
-                  <CheckBox fx:id="quiverCheck" mnemonicParsing="false" prefWidth="120.0" text="Quiver Plot" />
-                  <CheckBox fx:id="jetCheck" mnemonicParsing="false" prefHeight="18.0" prefWidth="120.0" text="Jet Plot" />
-                  <CheckBox fx:id="mergeCheck" mnemonicParsing="false" prefWidth="120.0" text="Original Image" />
+                  <CheckBox fx:id="quiverCheck" mnemonicParsing="false" prefWidth="140.0" text="Vector Field" />
+                  <CheckBox fx:id="jetCheck" mnemonicParsing="false" prefHeight="18.0" prefWidth="140.0" text="Magnitude Field" />
+                  <CheckBox fx:id="mergeCheck" mnemonicParsing="false" prefWidth="140.0" text="Original Image" />
                </children>
             </VBox>
-            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="3">
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="4" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.rowSpan="3">
                <children>
                   <GridPane>
                     <columnConstraints>
@@ -253,9 +253,9 @@
                   </GridPane>
                </children>
             </VBox>
-            <Separator orientation="VERTICAL" prefHeight="200.0" prefWidth="20.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.rowSpan="3" />
-            <ToggleButton fx:id="togglebuttonContour" mnemonicParsing="false" onAction="#toggleContour" text="Contour Filter is OFF" GridPane.columnIndex="6" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.rowSpan="2" GridPane.valignment="CENTER" />
-            <Separator orientation="VERTICAL" prefHeight="200.0" prefWidth="20.0" GridPane.columnIndex="6" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.rowSpan="3" GridPane.valignment="CENTER" />
+            <Separator orientation="VERTICAL" prefHeight="200.0" prefWidth="20.0" GridPane.columnIndex="3" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.rowSpan="3" />
+            <ToggleButton fx:id="togglebuttonContour" mnemonicParsing="false" onAction="#toggleContour" text="Contour Filter is OFF" GridPane.columnIndex="7" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.rowSpan="2" GridPane.valignment="CENTER" />
+            <Separator orientation="VERTICAL" prefHeight="200.0" prefWidth="20.0" GridPane.columnIndex="7" GridPane.halignment="LEFT" GridPane.rowIndex="1" GridPane.rowSpan="3" GridPane.valignment="CENTER" />
             <Button fx:id="cmdSliderPlay" mnemonicParsing="false" onAction="#handlePlayStopButton" text="Play" GridPane.columnIndex="9" GridPane.rowIndex="18">
                <GridPane.margin>
                   <Insets left="20.0" />

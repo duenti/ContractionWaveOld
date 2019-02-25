@@ -101,7 +101,7 @@ public class PackageData  implements Serializable {
 		for (int i = 0;i <this.current_groups.size(); i++) {
 			Group g = current_groups.get(i);
 			if (!g.getStatus().equals("Done")) {
-				CalculationTask new_task = new CalculationTask(g, this, save_data);
+				CalculationTask new_task = new CalculationTask(g, save_data);
 				
 				new_task.setOnFailed(e -> {
 //					String group_name = e.getSource().getMessage();

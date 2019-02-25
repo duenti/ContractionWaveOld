@@ -106,6 +106,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	private static Group currentGroup;
 	private JFreeChart currentChart;
 	private Peak currentPeak;
+	private static boolean zoomGridLinesState = true;
 	private List<IntervalMarker> intervalsList;
 	private List<Integer> maximum_list;
 	private List<Integer> minimum_list;
@@ -119,7 +120,11 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	private int step = 1;
 	private int global_min;
 	private List<TimeSpeed> timespeedlist;
-	@FXML
+	private double delta;
+	private double intra;
+	private double inter;
+	
+    @FXML
     private Button cmdBack;
 
     @FXML
@@ -605,7 +610,10 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	System.out.println(ask_saved);
     	if (ask_saved == false) {
 
-            Button buttonTypeOk = new Button("Save");
+            Stage primaryStage;
+        	primaryStage = (Stage) cmdNext.getScene().getWindow();
+        	
+    		Button buttonTypeOk = new Button("Save");
     		Button buttonTypeSkip = new Button("Skip");
     		Button buttonTypeCancel = new Button("Cancel");
     		
@@ -687,6 +695,8 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	        });
         	dialogMicroscope.setScene(new Scene(grid));
 	    	dialogMicroscope.show();
+	    	
+	    	Boolean return_bool;
 		} else {
             navigation();
 		}

@@ -41,6 +41,7 @@ import javafx.stage.Stage;
 
 public class Controller_Scale implements Initializable{
 	
+	private double mask_value;
 	private double scale_start;
 	private double scale_end;
 	private int width = 30;
@@ -158,6 +159,7 @@ public class Controller_Scale implements Initializable{
 	
 	public void setContext(double mask_value1, double scale_start1, double scale_end1) {
 		System.out.println("About to gen test scale 1");
+		mask_value = mask_value1;
 		scale_start = scale_start1;
 		scale_end = scale_end1;
 		this_jet = new ColorMap(scale_start, scale_end, JET);
@@ -267,6 +269,8 @@ public class Controller_Scale implements Initializable{
 //			}
 			int x = width+20; //tick width to write
 			int y = ((int) convertScaleToHeight(scale_end)) + 20;
+//			gc.fillText(String.valueOf(scale_end), x, y);
+			int currentpad_f = 5;
 			String current_print_f = String.valueOf(round(scale_end,2));
 //			if (!current_print_f.contains(".")) {
 //				current_print_f += ".";
@@ -276,6 +280,7 @@ public class Controller_Scale implements Initializable{
 //			}
 //			current_print_f = rightPadZeros(current_print_f, currentpad_f);
 			
+			int currentpad_s = 5;
 			String current_print_s = String.valueOf(round(scale_start,2));
 //			if (!current_print_s.contains(".")) {
 //				current_print_s += ".";

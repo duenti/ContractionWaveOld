@@ -95,6 +95,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	private static Group currentGroup;
 	private JFreeChart currentChart;
 	private static JFreeChart currentZoomChart;
+	private static boolean zoomGridLinesState = true;
+	private boolean mainGridLinesState = true;
 	private double average_value;
 	private double upper_limit;
 	private List<IntervalMarker> intervalsList = new ArrayList<IntervalMarker>();
@@ -1357,12 +1359,17 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         System.out.println(average_corrected);
         for (int v = 0; v < valid_maximum_list.size() - 1; v=v+2) {
         	int first_maximum_index = valid_maximum_list.get(v);            
-        	//search criteria look for first and fifth points based on simple set of rules:
+        	int min_index = first_max_to_minimum_hash.get(first_maximum_index);
+        	double minimum_flow = dataset_general.getYValue(0, min_index);
+    		//search criteria look for first and fifth points based on simple set of rules:
     		//first point - movable window for first point below or equal zero whose following neighbour is positive
         	boolean first_found = false;
         	for (int b = first_maximum_index-1; b >= 1; b--) {
+        		double next_value = dataset_general.getYValue(0, b-1);
         		double previous_value = dataset_general.getYValue(0, b+1);
         		double query_value = dataset_general.getYValue(0, b);
+        		double delta_front = query_value - next_value;
+        		double delta_back = query_value - previous_value;
         		if (query_value <= 0 && previous_value > 0) {
 //        		if (delta_front < 0 && delta_back < 0 && query_value <= 0){
         			//first point found, break

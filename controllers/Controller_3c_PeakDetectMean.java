@@ -487,7 +487,11 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	}
 	
 	
+	private boolean zoom_mode = false;
+	
 	public void triggerSelectMode() {
+		zoom_mode = false;
+		XYPlot plot_n = (XYPlot) currentChart.getPlot();
 		ChartPanel now_linepanel2 = (ChartPanel)swgChart.getContent();
 		MouseListener[] mouseListArray = now_linepanel2.getMouseListeners();
 		for (int i = 0; i < mouseListArray.length; i++) {
@@ -509,6 +513,8 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	}
 	
 	public void triggerZoomMode() {
+		zoom_mode = true;
+		XYPlot plot_n = (XYPlot) currentChart.getPlot();
 		ChartPanel now_linepanel2 = (ChartPanel)swgChart.getContent();
 		now_linepanel2.setMouseWheelEnabled(true);
 		now_linepanel2.setRangeZoomable(true);
@@ -602,6 +608,9 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	}
 	
 	
+	private boolean previousPlot = false;
+//	private ChartPanel general_linepanel2;
+	
 	private MouseMarker mousemark;
 	
 	private void createPlot() {
@@ -661,6 +670,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 		
 		
 		swgChart.setContent(linepanel2);
+		previousPlot = true;
 	}
 	
 	private XYDataset createDataset() {
@@ -813,6 +823,8 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	}
 	
 	
+	private Double last_start = Double.NaN;
+	private Double last_end = Double.NaN;
 	private final class MouseMarker extends MouseAdapter{
 	    private Marker marker;
 	    private Double markerStart = Double.NaN;
@@ -848,7 +860,11 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	        }
 	        if (!markerStart.isNaN()) {
 	        	if(!markerEnd.isNaN()) {
-double v1 = markerStart.doubleValue();
+//	        	int v1 = markerStart.intValue();
+//                int v2 = markerEnd.intValue();
+	        	last_start = markerStart;
+	        	last_end = markerEnd;
+                double v1 = markerStart.doubleValue();
                 double v2 = markerEnd.doubleValue();
 	        	if ( v2 > v1){
 	                marker = new IntervalMarker(markerStart, markerEnd);
@@ -877,7 +893,8 @@ double v1 = markerStart.doubleValue();
 	        	    if (ind != -1) {
 	        	    	toField = ind;
 	        	    }
-	        	    //	        	    txtAverage.setText(String.valueOf(mean));
+	        	    double mean = sum / size_numbers;
+//	        	    txtAverage.setText(String.valueOf(mean));
 	        	    txtAverage.setText(String.valueOf(max));
 	                //marker.setPaint(new java.awt.Color(0xDD, 0xFF, 0xDD, 0x80));
 	        	    current_marker = marker;

@@ -37,10 +37,13 @@ public class CalculationTask extends Task<Void> {
     private int winSize;
     private int iterations;
     private int polyN;
-    private PackageData parent;
+    //private PackageData parent;
     private boolean save_data;
-
-    public CalculationTask(Group group, PackageData parentPackage, boolean save_data1) {
+    private List<Double> magList = new ArrayList<Double>();
+    
+    
+    public CalculationTask(Group group, boolean save_data1) {
+    //public CalculationTask(Group group, PackageData parentPackage, boolean save_data1) {
         this.thisgroup = group;
         this.pyrScale = group.getPyrScale();
         this.pyrScale = group.getPyrScale();
@@ -49,7 +52,7 @@ public class CalculationTask extends Task<Void> {
         this.winSize = group.getWinSize();
         this.iterations = group.getIterations();
         this.polyN = group.getPolyN();
-        this.parent = parentPackage;
+        //this.parent = parentPackage;
         this.save_data = save_data1;
     }
     
@@ -62,10 +65,11 @@ public class CalculationTask extends Task<Void> {
     }
     
     
-
-    public void calculateMagnitudes(Group g2, PackageData parent) {
+    public void calculateMagnitudes(Group g2) {
+    //public void calculateMagnitudes(Group g2, PackageData parent) {
     	ImageGroup g = (ImageGroup) g2;
 		g.clearMagnitudeList();
+		magList.clear();
 		thisgroup.setStatus("Running");
 		List<File> images = g.getImages();
 		List<Long> time_average = new ArrayList<Long>();
@@ -93,15 +97,26 @@ public class CalculationTask extends Task<Void> {
 		   	FloatBuffer floatBufferMag = floatMags.createBuffer();
 		   	float[] floatArrayMag = new float[floatBufferMag.capacity()];
 		   	floatBufferMag.get(floatArrayMag);
-		   	float sum = 0;
-		   	for(float izx : floatArrayMag) {       
-		   	    sum += izx;
+		   	
+	    	float sum = 0;			    	
+		   	int carrijoMeAjude;
+		   	if (floatArrayMag == null) {
+		   		carrijoMeAjude = 1;
+		   	} else if (floatArrayMag.length >= 1) {
+		   		carrijoMeAjude = floatArrayMag.length;
+		    	for(float izx : floatArrayMag) {       
+		    	    sum += izx;
+		    	}
+		   	} else {
+		   		carrijoMeAjude = 1;
 		   	}
-		   	double magAverage = java.lang.Math.abs(sum / floatArrayMag.length);
-		   	g.addToMagnitudeList(magAverage);  	
+		   	
+		   	double magAverage = java.lang.Math.abs(sum / carrijoMeAjude);
+		   	magList.add(magAverage);
+		   	//g.addToMagnitudeList(magAverage);
 		   	System.out.print(sum);
 		   	System.out.print(" ");
-		   	System.out.println(floatArrayMag.length);
+		   	System.out.println(carrijoMeAjude);
 		   	double perc = (double)(i+1)/(double) (images.size()-1);
 			Instant end = Instant.now();
 			Duration timeElapsed = Duration.between(start, end);
@@ -120,14 +135,14 @@ public class CalculationTask extends Task<Void> {
 					if (time_end > 1000) {
 						time_end = Long.valueOf(time_end / 1000);
 						ending = " seconds";
-					}
-					if (time_end > 60) {
-						time_end = Long.valueOf(time_end / 60);
-						ending = " minutes";
-					}
-					if (time_end > 60) {
-						time_end = Long.valueOf(time_end / 60);
-						ending = " hours";
+						if (time_end > 60) {
+							time_end = Long.valueOf(time_end / 60);
+							ending = " minutes";
+							if (time_end > 60) {
+								time_end = Long.valueOf(time_end / 60);
+								ending = " hours";
+							}
+						}
 					}
 
 					String timeAvg = String.valueOf(time_end) + ending;
@@ -135,13 +150,22 @@ public class CalculationTask extends Task<Void> {
 					thisgroup.setRemainingTime(timeAvg);
 				}
 	        });
-
 		}
+		
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				thisgroup.setMagnitudeList(magList);
+			}
+        });
+		
 	}
 
-	public void calculateMagnitudesVideo(Group g2, PackageData parent) throws Exception{
+	public void calculateMagnitudesVideo(Group g2) throws Exception{
+	//public void calculateMagnitudesVideo(Group g2, PackageData parent) throws Exception{
 			VideoGroup g = (VideoGroup) g2;
 			g.clearMagnitudeList();
+			magList.clear();
 			thisgroup.setStatus("Running");
 			List<Long> time_average = new ArrayList<Long>();
 			try{
@@ -177,16 +201,28 @@ public class CalculationTask extends Task<Void> {
 			    	float[] floatArrayMag = new float[floatBufferMag.capacity()];
 			    	floatBufferMag.get(floatArrayMag);
 			    	
-			    	float sum = 0;
-			    	for(float izx : floatArrayMag) {       
-			    	    sum += izx;
-			    	}
+			    	float sum = 0;			    	
+				   	int carrijoMeAjude;
+				   	if (floatArrayMag == null) {
+				   		carrijoMeAjude = 1;
+				   	} else if (floatArrayMag.length >= 1) {
+				   		carrijoMeAjude = floatArrayMag.length;
+				    	for(float izx : floatArrayMag) {       
+				    	    sum += izx;
+				    	}
+				   	} else {
+				   		carrijoMeAjude = 1;
+				   	}
+				   	
+				   	double magAverage = java.lang.Math.abs(sum / carrijoMeAjude);
+				   	magList.add(magAverage);
 			    	
-			    	double magAverage = java.lang.Math.abs(sum / floatArrayMag.length);
-			    	g.addToMagnitudeList(magAverage);
+//			    	
+//			    	double magAverage = java.lang.Math.abs(sum / floatArrayMag.length);
+//			    	g.addToMagnitudeList(magAverage);
 			    	System.out.print(sum);
 				   	System.out.print(" ");
-				   	System.out.println(floatArrayMag.length);
+				   	System.out.println(carrijoMeAjude);
 			    	double perc = (double)(i+1)/(double) (N);
 			    	
 					Instant end = Instant.now();
@@ -204,14 +240,14 @@ public class CalculationTask extends Task<Void> {
 							if (time_end > 1000) {
 								time_end = Long.valueOf(time_end / 1000);
 								ending = " seconds";
-							}
-							if (time_end > 60) {
-								time_end = Long.valueOf(time_end / 60);
-								ending = " minutes";
-							}
-							if (time_end > 60) {
-								time_end = Long.valueOf(time_end / 60);
-								ending = " hours";
+								if (time_end > 60) {
+									time_end = Long.valueOf(time_end / 60);
+									ending = " minutes";
+									if (time_end > 60) {
+										time_end = Long.valueOf(time_end / 60);
+										ending = " hours";
+									}
+								}
 							}
 							String timeAvg = String.valueOf(time_end) + ending;
 //							parent.setTimeAvg(timeAvg);
@@ -221,6 +257,14 @@ public class CalculationTask extends Task<Void> {
 				}
 				frameGrabber.flush();
 				frameGrabber.close();
+				
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						thisgroup.setMagnitudeList(magList);
+					}
+		        });
+				
 			}catch(Exception e){
 				e.printStackTrace();
 			}
@@ -233,9 +277,9 @@ public class CalculationTask extends Task<Void> {
 			updateMessage(name);
 			int type = this.thisgroup.getType();
 			if (type == 0) {//Image
-				calculateMagnitudes(this.thisgroup, this.parent);
+				calculateMagnitudes(this.thisgroup);
 			} else {//Video
-				calculateMagnitudesVideo(this.thisgroup, this.parent);
+				calculateMagnitudesVideo(this.thisgroup);
 			}
 			Group localgroup = this.thisgroup;
 			boolean save_data = this.save_data;

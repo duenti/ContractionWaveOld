@@ -238,6 +238,14 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
+	private static Path rootDir; // The chosen root or source directory
+	private static final String DEFAULT_DIRECTORY =
+            System.getProperty("user.dir"); //  or "user.home"
+	
+	private static Path getInitialDirectory() {
+        return (rootDir == null) ? Paths.get(DEFAULT_DIRECTORY) : rootDir;
+    }
+    
     @FXML
     void handleExportTIFF(ActionEvent event) throws Exception{
     	FileChooser fileChooser = new FileChooser();

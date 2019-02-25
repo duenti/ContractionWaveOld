@@ -45,6 +45,20 @@ public class IntervalPeak {
 		}
 //		end = (int)Math.ceil(end_val);
 		setEndInterval(end);
+		System.out.println("Model start");
+		System.out.println(start);
+		System.out.println(start_val);
+		System.out.println("Model end");
+		System.out.println(end);
+		System.out.println(end_val);
+		boolean count_start = false; 
+		boolean count_end = false;
+		boolean first_done = false;
+		int f_point = -1;
+		int end_point = -1;
+		int mid_point = -1;
+		int sec_point = -1;
+		int fourth_point = -1;
 		int last_sec_point_index = 0;
 		int last_third_point_index = 0;
 		int last_fourth_point_index = 0;

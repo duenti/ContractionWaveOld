@@ -96,6 +96,11 @@ public abstract class Group implements Serializable {
 		return magList;
 	}
 	
+	public void setMagnitudeList(List<Double> magList1){
+		magList.clear();
+		magList= magList1.stream().collect(Collectors.toList());
+	}
+	
 	public double getMagnitudeListValue(int i){
 		return magList.get(i);
 	}
