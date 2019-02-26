@@ -22,6 +22,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import org.bytedeco.javacpp.opencv_core.Mat;
+import org.bytedeco.javacpp.opencv_core.Scalar;
 import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.bytedeco.javacv.Frame;
 import org.bytedeco.javacv.OpenCVFrameConverter;
@@ -93,30 +94,11 @@ public class CalculationTask extends Task<Void> {
 		   	extractChannel(flow, y_flow, 1);
 		   	cartToPolar(x_flow, y_flow, mag, ang);
 		   	Mat floatMags = new Mat();
-		   	mag.convertTo(floatMags, CV_32F);
-		   	FloatBuffer floatBufferMag = floatMags.createBuffer();
-		   	float[] floatArrayMag = new float[floatBufferMag.capacity()];
-		   	floatBufferMag.get(floatArrayMag);
-		   	
-	    	float sum = 0;			    	
-		   	int carrijoMeAjude;
-		   	if (floatArrayMag == null) {
-		   		carrijoMeAjude = 1;
-		   	} else if (floatArrayMag.length >= 1) {
-		   		carrijoMeAjude = floatArrayMag.length;
-		    	for(float izx : floatArrayMag) {       
-		    	    sum += izx;
-		    	}
-		   	} else {
-		   		carrijoMeAjude = 1;
-		   	}
-		   	
-		   	double magAverage = java.lang.Math.abs(sum / carrijoMeAjude);
+		   	mag.convertTo(floatMags, CV_32F);	    	
+	    	Scalar mean =  org.bytedeco.javacpp.opencv_core.mean(floatMags);
+	    	double magAverage = mean.get(0);
 		   	magList.add(magAverage);
-		   	//g.addToMagnitudeList(magAverage);
-		   	System.out.print(sum);
-		   	System.out.print(" ");
-		   	System.out.println(carrijoMeAjude);
+		   	System.out.println(magAverage);
 		   	double perc = (double)(i+1)/(double) (images.size()-1);
 			Instant end = Instant.now();
 			Duration timeElapsed = Duration.between(start, end);
@@ -127,10 +109,8 @@ public class CalculationTask extends Task<Void> {
 			Platform.runLater(new Runnable() {
 				@Override
 				public void run() {
-//					parent.setProgress(perc);
 					thisgroup.setProgress(perc);
 					long time_end = Long.valueOf(total_seconds);
-					//System.out.println(total_seconds);
 					String ending = " milliseconds";
 					if (time_end > 1000) {
 						time_end = Long.valueOf(time_end / 1000);
@@ -146,7 +126,6 @@ public class CalculationTask extends Task<Void> {
 					}
 
 					String timeAvg = String.valueOf(time_end) + ending;
-//					parent.setTimeAvg(timeAvg);
 					thisgroup.setRemainingTime(timeAvg);
 				}
 	        });
@@ -197,32 +176,9 @@ public class CalculationTask extends Task<Void> {
 			    	cartToPolar(x_flow, y_flow, mag, ang);
 			    	Mat floatMags = new Mat();
 			    	mag.convertTo(floatMags, CV_32F);
-			    	FloatBuffer floatBufferMag = floatMags.createBuffer();
-			    	float[] floatArrayMag = new float[floatBufferMag.capacity()];
-			    	floatBufferMag.get(floatArrayMag);
-			    	
-			    	float sum = 0;			    	
-				   	int carrijoMeAjude;
-				   	if (floatArrayMag == null) {
-				   		carrijoMeAjude = 1;
-				   	} else if (floatArrayMag.length >= 1) {
-				   		carrijoMeAjude = floatArrayMag.length;
-				    	for(float izx : floatArrayMag) {       
-				    	    sum += izx;
-				    	}
-				   	} else {
-				   		carrijoMeAjude = 1;
-				   	}
-				   	
-				   	double magAverage = java.lang.Math.abs(sum / carrijoMeAjude);
-				   	magList.add(magAverage);
-			    	
-//			    	
-//			    	double magAverage = java.lang.Math.abs(sum / floatArrayMag.length);
-//			    	g.addToMagnitudeList(magAverage);
-			    	System.out.print(sum);
-				   	System.out.print(" ");
-				   	System.out.println(carrijoMeAjude);
+			    	Scalar mean =  org.bytedeco.javacpp.opencv_core.mean(floatMags);
+			    	double magAverage = mean.get(0);
+				   	System.out.println(magAverage);
 			    	double perc = (double)(i+1)/(double) (N);
 			    	
 					Instant end = Instant.now();
