@@ -159,6 +159,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
@@ -167,7 +168,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
@@ -407,6 +408,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     @FXML
     void back(ActionEvent event) throws IOException, ClassNotFoundException {
 		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
 
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
@@ -416,7 +418,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	commitColors();
@@ -446,6 +448,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 			return;
 		}
     	Stage primaryStage = (Stage) cmdNext.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_3d2_PeakParametersPlot.fxml");
@@ -454,7 +457,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 //    	JFreeChart currentChart2 = currentChart;

@@ -110,6 +110,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
     @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdParametrize.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
@@ -118,7 +119,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
@@ -147,6 +148,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
     void back(ActionEvent event) throws IOException {
     	Stage primaryStage;
     	primaryStage = (Stage) cmdParametrize.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
     	FXMLLoader fxmlloader = new FXMLLoader();
@@ -157,7 +159,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
         	fxmlloader.setLocation(url);
         	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         	root = fxmlloader.load();
-        	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+        	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 
 //        	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //        	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
@@ -183,6 +185,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		
 		Stage primaryStage;
     	primaryStage = (Stage) cmdParametrize.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
     	URL url = getClass().getResource("FXML_2a_ProgressBar.fxml");
@@ -191,7 +194,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());

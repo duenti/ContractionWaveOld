@@ -80,6 +80,7 @@ public class Controller_1_InitialScreen implements Initializable {
     @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdCheckProgress.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
     	
@@ -94,7 +95,7 @@ public class Controller_1_InitialScreen implements Initializable {
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
 		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
@@ -119,6 +120,7 @@ public class Controller_1_InitialScreen implements Initializable {
     @FXML
     void handleCheckProgress(ActionEvent event) throws IOException {
 		Stage primaryStage = (Stage) cmdCheckProgress.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
     	
@@ -130,7 +132,7 @@ public class Controller_1_InitialScreen implements Initializable {
     	root = fxmlloader.load();
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 		((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
 		primaryStage.setTitle("ContractionWave - Processing Progress");
 //		primaryStage.setMaximized(true);
@@ -158,6 +160,7 @@ public class Controller_1_InitialScreen implements Initializable {
     @FXML
     void handleStartAnalysis(ActionEvent event) throws IOException, ClassNotFoundException {
 		Stage primaryStage = (Stage) cmdCheckProgress.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
     	
@@ -172,7 +175,7 @@ public class Controller_1_InitialScreen implements Initializable {
 //    	Scene scene = new Scene(root);
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
     	
 		((Controller_3a_AnalysisSelection)fxmlloader.getController()).setContext(main_package);
 		primaryStage.setTitle("ContractionWave - Select Group for Analysis");
@@ -207,6 +210,7 @@ public class Controller_1_InitialScreen implements Initializable {
 	    	FileChooser fileChooser = new FileChooser();
 	        Stage primaryStage;
 	    	primaryStage = (Stage) cmdContinueAnalysis.getScene().getWindow();
+	    	Scene oldScene = primaryStage.getScene();
 	    	double prior_X = primaryStage.getX();
 	    	double prior_Y = primaryStage.getY();
 	    	
@@ -240,7 +244,7 @@ public class Controller_1_InitialScreen implements Initializable {
 	    	root = fxmlloader.load();
 //	    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //	    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-	    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight()); 	
+	    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight()); 	
 			((Controller_3d2_PeakParametersPlot)fxmlloader.getController()).setContext(main_package, currentGroup, fps_val, pixel_val, average_value, upper_limit, intervalsList, maximum_list, minimum_list, first_points, fifth_points, timespeedlist, true);
 			primaryStage.setTitle("ContractionWave - Select Group for Analysis");
 //			primaryStage.setMaximized(true);

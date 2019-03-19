@@ -91,7 +91,7 @@ public class Main extends Application {
 		    	Scene scene = new Scene(root);
 				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
 				primaryStage.setTitle("ContractionWave - Welcome");
-				primaryStage.setMaximized(true);
+				//primaryStage.setMaximized(true);
 				primaryStage.setScene(scene);
 				primaryStage.show();	
 			} else if (result.get() == buttonTypeTwo) {
@@ -105,7 +105,7 @@ public class Main extends Application {
 		    	Scene scene = new Scene(root);
 				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
 				primaryStage.setTitle("ContractionWave - Welcome");
-				primaryStage.setMaximized(true);
+				//primaryStage.setMaximized(true);
 				primaryStage.setScene(scene);
 				primaryStage.show();	
 			} else if (result.get() == buttonTypeThree) {
@@ -120,7 +120,7 @@ public class Main extends Application {
 		    	Scene scene = new Scene(root);
 				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
 				primaryStage.setTitle("ContractionWave - Welcome");
-				primaryStage.setMaximized(true);
+				//primaryStage.setMaximized(true);
 				primaryStage.setScene(scene);
 				primaryStage.show();	
 			} else {
@@ -142,7 +142,7 @@ public class Main extends Application {
 	    	Scene scene = new Scene(root);
 			((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
 			primaryStage.setTitle("ContractionWave - Welcome");
-			primaryStage.setMaximized(true);
+			//primaryStage.setMaximized(true);
 			primaryStage.setScene(scene);
 			primaryStage.show();	
 		}

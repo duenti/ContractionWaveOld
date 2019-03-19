@@ -292,6 +292,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
@@ -300,7 +301,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
@@ -648,6 +649,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     void back(ActionEvent event) throws ClassNotFoundException, IOException {
     	//ask for saving object
 		Stage primaryStage = (Stage) cmdNext.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_3d_MagnitudeFirstCharts.fxml");
@@ -656,7 +658,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	Group g1 = currentGroup;
@@ -941,6 +943,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
         
     private void nextPageDo() throws IOException {
 		Stage primaryStage = (Stage) cmdNext.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 //		URL url = getClass().getResource("FXML_3e_ViewJetQuiverMerge.fxml");
@@ -950,7 +953,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	commitColors();

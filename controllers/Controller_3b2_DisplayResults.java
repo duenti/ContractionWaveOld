@@ -147,6 +147,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
     @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
     	
@@ -158,7 +159,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
     	root = fxmlloader.load();
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
 		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
@@ -333,6 +334,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
 	@FXML
 	void back(ActionEvent event) throws IOException, ClassNotFoundException {
 		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
     	
@@ -344,7 +346,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
         Parent root;
     	root = fxmlloader.load();
     	
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
     	commitColors();
 
 		((Controller_3a_AnalysisSelection)fxmlloader.getController()).setContext(main_package);
@@ -361,6 +363,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
 	@FXML
 	void nextPageNavigate(ActionEvent event) throws ClassNotFoundException, IOException {	
 		Stage primaryStage = (Stage) cmdNext.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
     	
@@ -370,7 +373,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
   	
     	Group g1 = currentGroup;
     	commitColors();

@@ -208,6 +208,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle2 implements Initializable {
 	@FXML
 	void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
 		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
 		if (sliderState == true) {
 			sliderState = false;
 			sliderTimer.stop();
@@ -223,7 +224,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle2 implements Initializable {
 		fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
 		Parent root;
 		root = fxmlloader.load();
-		Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+		Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
 		main_package.getListFlows().clear();
@@ -924,6 +925,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle2 implements Initializable {
     @FXML
     void back(ActionEvent event) throws ClassNotFoundException, IOException {
 		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
 		if (sliderState == true) {
 			sliderState = false;
 			sliderTimer.stop();
@@ -939,7 +941,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle2 implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	commitColors();

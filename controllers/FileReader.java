@@ -40,7 +40,7 @@ public class FileReader {
         chooser.setTitle("Select a root path:");
         chooser.setInitialDirectory(getInitialDirectory().toFile());
         File chosenDir = chooser.showDialog(null);
-        primaryStage.setMaximized(true);
+        //primaryStage.setMaximized(true);
         determineRootDirectory(chosenDir);
         if(chosenDir == null){
         	return;
@@ -73,7 +73,8 @@ public class FileReader {
 	    
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root , primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene oldScene = primaryStage.getScene();
+    	Scene scene = new Scene(root , oldScene.getWidth(), oldScene.getHeight());
 
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
@@ -126,7 +127,8 @@ public class FileReader {
 	    
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root , primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene oldScene = primaryStage.getScene();
+    	Scene scene = new Scene(root , oldScene.getWidth(), oldScene.getHeight());
 
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());

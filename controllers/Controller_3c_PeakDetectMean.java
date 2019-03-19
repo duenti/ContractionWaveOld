@@ -163,6 +163,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
     @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
@@ -171,7 +172,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
     	scene.removeEventFilter(KeyEvent.KEY_RELEASED, zoomKey);
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
@@ -362,6 +363,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	@FXML
 	void back(ActionEvent event) throws IOException, ClassNotFoundException {
 		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_3b2_DisplayResults.fxml");
@@ -370,7 +372,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
     	scene.removeEventFilter(KeyEvent.KEY_RELEASED, zoomKey);
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
@@ -464,6 +466,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 		if(!validation()) return;	
 		calculateLowerUpperConfidenceBoundaryPercent(0.99, fromField, toField);
 		Stage primaryStage = (Stage) cmdNext.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_3d_MagnitudeFirstCharts.fxml");
@@ -472,7 +475,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
     	scene.removeEventFilter(KeyEvent.KEY_RELEASED, zoomKey);
 //    	javafx.geometry.Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());

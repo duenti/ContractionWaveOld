@@ -90,6 +90,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
     	
@@ -101,7 +102,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     	root = fxmlloader.load();
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
 		primaryStage.setTitle("ContractionWave");
 //		primaryStage.setMaximized(true);
@@ -126,6 +127,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     @FXML
     void back(ActionEvent event) throws IOException {
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
 		URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
@@ -134,7 +136,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 		primaryStage.setTitle("ContractionWave - Welcome");
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -361,6 +363,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 			selecteditem = selecteditem.split(Pattern.quote(" (Temporary)"))[0];
 		}
 		Stage primaryStage = (Stage) cmdNext.getScene().getWindow();
+		Scene oldScene = primaryStage.getScene();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
     	
@@ -375,7 +378,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
 	
 		try {
 			((Controller_3b2_DisplayResults)fxmlloader.getController()).setContext(main_package, selecteditem, fps_value, pixel_value);
