@@ -369,7 +369,7 @@ public class Controller_2b_ImagesNew implements Initializable {
 	    File fileInputDirectoryLocation = new File(inputDirectoryLocation);
 	    inputDirFile = fileInputDirectoryLocation;
 	    File fileList[] = fileInputDirectoryLocation.listFiles();
-
+	    
 	    //Add event
 	    rootItem.selectedProperty().addListener((obs, oldVal, newVal) -> {
         	if (rootItem.getChildren().size() == 0) {
@@ -387,11 +387,19 @@ public class Controller_2b_ImagesNew implements Initializable {
         });
 	    
 	    // create tree
+	    int subdir_num = 0;
 	    for (File file : fileList) {
+	    	if (file.isDirectory() == true) {
+	    		subdir_num += 1;
+	    	}
 	        createTree(file, rootItem);
 	    }
-
 	    filetreeview.setRoot(rootItem);
+	    
+    	System.out.println(subdir_num);
+	    if (subdir_num == 0) {
+	    	rootItem.setSelected(true);
+	    }
 	}
 	
 	public void setContext(PackageData main_package_init, Path rootDir2) {

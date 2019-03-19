@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.embed.swing.SwingNode?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -34,17 +35,8 @@
                   </Menu>
                   <Menu mnemonicParsing="false" text="Color Settings">
                      <items>
-                        <MenuItem mnemonicParsing="false" onAction="#handleMarkerColor" text="Set Marker Color" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleMarkerAlpha" text="Set Marker Transparency" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleSeriesColor" text="Set Series Color" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleFirstColor" text="Set Peak Start Color" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleMaximumColor" text="Set Peak Max Color" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleMinimumColor" text="Set Peak Min Color" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleLastColor" text="Set Peak Last Color" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleSeriesThickness" text="Set Line Thickness" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleShowAnnotations" text="Set Annotations on/off" />
-                     </items>
-                  </Menu>
+                        <MenuItem mnemonicParsing="false" onAction="#handleColors" text="Change Plot Configs" />
+                     </items></Menu>
                   <Menu mnemonicParsing="false" text="Export">
                     <items>
                         <Menu mnemonicParsing="false" text="Data">
@@ -106,8 +98,7 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints />
         </rowConstraints>
          <children>
             <Label alignment="CENTER" prefHeight="16.0" prefWidth="867.0" text=" Subset Chart for further Analysis: " GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER">
@@ -117,15 +108,29 @@
             </Label>
             <Label text="Delta (µm/s):" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
             <Spinner fx:id="spinnerDelta" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />
-            <Label text="Min. IntraPeaks (s):" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+            <Label text="Max. Peak Length (s):" GridPane.columnIndex="3" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
             <Spinner fx:id="spinnerIntra" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
-            <Label text="Min. InterPeaks (s):" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
-            <Spinner fx:id="spinnerInter" GridPane.columnIndex="8" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+            <Label text="Min. InterPeaks (s):" visible="false" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+            <Spinner fx:id="spinnerInter" visible="false" GridPane.columnIndex="8" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
             <SwingNode fx:id="swgChart" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="5" GridPane.valignment="CENTER" />
             <SwingNode fx:id="swgNodeBig" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.rowSpan="6" GridPane.valignment="CENTER" />
-            <Button id="glass-grey" fx:id="cmdBack" mnemonicParsing="false" onAction="#back" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" GridPane.columnIndex="1" GridPane.halignment="LEFT" GridPane.rowIndex="12" />
-            <Button id="glass-grey" fx:id="cmdNext" mnemonicParsing="false" onAction="#nextPageNavigate" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" GridPane.columnIndex="9" GridPane.halignment="RIGHT" GridPane.rowIndex="12" />
          </children>
       </GridPane>
    </center>
+   <bottom>
+      <BorderPane BorderPane.alignment="CENTER">
+         <left>
+            <Button id="glass-grey" fx:id="cmdBack" mnemonicParsing="false" onAction="#back" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="30.0" left="80.0" />
+               </BorderPane.margin></Button>
+         </left>
+         <right>
+            <Button id="glass-grey" fx:id="cmdNext" mnemonicParsing="false" onAction="#nextPageNavigate" prefHeight="40.0" prefWidth="40.0" stylesheets="@button_styles.css" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="30.0" right="80.0" />
+               </BorderPane.margin></Button>
+         </right>
+      </BorderPane>
+   </bottom>
 </BorderPane>

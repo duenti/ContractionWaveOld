@@ -160,6 +160,12 @@ public class PackageData  implements Serializable {
 	public void addListPoints(int a) {
 		this.listPoints.add(a);
 	}
+	
+	public void resetListsMag() {
+		this.listPoints.clear();
+		this.listMags.clear();
+		this.listFlows.clear();
+	}
 
 	public int getCores() {
 		return cores;

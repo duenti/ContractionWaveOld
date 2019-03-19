@@ -69,6 +69,8 @@ import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -204,7 +206,8 @@ public class Controller_3c_PeakDetectMean implements Initializable {
         //Show save file dialog
         File file = fileChooser.showSaveDialog(primaryStage);
 		writeTSV(file);
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     @FXML
@@ -216,7 +219,8 @@ public class Controller_3c_PeakDetectMean implements Initializable {
         //Show save file dialog
         File file = fileChooser.showSaveDialog(primaryStage);
 		writeTSV(file);
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     public void writeTSV(File file) throws Exception {
@@ -249,7 +253,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 		Row row = spreadsheet.createRow(0);
 		
 		row.createCell(0).setCellValue("Time (s)");
-		row.createCell(1).setCellValue("Speed (\u00B5/s)");
+		row.createCell(1).setCellValue("Average Speed (\u00B5/s)");
 		
 		for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
 			double average = currentGroup.getMagnitudeListValue(i);
@@ -269,7 +273,8 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 		workbook.close();
 		fileOut.close();
 		
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     @FXML
@@ -286,7 +291,8 @@ public class Controller_3c_PeakDetectMean implements Initializable {
                 currentChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     @FXML
@@ -303,7 +309,8 @@ public class Controller_3c_PeakDetectMean implements Initializable {
                 currentChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     @FXML
@@ -331,89 +338,15 @@ public class Controller_3c_PeakDetectMean implements Initializable {
         channels2.put(2, blueCh);
         org.bytedeco.javacpp.opencv_core.merge(channels2, imgLayerRGB);
 		imwrite(file.getCanonicalPath(), imgLayerRGB);
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     @FXML
-    void handleMarkerAlpha(ActionEvent event) {
-    	Dialog<Boolean> dialogJet = new Dialog<>();
-    	dialogJet.setHeaderText("Set Marker Alpha:");
-    	dialogJet.setResizable(true);
-    	Label label1 = new Label("Marker Alpha: ");
-    	Spinner<Double> xwindowSpin = new Spinner<Double>();
-    	SpinnerValueFactory<Double> dobGen = facGen(0.0, 1.0, (double) main_package.getPlot_preferences().getMarkerAlpha(), 0.01);
-    	xwindowSpin.setEditable(true);
-		TextFormatter<Double> formatter1 = new TextFormatter<Double>(dobGen.getConverter(), dobGen.getValue());
-		xwindowSpin.getEditor().setTextFormatter(formatter1);
-		dobGen.valueProperty().bindBidirectional(formatter1.valueProperty());
-		formatter1.valueProperty().addListener((s, ov, nv) -> {
-			main_package.getPlot_preferences().setMarkerAlpha((float)nv.doubleValue());
-	        current_marker.setAlpha((float)nv.doubleValue());
-		});
-//    	xwindowSpin.setValueFactory(facGen(0.0, 1.0, (double) main_package.getPlot_preferences().getMarkerAlpha(), 0.01));
-//    	xwindowSpin.setEditable(true);
-//		IncrementHandler handler2 = new IncrementHandler();
-//		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, handler2);
-//		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, evt -> {
-//	        Node node = evt.getPickResult().getIntersectedNode();
-//	        if (node.getStyleClass().contains("increment-arrow-button") ||
-//	            node.getStyleClass().contains("decrement-arrow-button")) {
-//	                if (evt.getButton() == MouseButton.PRIMARY) {
-//	                    handler2.stop();
-//	                }
-//	        }
-//	    });
-//		xwindowSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				main_package.getPlot_preferences().setMarkerAlpha(Float.valueOf(newValue));
-//		        current_marker.setAlpha(Float.valueOf(newValue));
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//	    });
-//		xwindowSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//	        if (newValue == false) {
-//	        	xwindowSpin.increment(0);
-//	        } 
-//	    });
-    	GridPane grid = new GridPane();
-    	grid.add(label1, 1, 1);
-    	grid.add(xwindowSpin, 2, 1);
-    	dialogJet.getDialogPane().setContent(grid);
-    	ButtonType buttonTypeOk = new ButtonType("Ok", ButtonData.OK_DONE);
-    	dialogJet.getDialogPane().getButtonTypes().add(buttonTypeOk);
-    	dialogJet.show();
-    }
-
-    @FXML
-    void handleMarkerColor(ActionEvent event) {
-    	java.awt.Color initialColor = main_package.getPlot_preferences().getMarkerColorRGB();
-        java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Marker color", initialColor);
-        main_package.getPlot_preferences().setMarkerColorRGB(newColor);
-        current_marker.setPaint(newColor);
-    }
-    
-    @FXML
-    void handleSeriesColor(ActionEvent event) {
+    void handleColors(ActionEvent event) {
     	XYPlot plot = currentChart.getXYPlot();
-    	java.awt.Color initialColor = main_package.getPlot_preferences().getSeriesColorRGB();
-        java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Series color", initialColor);
-        plot.getRenderer().setSeriesPaint(0, newColor);
-        main_package.getPlot_preferences().setSeriesColorRGB(newColor);
-    }
-    
-    @FXML
-    void handleSeriesThickness(ActionEvent event) {
-    	XYPlot plot = currentChart.getXYPlot();
-    	//int thickness = main_package.getPlot_preferences().getLineThickness();
-        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default: 1)");
-        float new_thickness = Float.parseFloat(test1);
-        if (new_thickness > 0) {
-        	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
-        	main_package.getPlot_preferences().setLineThickness(new_thickness);
-        }
-    }
-    
+    	ShowMarkerColorThickDialog.showDialog(main_package, plot, current_marker);
+    }   
     
     private void commitColors() {
     	XYPlot plot = currentChart.getXYPlot();
@@ -454,35 +387,21 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 
 	private boolean validation(){
 		String value1 = txtAverage.getText();
+		Alert alert = new Alert(AlertType.WARNING);
+		alert.setTitle("Warning");
+		alert.setContentText("Please select area before advancing.");
+		
 		try{
 			average_value = Double.parseDouble(value1);
 		}catch(NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Please select area before advancing.","Warning",JOptionPane.WARNING_MESSAGE);
+//			JOptionPane.showMessageDialog(null, "Please select area before advancing.","Warning",JOptionPane.WARNING_MESSAGE);
+			alert.showAndWait();
 	        return false;
 	    } catch(NullPointerException e) {
-	    	JOptionPane.showMessageDialog(null, "Please select area before advancing.","Warning",JOptionPane.WARNING_MESSAGE);
+//	    	JOptionPane.showMessageDialog(null, "Please select area before advancing.","Warning",JOptionPane.WARNING_MESSAGE);
+	    	alert.showAndWait();
 	        return false;
 	    }
-//		String value2 = txtAverage.getText();
-//		try{
-//			average_value = Double.parseDouble(value2);
-//		}catch(NumberFormatException e) {
-//			JOptionPane.showMessageDialog(null, "The end value of the selection area must be an integer.","Warning",JOptionPane.WARNING_MESSAGE);
-//	        return false;
-//	    } catch(NullPointerException e) {
-//	    	JOptionPane.showMessageDialog(null, "Please select area before advancing.","Warning",JOptionPane.WARNING_MESSAGE);
-//	        return false;
-//	    }
-//		String value = txtAverage.getText();
-//		try{
-//			average_value = Double.parseDouble(value);
-//		}catch(NumberFormatException e) {
-//			JOptionPane.showMessageDialog(null, "The average value from the gap area must be a real number.","Warning",JOptionPane.WARNING_MESSAGE);
-//	        return false;
-//	    } catch(NullPointerException e) {
-//	    	JOptionPane.showMessageDialog(null, "You must select a gap area between peaks..","Warning",JOptionPane.WARNING_MESSAGE);
-//	        return false;
-//	    }
 		return true;
 	}
 	
@@ -694,7 +613,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Main Plot",
             "Time (s)",
-            "Speed (\u00B5m/s)",
+            "Average Speed (\u00B5m/s)",
             dataset,
             PlotOrientation.VERTICAL,
             true,

@@ -43,7 +43,7 @@
          </children>
       </VBox>
    </top>
-   <left>
+   <center>
       <GridPane BorderPane.alignment="CENTER">
         <columnConstraints>
           <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
@@ -68,6 +68,7 @@
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -83,13 +84,12 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Button id="glass-grey" fx:id="cmdBack" mnemonicParsing="false" onAction="#back" prefHeight="45.0" prefWidth="45.0" stylesheets="@button_styles.css" GridPane.columnIndex="10" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="CENTER" />
                   <Label alignment="CENTER" prefHeight="30.0" prefWidth="356.0" text="Processing Progress" GridPane.columnIndex="3" GridPane.columnSpan="6" GridPane.halignment="CENTER">
                      <font>
                         <Font size="25.0" />
                      </font>
                   </Label>
-                  <TableView fx:id="tableRunStatus" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.rowIndex="1" GridPane.rowSpan="8">
+                  <TableView fx:id="tableRunStatus" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="11" GridPane.rowIndex="1" GridPane.rowSpan="10">
                     <columns>
                       <TableColumn fx:id="colGroupName" prefWidth="213.0" text="Group" />
                       <TableColumn fx:id="colStatus" prefWidth="99.0" text="Status" />
@@ -104,5 +104,16 @@
             </GridPane>
          </children>
       </GridPane>
-   </left>
+   </center>
+   <bottom>
+      <BorderPane BorderPane.alignment="CENTER">
+         <right>
+            <Button id="glass-grey" fx:id="cmdBack" mnemonicParsing="false" onAction="#back" prefHeight="45.0" prefWidth="45.0" stylesheets="@button_styles.css" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="30.0" right="80.0" />
+               </BorderPane.margin>
+            </Button>
+         </right>
+      </BorderPane>
+   </bottom>
 </BorderPane>

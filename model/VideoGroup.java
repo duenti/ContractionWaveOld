@@ -14,14 +14,15 @@ public class VideoGroup extends Group{
 	 */
 	private static final long serialVersionUID = 1L;
 	public File video;
-	private int height, width, frames;
-	private List<Mat> selectedFrames;
+	private int height, width;
+	private int frames = 1;
+//	private List<Mat> selectedFrames;
 	
 	public VideoGroup(String name, String path) throws Exception{
 		super(name,path,0);
 		if (path != null && path.matches(".*((\\.[aA][vV][iI])|(\\.[mM][pP][4])|(\\.[mM][kK][vV])|(\\.[wW][mM][vV])|(\\.[mM][4][vV]))")) {
 			video = new File(path);
-			selectedFrames = new ArrayList<Mat>();
+//			selectedFrames = new ArrayList<Mat>();
 			//extractFrameList();
 	    }
 	}
@@ -58,20 +59,26 @@ public class VideoGroup extends Group{
 	public int size(){
 		return frames;
 	}
-	
-	public void clearFrames(){
-		this.selectedFrames.clear();
+	public int getSize(){
+		return frames;
+	}
+	public void addSize(){
+		this.frames += 1;
 	}
 	
-	public void addFrame(Mat img){
-		this.selectedFrames.add(img);
-	}
-	
-	public int framesSize(){
-		return this.selectedFrames.size();
-	}
-	
-	public Mat getFrame(int i){
-		return this.selectedFrames.get(i);
-	}
+//	public void clearFrames(){
+//		this.selectedFrames.clear();
+//	}
+//	
+//	public void addFrame(Mat img){
+//		this.selectedFrames.add(img);
+//	}
+//	
+//	public int framesSize(){
+//		return this.selectedFrames.size();
+//	}
+//	
+//	public Mat getFrame(int i){
+//		return this.selectedFrames.get(i);
+//	}
 }

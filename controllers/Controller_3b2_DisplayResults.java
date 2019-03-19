@@ -189,7 +189,8 @@ public class Controller_3b2_DisplayResults implements Initializable{
         //Show save file dialog
         File file = fileChooser.showSaveDialog(primaryStage);
 		writeTSV(file);
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+		//JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -201,7 +202,8 @@ public class Controller_3b2_DisplayResults implements Initializable{
         //Show save file dialog
         File file = fileChooser.showSaveDialog(primaryStage);
 		writeTSV(file);
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -218,7 +220,8 @@ public class Controller_3b2_DisplayResults implements Initializable{
                 currentChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+//        JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -235,7 +238,8 @@ public class Controller_3b2_DisplayResults implements Initializable{
                 currentChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+//        JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
 	private static Path rootDir; // The chosen root or source directory
@@ -271,7 +275,8 @@ public class Controller_3b2_DisplayResults implements Initializable{
         channels2.put(2, blueCh);
         org.bytedeco.javacpp.opencv_core.merge(channels2, imgLayerRGB);
 		imwrite(file.getCanonicalPath(), imgLayerRGB);
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
@@ -304,29 +309,14 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		workbook.write(fileOut);
 		workbook.close();
 		fileOut.close();
-		
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
     
     @FXML
-    void handleSeriesColor(ActionEvent event) {
+    void handleColors(ActionEvent event) {
     	XYPlot plot = currentChart.getXYPlot();
-    	java.awt.Color initialColor = main_package.getPlot_preferences().getSeriesColorRGB();
-        java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Series color", initialColor);
-        plot.getRenderer().setSeriesPaint(0, newColor);
-        main_package.getPlot_preferences().setSeriesColorRGB(newColor);
-    }
-    
-    @FXML
-    void handleSeriesThickness(ActionEvent event) {
-    	XYPlot plot = currentChart.getXYPlot();
-    	//int thickness = main_package.getPlot_preferences().getLineThickness();
-        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default: 1)");
-        float new_thickness = Float.parseFloat(test1);
-        if (new_thickness > 0) {
-        	main_package.getPlot_preferences().setLineThickness(new_thickness);
-        	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
-        }
+    	ShowColorThickDialog.showDialog(main_package, plot);
     }
     
     
@@ -354,10 +344,6 @@ public class Controller_3b2_DisplayResults implements Initializable{
         Parent root;
     	root = fxmlloader.load();
     	
-
-//    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
-//    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-    	
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
     	commitColors();
 
@@ -370,10 +356,6 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		primaryStage.setX(prior_X);
 		primaryStage.setY(prior_Y);
 		
-//		((Controller_3b_MicroscopeParametrization)fxmlloader.getController()).setContext(main_package, currentGroup.getName());
-//		primaryStage.setTitle("Image Optical Flow - Input Microscope Data");
-//		primaryStage.setScene(scene);
-//		primaryStage.show();
 	}
 	
 	@FXML
@@ -389,10 +371,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
         Parent root;
     	root = fxmlloader.load();
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
-
-//    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
-//    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-//    	
+  	
     	Group g1 = currentGroup;
     	commitColors();
 		((Controller_3c_PeakDetectMean)fxmlloader.getController()).setContext(main_package, g1, fps_value, pixel_value, timespeedlist);	
@@ -466,6 +445,9 @@ public class Controller_3b2_DisplayResults implements Initializable{
 				}
 			}
 		}
+		System.out.println("Group stats");
+		System.out.println(currentGroup.getName());
+		System.out.println(currentGroup.getMagnitudeSize());
 		createPlot();
 	}
 	
@@ -489,7 +471,6 @@ public class Controller_3b2_DisplayResults implements Initializable{
 	}
 	
 	public void runConvolution() {
-//    	a.setConvolution(false);
 		convStatus = false;
 		Button buttonTypeOk = new Button("Run");
 		Button buttonTypeCancel = new Button("Cancel");
@@ -501,24 +482,6 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		TextFormatter<Integer> formatter = new TextFormatter<Integer>(intFac.getConverter(), intFac.getValue());
 		spinnerSize.getEditor().setTextFormatter(formatter);
 		intFac.valueProperty().bindBidirectional(formatter.valueProperty());
-//		spinnerSize.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, currentGroup.getMagnitudeSize()-1, 5, 1));
-//		spinnerSize.setEditable(true);
-//		IncrementHandler handler_10 = new IncrementHandler();
-//		spinnerSize.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_10);
-//		spinnerSize.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-//	        Node node = evt.getPickResult().getIntersectedNode();
-//	        if (node.getStyleClass().contains("increment-arrow-button") ||
-//	            node.getStyleClass().contains("decrement-arrow-button")) {
-//	                if (evt.getButton() == MouseButton.PRIMARY) {
-//	                	handler_10.stop();
-//	                }
-//	        }
-//	    });
-//		spinnerSize.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//	        if (newValue == false) {
-//	        	spinnerSize.increment(0);
-//	        } 
-//	    });
 		
 		Spinner<Double> spinnerAvg = new Spinner<Double>();
 		SpinnerValueFactory<Double> dobFac = facGen(0.00000001, 10000.0, 0.24390244, 0.001);
@@ -528,55 +491,38 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		spinnerAvg.getEditor().setTextFormatter(formatter2);
 		dobFac.valueProperty().bindBidirectional(formatter2.valueProperty());
 		
-//		spinnerAvg.setValueFactory(facGen(0.00000001, 10000.0, 0.24390244, 0.001));
-//		spinnerAvg.setEditable(true);
-//		IncrementHandler handler_9 = new IncrementHandler();
-//		spinnerAvg.addEventFilter(MouseEvent.MOUSE_PRESSED, handler_9);
-//		spinnerAvg.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-//	        Node node = evt.getPickResult().getIntersectedNode();
-//	        if (node.getStyleClass().contains("increment-arrow-button") ||
-//	            node.getStyleClass().contains("decrement-arrow-button")) {
-//	                if (evt.getButton() == MouseButton.PRIMARY) {
-//	                	handler_9.stop();
-//	                }
-//	        }
-//	    });
-//		spinnerAvg.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//	        if (newValue == false) {
-//	        	spinnerAvg.increment(0);
-//	        } 
-//	    });
-//		
 		Stage dialogConvolution= new Stage();    		
     	dialogConvolution.initModality(Modality.APPLICATION_MODAL);
     	dialogConvolution.initOwner(null);
     	dialogConvolution.setResizable(true);
     	GridPane grid = new GridPane();
-//    	grid.setGridLinesVisible(true);
-    	grid.setPrefWidth(500);
+
+    	grid.setPrefWidth(300);
     	grid.setPrefHeight(120);
-    	Label askQuestion = new Label("Run Convolution (Noise Reduction)?");
+    	Label askQuestion = new Label("Data Smoothing:");
     	grid.add(askQuestion, 1, 0, 2, 1);
     	GridPane.setHalignment(askQuestion, HPos.CENTER);
     	GridPane.setHgrow(askQuestion, Priority.ALWAYS);
     	GridPane.setVgrow(askQuestion, Priority.ALWAYS);
 
-    	Label askVal = new Label("Value:");
-    	grid.add(askVal, 0, 1, 1, 1);
-    	GridPane.setHalignment(askVal, HPos.CENTER);
-    	GridPane.setHgrow(askVal, Priority.ALWAYS);
-    	GridPane.setVgrow(askVal, Priority.ALWAYS);
-    	grid.add(spinnerAvg, 1, 1, 1, 1);
-    	GridPane.setHalignment(spinnerAvg, HPos.CENTER);
-    	GridPane.setHgrow(spinnerAvg, Priority.ALWAYS);
-    	GridPane.setVgrow(spinnerAvg, Priority.ALWAYS);
+//    	Label askVal = new Label("Value:");
+//    	grid.add(askVal, 0, 1, 1, 1);
+//    	GridPane.setHalignment(askVal, HPos.CENTER);
+//    	GridPane.setHgrow(askVal, Priority.ALWAYS);
+//    	GridPane.setVgrow(askVal, Priority.ALWAYS);
+//    	grid.add(spinnerAvg, 1, 1, 1, 1);
+//    	GridPane.setHalignment(spinnerAvg, HPos.CENTER);
+//    	GridPane.setHgrow(spinnerAvg, Priority.ALWAYS);
+//    	GridPane.setVgrow(spinnerAvg, Priority.ALWAYS);
     	
     	Label askSize = new Label("Size:");
-    	grid.add(askSize, 2, 1, 1, 1);
+//    	grid.add(askSize, 2, 1, 1, 1);
+    	grid.add(askSize, 0, 1, 1, 1);
     	GridPane.setHalignment(askSize, HPos.CENTER);
     	GridPane.setHgrow(askSize, Priority.ALWAYS);
     	GridPane.setVgrow(askSize, Priority.ALWAYS);
-    	grid.add(spinnerSize, 3, 1, 1, 1);
+//    	grid.add(spinnerSize, 3, 1, 1, 1);
+    	grid.add(spinnerSize, 1, 1, 1, 1);
     	GridPane.setHalignment(spinnerSize, HPos.CENTER);
     	GridPane.setHgrow(spinnerSize, Priority.ALWAYS);
     	GridPane.setVgrow(spinnerSize, Priority.ALWAYS);
@@ -594,11 +540,10 @@ public class Controller_3b2_DisplayResults implements Initializable{
             public void handle(ActionEvent event) {
             	int avgSize = spinnerSize.getValue();
             	double avgValue = spinnerAvg.getValue();
-        		currentGroup.convoluteMagnitudeList(avgSize, avgValue);
+        		currentGroup.convoluteMagnitudeList(avgSize, 1.0);
         		createPlot();
                 dialogConvolution.close();
                 convStatus = true;
-//                a.setConvolution(true);
             }
         });
     	buttonTypeCancel.setOnAction(new EventHandler<ActionEvent>() {
@@ -714,7 +659,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Main Plot",
             "Time(s)",
-            "Speed(\u00B5m/s)",
+            "Average Speed(\u00B5m/s)",
             dataset,
             PlotOrientation.VERTICAL,
             true,
@@ -742,7 +687,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
         	public void plotChanged(PlotChangeEvent event) {
 //        		System.out.println("I am called after a zoom event (and some other events too).");
         		if (fourier_change_on == true && fourier_plot == false) {
-        			System.out.println("About to gen new dataset fourier");
+        			System.out.println("About to gen dataset fourier from plot");
     				XYSeriesCollection dataset_new = new XYSeriesCollection();		
     			    XYSeries series3 = new XYSeries("");        
     				for (int i = 0; i < dataset.getItemCount(0); i++) {
@@ -752,7 +697,6 @@ public class Controller_3b2_DisplayResults implements Initializable{
     				}
     				dataset_new.addSeries(series3);
     				fourier_dataset = (XYDataset) dataset_new;
-    				System.out.println("New fourier length: " + fourier_dataset.getItemCount(0));
     				frequencyFind();
         		}
         	}
@@ -849,14 +793,12 @@ public class Controller_3b2_DisplayResults implements Initializable{
 	private void peakDetectionAlgorithm() {
 		maximum_list.clear();
 		minimum_list.clear();
-		//estimacao de janela http://paulbourke.net/fractals/fracdim/
 		double delta = fourier_delta;
 		boolean lookformax = true;
 		double maximum = Double.MIN_VALUE;
 		double minimum = Double.MAX_VALUE;
 		Long maximum_pos = null;
 		Long minimum_pos = null;
-
 		for (int i = 0; i < fourier_magnitude.length; i++) {
 			double average = fourier_magnitude[i];
 			if (average > maximum) {
@@ -869,7 +811,6 @@ public class Controller_3b2_DisplayResults implements Initializable{
 	        }
 	        if (lookformax == true) {
 	        	if (average < maximum-delta) {
-//	        		maximum_hash.put((int)(long)maximum_pos, maximum);
 	        		maximum_list.add((int)(long)maximum_pos);
 	                minimum = average;
 	                minimum_pos = (long) i;
@@ -877,7 +818,6 @@ public class Controller_3b2_DisplayResults implements Initializable{
 	        	}
 	        } else {
 	        	if (average > minimum+delta) {
-//	        		minimum_hash.put((int)(long)minimum_pos, minimum);
 	        		minimum_list.add((int)(long)minimum_pos);
 	        		maximum = average;
 	        		maximum_pos = (long) i;
@@ -889,9 +829,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		
 	private void frequencyFind() {
 		XYDataset dataset = fourier_dataset;
-		//double[] input = new double[currentGroup.getMagnitudeSize()];
 		double [] input = new double[dataset.getItemCount(0)];
-//		for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
 		for (int i = 0; i < dataset.getItemCount(0); i++) {
 			input[i] = dataset.getYValue(0, i);
 		}				
@@ -899,48 +837,55 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		double[] fft = new double[input.length* 2];
 		System.arraycopy(input, 0, fft, 0, input.length);
 		fftDo.realForwardFull(fft);
-		XYSeries series2 = new XYSeries("FFT");
-		double[] realfft = new double[input.length];
-		int j = 0;
-		for (int i = 0; i < fft.length; i=i+2) {
-			realfft[j] = fft[i];
-			series2.add(j, realfft[j]);
-			j++;
-		}
 		double fps = 1.0/fps_value;
 		double[] fft_frequency = fftfreq(input.length, fps);
-		double[] magnitude = new double[input.length];
-		j = 0;
+//		double[] magnitude = new double[input.length];
+		int j = 0;
 		double found_freq = 0;
 		double avg_magnitude = 0;
+		List<Double> freqs = new ArrayList<Double>();
+		List<Double> mags = new ArrayList<Double>();
 		for (int i = 0; i < fft.length; i=i+2) {
-			double re = fft[i];
-			double im = fft[i+1];
-			magnitude[j] = Math.sqrt(re*re+im*im);
-			avg_magnitude += magnitude[j];
-			//	    	System.out.println(fft_frequency[j] + "," + magnitude[j]);
+	    	double re = (fft[i] * fft[i]) / Math.sqrt((double)fft.length);
+	    	double im = (fft[i+1] * fft[i+1]) / Math.sqrt((double)fft.length);
+	    	double value = Math.sqrt(Math.sqrt(re+im)) * 2.0;
+	    	if (fft_frequency[j] >= 0) {
+	    		freqs.add(fft_frequency[j]);
+	    		mags.add(value);
+				avg_magnitude += value;
+	    	}
 			j++;
 		}
-		avg_magnitude /= j;
-		freqFourier.setText(String.valueOf(found_freq));
-		fourier_freqs = fft_frequency;
+		avg_magnitude /= mags.size();
+		
+		double[] frequencies = new double[mags.size()];
+		int v = 0;
+		for (double d : freqs) {
+			frequencies[v] = d;
+			v++;
+		}
+		
+		double[] magnitude = new double[mags.size()];
+		v = 0;
+		for (Double d1 : mags) {
+			magnitude[v] = d1;
+			v++;
+		}
+		
+        DecimalFormat df = new DecimalFormat("#.#");
+        df.setMaximumFractionDigits(5);
+        
+		freqFourier.setText(df.format(found_freq) + "");
+//		fourier_freqs = fft_frequency;
+		fourier_delta = avg_magnitude;
+		fourier_freqs = frequencies;
 		fourier_magnitude = magnitude;
 		
-		fourier_delta = (int) avg_magnitude;
-		
-		//peakDetectThis();
 		peakDetectionAlgorithm();
 		if(fourier_index < maximum_list.size()){
-			System.out.println("New index 1:");
-			System.out.println(maximum_list.get(fourier_index ));
-			int index = maximum_list.get(fourier_index );
-			System.out.println(maximum_list.toString());
-			System.out.println("New average 1:");
-			System.out.println(fft_frequency[index]);
-			System.out.println(maximum_list.get(fourier_index ));
-			System.out.println(fft_frequency);
-			System.out.println("");
-			freqFourier.setText(String.valueOf(fft_frequency[index]));
+			int index = maximum_list.get(fourier_index);
+//			freqFourier.setText(df.format(fft_frequency[index]) + "");
+			freqFourier.setText(df.format(fourier_freqs[index]) + "");
 		}else{
 			freqFourier.setText("None");
 		}
@@ -949,15 +894,10 @@ public class Controller_3b2_DisplayResults implements Initializable{
 	private void runNewFourier() {
 		peakDetectionAlgorithm();
 		if(fourier_index < maximum_list.size()){
-			System.out.println("New index 2:");
-			System.out.println(maximum_list.get(fourier_index ));
 			int index = maximum_list.get(fourier_index );
-			System.out.println(maximum_list.toString());
-			System.out.println("New average 2:");
-			System.out.println(String.valueOf(fourier_freqs[index]));
-			System.out.println(fourier_freqs);
-			System.out.println("");
-			freqFourier.setText(String.valueOf(fourier_freqs[index]));
+	        DecimalFormat df = new DecimalFormat("#.#");
+	        df.setMaximumFractionDigits(5);
+			freqFourier.setText(df.format(fourier_freqs[index]) + "");
 		}else{
 			freqFourier.setText("None");
 		}
@@ -970,9 +910,12 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		dialogFourier.setResizable(true);
 		Label label1 = new Label("Delta Value: ");
 		Label label2 = new Label("Peak Index (Positive): ");
+		
 		Spinner<Double> fourierDeltaSpin = new Spinner<Double>();
 		Spinner<Integer> fourierIndexSpin= new Spinner<Integer>();
-		SpinnerValueFactory<Double> dobFac2 = new SpinnerValueFactory.DoubleSpinnerValueFactory(1, Double.MAX_VALUE, fourier_delta, 1);
+		
+		SpinnerValueFactory<Double> dobFac2 = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE, fourier_delta, 1.0);
+		fourierDeltaSpin.setValueFactory(dobFac2);
 		fourierDeltaSpin.setEditable(true);
 		TextFormatter<Double> formatter3 = new TextFormatter<Double>(dobFac2.getConverter(), dobFac2.getValue());
 		fourierDeltaSpin.getEditor().setTextFormatter(formatter3);
@@ -994,40 +937,6 @@ public class Controller_3b2_DisplayResults implements Initializable{
 			}
 		});
 		
-//		fourierDeltaSpin.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(1, Double.MAX_VALUE, fourier_delta, 1));
-//		fourierDeltaSpin.setEditable(true);
-//		IncrementHandler handler12 = new IncrementHandler();
-//		fourierDeltaSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler12);
-//		fourierDeltaSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-//			Node node = evt.getPickResult().getIntersectedNode();
-//			if (node.getStyleClass().contains("increment-arrow-button") ||
-//					node.getStyleClass().contains("decrement-arrow-button")) {
-//				if (evt.getButton() == MouseButton.PRIMARY) {
-//					handler12.stop();
-//				}
-//			}
-//		});
-//		fourierDeltaSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				fourier_delta = Double.valueOf(newValue);
-//				runNewFourier();
-//				if (fourier_plot == true) {
-//					XYPlot plote = (XYPlot) currentChart.getPlot();
-//					plote.clearAnnotations();
-//					int index = maximum_list.get(fourier_index);
-//					double x_do = fourier_freqs[index];
-//					double y_do = fourier_magnitude[index];
-//					plote.addAnnotation(new XYCircleAnnotation(x_do, y_do, 5.0, java.awt.Color.RED));
-//				}
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//		});
-//		fourierDeltaSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//			if (newValue == false) {
-//				fourierDeltaSpin.increment(0);
-//			} 
-//		});
 		SpinnerValueFactory<Integer> intFac2 = new SpinnerValueFactory.IntegerSpinnerValueFactory(1, maximum_list.size(), fourier_index, 1);
 		fourierIndexSpin.setValueFactory(intFac2);
 		fourierIndexSpin.setEditable(true);
@@ -1051,41 +960,9 @@ public class Controller_3b2_DisplayResults implements Initializable{
 			}
 		});
 		
-//		fourierIndexSpin.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, maximum_list.size(), fourier_index, 1));
-//		fourierIndexSpin.setEditable(true);
-//		IncrementHandler handler11 = new IncrementHandler();
-//		fourierIndexSpin.addEventFilter(MouseEvent.MOUSE_PRESSED, handler11);
-//		fourierIndexSpin.addEventFilter(MouseEvent.MOUSE_RELEASED, evt -> {
-//			Node node = evt.getPickResult().getIntersectedNode();
-//			if (node.getStyleClass().contains("increment-arrow-button") ||
-//					node.getStyleClass().contains("decrement-arrow-button")) {
-//				if (evt.getButton() == MouseButton.PRIMARY) {
-//					handler11.stop();
-//				}
-//			}
-//		});
-//		fourierIndexSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				fourier_index = Integer.valueOf(newValue);
-//				runNewFourier();
-//				if (fourier_plot == true) {
-//					XYPlot plote = (XYPlot) currentChart.getPlot();
-//					plote.clearAnnotations();
-//					int index = maximum_list.get(fourier_index);
-//					double x_do = fourier_freqs[index];
-//					double y_do = fourier_magnitude[index];
-//					plote.addAnnotation(new XYCircleAnnotation(x_do, y_do, 5.0, java.awt.Color.RED));
-//				}
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//		});
-//		fourierIndexSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//			if (newValue == false) {
-//				fourierIndexSpin.increment(0);
-//			} 
-//		});
 		GridPane grid = new GridPane();
+    	grid.setPrefWidth(450);
+    	grid.setPrefHeight(80);
 		grid.add(label1, 1, 1);
 		grid.add(fourierDeltaSpin, 2, 1);
 		grid.add(label2, 1, 2);
@@ -1133,9 +1010,9 @@ public class Controller_3b2_DisplayResults implements Initializable{
 				frequencyFind();
 			} else  {
     			System.out.println("About to reset dataset fourier");
-				fourier_dataset = original_dataset;
+				fourier_dataset = (XYDataset) original_dataset;
 				fourier_change_on = false;
-				//frequencyFind();
+				frequencyFind();
 			}
 //	        plot.getRangeAxis().setAutoRange(true);
 			System.out.println(plot.getDomainAxis().getLowerBound());
@@ -1199,35 +1076,24 @@ public class Controller_3b2_DisplayResults implements Initializable{
 				double[] input = new double[fourier_dataset.getItemCount(0)];
 				for (int i = 0; i < fourier_dataset.getItemCount(0); i++) {
 					input[i] = fourier_dataset.getYValue(0, i);
-				}
-//				double[] input = new double[currentGroup.getMagnitudeSize()]; 
-//			    for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
-//			    	input[i] = this.dataset.getYValue(0, i);
-//			    }				
+				}			
 			    DoubleFFT_1D fftDo = new DoubleFFT_1D(input.length);
 			    double[] fft = new double[input.length* 2];
 			    System.arraycopy(input, 0, fft, 0, input.length);
 			    fftDo.realForwardFull(fft);
-			    XYSeries series2 = new XYSeries("FFT");
-			    double[] realfft = new double[input.length];
-			    int j = 0;
-			    for (int i = 0; i < fft.length; i=i+2) {
-			    	realfft[j] = fft[i];
-			    	series2.add(j, realfft[j]);
-			    	j++;
-			    }
 			    XYSeries series3 = new XYSeries("FFTfreq");
 			    double fps = 1.0/fps_value;
 			    double[] fft_frequency = fftfreq(input.length, fps);
 			    double[] magnitude = new double[input.length];
-			    j = 0;
+			    int j = 0;
 		        XYSeriesCollection dataset_new = new XYSeriesCollection();
 			    for (int i = 0; i < fft.length; i=i+2) {
-			    	double re = fft[i];
-			    	double im = fft[i+1];
-			    	magnitude[j] = Math.sqrt(re*re+im*im);
-			    	series3.add(fft_frequency[j], magnitude[j]);
-			    	System.out.println(fft_frequency[j] + "," + magnitude[j]);
+			    	double re = (fft[i] * fft[i]) / Math.sqrt((double)fft.length);
+			    	double im = (fft[i+1] * fft[i+1]) / Math.sqrt((double)fft.length);
+			    	magnitude[j] = Math.sqrt(Math.sqrt(re+im)) * 2.0;
+			    	if (fft_frequency[j] >= 0) {
+			    		series3.add(fft_frequency[j], magnitude[j]);
+			    	}
 			    	j++;
 			    }
 		        dataset_new.addSeries(series3);
@@ -1239,7 +1105,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		        try {
 		        	int index = maximum_list.get(fourier_index);
 		        	double x_do = fourier_freqs[index];
-		        	double y_do = magnitude[index];
+		        	double y_do = fourier_magnitude[index];
 		        	plot.addAnnotation(new XYCircleAnnotation(x_do, y_do, 5.0, java.awt.Color.RED));
 		        } catch (java.lang.IndexOutOfBoundsException ev) {
 		        	ev.printStackTrace();
@@ -1248,7 +1114,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		        fourier_plot = false;
 		        plot.setDataset(this.dataset);
 		        plot.getDomainAxis().setLabel("Time(s)");
-		        plot.getRangeAxis().setLabel("Speed(µm/s)");
+		        plot.getRangeAxis().setLabel("Average Speed(µm/s)");
 		        plot.getRangeAxis().setAutoRange(true);
 		        plot.getDomainAxis().setAutoRange(true);
 			}
@@ -1402,86 +1268,5 @@ public class Controller_3b2_DisplayResults implements Initializable{
     	});
     	return dblFactory;
     }
-    
-      
-//    private static final PseudoClass PRESSED = PseudoClass.getPseudoClass("pressed");
-  
-//    class IncrementHandler implements EventHandler<MouseEvent> {
-//        private Spinner spinner;
-//        private boolean increment;
-//        private long startTimestamp;
-//        private int currentFrame = 0;
-//        private int previousFrame = 0;  
-//
-//        private long initialDelay = 1000l * 1000L * 750L; // 0.75 sec
-//        private Node button;
-//
-//        private final AnimationTimer timer = new AnimationTimer() {
-//
-//            @Override
-//            public void handle(long now) {
-//            	if (currentFrame == previousFrame || currentFrame % 10 == 0) {
-//	                if (now - startTimestamp >= initialDelay) {
-//	                    // trigger updates every frame once the initial delay is over
-//	                    if (increment) {
-//	                        spinner.increment();
-//	                    } else {
-//	                        spinner.decrement();
-//	                    }
-//	                }
-//            	}
-//            	++currentFrame;
-//            }
-//        };
-//
-//        @Override
-//        public void handle(MouseEvent event) {
-//            if (event.getButton() == MouseButton.PRIMARY) {
-//                Spinner source = (Spinner) event.getSource();
-//                Node node = event.getPickResult().getIntersectedNode();
-//
-//                Boolean increment = null;
-//                // find which kind of button was pressed and if one was pressed
-//                while (increment == null && node != source) {
-//                    if (node.getStyleClass().contains("increment-arrow-button")) {
-//                        increment = Boolean.TRUE;
-//                    } else if (node.getStyleClass().contains("decrement-arrow-button")) {
-//                        increment = Boolean.FALSE;
-//                    } else {
-//                        node = node.getParent();
-//                    }
-//                }
-//                if (increment != null) {
-//                    event.consume();
-//                    source.requestFocus();
-//                    spinner = source;
-//                    this.increment = increment;
-//
-//                    // timestamp to calculate the delay
-//                    startTimestamp = System.nanoTime();
-//
-//                    button = node;
-//
-//                    // update for css styling
-//                    node.pseudoClassStateChanged(PRESSED, true);
-//
-//                    // first value update
-//                    timer.handle(startTimestamp + initialDelay);
-//
-//                    // trigger timer for more updates later
-//                    timer.start();
-//                }
-//            }
-//        }
-//
-//        public void stop() {
-//            timer.stop();
-//            button.pseudoClassStateChanged(PRESSED, false);
-//            button = null;
-//            spinner = null;
-//            previousFrame = currentFrame;
-//        }
-//    }
-	
 
 }

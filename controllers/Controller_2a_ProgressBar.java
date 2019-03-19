@@ -74,6 +74,10 @@ public class Controller_2a_ProgressBar implements Initializable {
     
     @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
+    	reinit(); 
+    }
+    
+    void reinit() throws IOException, ClassNotFoundException {
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
 
     	double prior_X = primaryStage.getX();
@@ -208,62 +212,38 @@ public class Controller_2a_ProgressBar implements Initializable {
     	timeline.stop();
     }
     
-//    public void setContext(Groups gs, PackageData main_package_init) { //first form of setContext. involves adding to the queue
-//    	//here groups are added to their queue
-//    	main_package = main_package_init;
-//    	tableRunStatus.setItems(main_package_init.getCurrent_groups().getObservableList());
-//    	
-//    	timeline = new Timeline(new KeyFrame(Duration.seconds(0.001),
-//    			new EventHandler<ActionEvent>() {
-//    				@Override
-//    				public void handle(ActionEvent event) {
-//    					tableRunStatus.refresh();
-//    					boolean is_it_done = true;
-//    					for (int i = 0; i < main_package.getCurrent_groups().size(); i++) {
-//    						Group g = main_package.getCurrent_groups().get(i);
-//    						String currentStatus = g.getStatus();
-//    						if (!currentStatus.equals("Done")) {
-//    							is_it_done = false;
-//    						}
-//    					}
-//    		    		if (is_it_done == true) {
-//    		    			killTimeline();
-//    		    		}
-//    				}
-//    			}
-//    	));
-//    	timeline.setCycleCount(Timeline.INDEFINITE);
-//    	timeline.play();
-//    }
-    
-//    private static boolean save_groups_status;
-    
     public void ask_save_groups() {
-//	    Stage primaryStage;
-//    	primaryStage = (Stage) cmdBack.getScene().getWindow();
 		Button buttonTypeOk = new Button("Save");
 		Button buttonTypeCancel = new Button("Skip");
+		Button buttonTypeReturn = new Button("Cancel");
 		Stage dialogMicroscope= new Stage();    		
     	dialogMicroscope.initModality(Modality.APPLICATION_MODAL);
     	dialogMicroscope.initOwner(null);
     	dialogMicroscope.setResizable(false);
     	GridPane grid = new GridPane();
-//    	grid.setGridLinesVisible(true);
-    	grid.setPrefWidth(300);
+    	grid.setPrefWidth(450);
     	grid.setPrefHeight(80);
-    	Label askQuestion = new Label("Save Groups in Hard Drive?");
-    	grid.add(askQuestion, 2, 0, 1, 1);
+    	Label askQuestion = new Label("Save Progress in Hard Drive?");
     	GridPane.setHalignment(askQuestion, HPos.CENTER);
     	GridPane.setHgrow(askQuestion, Priority.ALWAYS);
     	GridPane.setVgrow(askQuestion, Priority.ALWAYS);
-    	grid.add(buttonTypeOk, 0, 1, 2, 1);
+    	grid.add(askQuestion, 0, 0, 3, 1);
+    	
     	GridPane.setHalignment(buttonTypeOk, HPos.CENTER);
     	GridPane.setHgrow(buttonTypeOk, Priority.ALWAYS);
     	GridPane.setVgrow(buttonTypeOk, Priority.ALWAYS);
-    	grid.add(buttonTypeCancel, 4, 1, 2, 1);
+    	grid.add(buttonTypeOk, 0, 1, 1, 1);
+
     	GridPane.setHalignment(buttonTypeCancel, HPos.CENTER);
     	GridPane.setHgrow(buttonTypeCancel, Priority.ALWAYS);
     	GridPane.setVgrow(buttonTypeCancel, Priority.ALWAYS);
+    	grid.add(buttonTypeCancel, 1, 1, 1, 1);
+    	
+    	GridPane.setHalignment(buttonTypeReturn, HPos.CENTER);
+    	GridPane.setHgrow(buttonTypeReturn, Priority.ALWAYS);
+    	GridPane.setVgrow(buttonTypeReturn, Priority.ALWAYS);
+    	grid.add(buttonTypeReturn, 2, 1, 1, 1);
+    	
     	buttonTypeOk.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -280,10 +260,29 @@ public class Controller_2a_ProgressBar implements Initializable {
     	    	main_package.runGroups(false);
             }
         });
+    	buttonTypeReturn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+//                Controller_2a_ProgressBar.setSave_groups_status(false);
+                dialogMicroscope.close();
+                try {
+					reinit();
+				} catch (ClassNotFoundException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+        });
     	dialogMicroscope.setOnCloseRequest(new EventHandler<WindowEvent>() {
     		@Override
     	      public void handle(WindowEvent we) {
-    	    	main_package.runGroups(false);
+//    	    	main_package.runGroups(false);
+                try {
+					reinit();
+				} catch (ClassNotFoundException | IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
     	      }
     	}); 
     	dialogMicroscope.setScene(new Scene(grid));

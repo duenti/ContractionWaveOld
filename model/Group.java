@@ -2,6 +2,7 @@ package model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -129,6 +130,7 @@ public abstract class Group implements Serializable {
 	public void convoluteMagnitudeList(int n_ave, double ave_value) {
 //		Collections.copy(magListCopy , magList);
 		magListCopy = magList.stream().collect(Collectors.toList());
+		double max_first_val = Collections.max(magListCopy);
 		List<Double> new_value_list = new ArrayList<Double>();
 //		int n_ave = 5;
 //		double ave_value = 0.24390244; //smaller vector so convolution == cross-correlation
@@ -136,9 +138,11 @@ public abstract class Group implements Serializable {
 			double new_val = 0.0;
 			for (int j = i; j < i + n_ave; j++) { //sliding window
 				if (j >= 0 && j < magList.size() ) { 
-					new_val += ave_value * magList.get(j);
-				} else { //negative indexes mean 0
-					new_val += 0.0;
+					new_val += (ave_value * magList.get(j)) / n_ave;
+				} else if (j < 0) { //negative indexes mean 0
+					new_val += (ave_value * magList.get(0)) / n_ave;
+				} else {
+					new_val += (ave_value * magList.get(magList.size()-1)) / n_ave;
 				}
 			}
 			new_value_list.add(new_val);
@@ -147,7 +151,9 @@ public abstract class Group implements Serializable {
 		for (int z = n_ave-2; z < magList.size() + n_ave-2; z++) { //same mode
 			new_value_list2.add(new_value_list.get(z));
 		}
-		magList= new_value_list2.stream().collect(Collectors.toList());
+//		double max_second_val = Collections.max(new_value_list2);
+//		double diff_max = max_second_val - max_first_val;
+		magList= new_value_list2; //.stream().map(i -> i - diff_max).collect(Collectors.toList());
 	}
 	
 	public void restoreMagnitudeList() {

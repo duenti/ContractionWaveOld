@@ -25,6 +25,15 @@ public class Groups implements Serializable {
 		}
 	}
 	
+	public void remove(String g_name) {
+		for (Group group : groups) {
+			if (group.getName().equals(g_name) == true) {
+				groups.remove(group);
+				break;
+			}
+		}
+	}
+	
 	public void clear(){
 		groups.clear();
 	}

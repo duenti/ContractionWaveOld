@@ -21,6 +21,7 @@ import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -28,6 +29,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TitledPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Modality;
@@ -223,10 +225,18 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		try{
 			Double.parseDouble(value);
 		}catch(NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Pyramids Scale must be a real number.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("Pyramids Scale must be a real number.");
+			alert.showAndWait();
+//			JOptionPane.showMessageDialog(null, "Pyramids Scale must be a real number.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    } catch(NullPointerException e) {
-	    	JOptionPane.showMessageDialog(null, "You must inform the pyramids scale.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("You must inform the pyramids scale.");
+			alert.showAndWait();
+//	    	JOptionPane.showMessageDialog(null, "You must inform the pyramids scale.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    }
 		
@@ -234,10 +244,18 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		try{
 			Double.parseDouble(value);
 		}catch(NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Sigma must be a real number.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("Sigma must be a real number.");
+			alert.showAndWait();
+//			JOptionPane.showMessageDialog(null, "Sigma must be a real number.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    } catch(NullPointerException e) {
-	    	JOptionPane.showMessageDialog(null, "You must inform the sigma value.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("You must inform the sigma value.");
+			alert.showAndWait();
+//	    	JOptionPane.showMessageDialog(null, "You must inform the sigma value.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    }
 		
@@ -245,10 +263,18 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		try{
 			Integer.parseInt(value);
 		}catch(NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Levels must be a integer number.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("Levels must be a integer number.");
+			alert.showAndWait();
+//			JOptionPane.showMessageDialog(null, "Levels must be a integer number.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    } catch(NullPointerException e) {
-	    	JOptionPane.showMessageDialog(null, "You must inform the levels.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("You must inform the levels.");
+			alert.showAndWait();
+//	    	JOptionPane.showMessageDialog(null, "You must inform the levels.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    }
 		
@@ -256,10 +282,18 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		try{
 			Integer.parseInt(value);
 		}catch(NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Window Size must be a integer number.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("Window Size must be a integer numbe");
+			alert.showAndWait();
+//			JOptionPane.showMessageDialog(null, "Window Size must be a integer number.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    } catch(NullPointerException e) {
-	    	JOptionPane.showMessageDialog(null, "You must inform the window size.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("You must inform the window size.");
+			alert.showAndWait();
+//	    	JOptionPane.showMessageDialog(null, "You must inform the window size.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    }
 		
@@ -267,10 +301,18 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		try{
 			Integer.parseInt(value);
 		}catch(NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Iterations must be a integer number.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("Iterations must be a integer number.");
+			alert.showAndWait();
+//			JOptionPane.showMessageDialog(null, "Iterations must be a integer number.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    } catch(NullPointerException e) {
-	    	JOptionPane.showMessageDialog(null, "You must inform the number of iterations.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("You must inform the number of iterations.");
+			alert.showAndWait();
+//	    	JOptionPane.showMessageDialog(null, "You must inform the number of iterations.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    }
 		
@@ -278,10 +320,18 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		try{
 			Integer.parseInt(value);
 		}catch(NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Pixel size must be a integer number.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("Pixel size must be a integer number.");
+			alert.showAndWait();
+//			JOptionPane.showMessageDialog(null, "Pixel size must be a integer number.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    } catch(NullPointerException e) {
-	    	JOptionPane.showMessageDialog(null, "You must inform the pixel size.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("You must inform the pixel size.");
+			alert.showAndWait();
+//	    	JOptionPane.showMessageDialog(null, "You must inform the pixel size.","Warning",JOptionPane.WARNING_MESSAGE);
 	        return false;
 	    }
 		

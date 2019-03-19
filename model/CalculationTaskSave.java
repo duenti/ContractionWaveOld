@@ -78,6 +78,11 @@ public class CalculationTaskSave extends Task<Void>{
 		   	FloatBuffer floatBufferMag = floatMags.createBuffer();
 		   	float[] floatArrayMag = new float[floatBufferMag.capacity()];
 		   	floatBufferMag.get(floatArrayMag);
+//	    	System.out.println("Printing important INFO!");
+//	    	System.out.println(floatMags.channels());
+//	    	System.out.println(floatMags.capacity());
+//	    	System.out.println(floatMags.rows());
+//	    	System.out.println(floatMags.cols());
 		   	
 		   	int index = i;
 		   	Platform.runLater(() -> {
@@ -93,7 +98,6 @@ public class CalculationTaskSave extends Task<Void>{
 	
 	public void calculateFlowVideo(int from, int to, int step) throws Exception{
 		VideoGroup g1 = (VideoGroup) this.thisgroup;
-		g1.clearFlowList();
 		File video = g1.getVideo();
 		@SuppressWarnings("resource")
 		FFmpegFrameGrabber frameGrabber = new FFmpegFrameGrabber(video.getAbsolutePath());
@@ -101,12 +105,12 @@ public class CalculationTaskSave extends Task<Void>{
 		frameGrabber.start();
 		Frame frame1 = frameGrabber.grab();
 		int N = frameGrabber.getLengthInFrames();
-		for(int i = 1; i<N; i+=step){
+		for(int i = 0; i<N; i+=step){
 			if(i > to) return;
 			Mat img1 = converterToMat.convert(frame1);
 			g1.setWidth(img1.cols());
 			g1.setHeight(img1.rows());
-			g1.addFrame(img1);
+//			g1.addFrame(img1);
 			cvtColor(img1, img1, COLOR_BGR2GRAY);
 			Frame frame2 = frameGrabber.grab();
 			Mat img2 = converterToMat.convert(frame2);
@@ -125,17 +129,21 @@ public class CalculationTaskSave extends Task<Void>{
 		    	cartToPolar(x_flow, y_flow, mag, ang);
 		    	Mat floatMags = new Mat();
 		    	mag.convertTo(floatMags, CV_32F);
+//		    	System.out.println("Printing important INFO!");
+//		    	System.out.println(floatMags.channels());
+//		    	System.out.println(floatMags.capacity());
+//		    	System.out.println(floatMags.rows());
+//		    	System.out.println(floatMags.cols());		
 		    	FloatBuffer floatBufferMag = floatMags.createBuffer();
 		    	float[] floatArrayMag = new float[floatBufferMag.capacity()];
 		    	floatBufferMag.get(floatArrayMag);
-		    	
-		    	float sum = 0;
-		    	for(float izx : floatArrayMag) {       
-		    	    sum += izx;
-		    	}
+//		    	float sum = 0;
+//		    	for(float izx : floatArrayMag) {       
+//		    	    sum += izx;
+//		    	}
 		    	int index = i;
-		    	double magAverage = java.lang.Math.abs(sum / floatArrayMag.length);
-		    	System.out.println(magAverage);
+//		    	double magAverage = java.lang.Math.abs(sum / floatArrayMag.length);
+//		    	System.out.println(magAverage);
 		    	//magList.add(magAverage);
 			   	Platform.runLater(() -> {
 			   		System.out.println("Adding flow: " + String.valueOf(index));

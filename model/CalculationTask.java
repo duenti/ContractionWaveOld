@@ -142,6 +142,7 @@ public class CalculationTask extends Task<Void> {
 
 	public void calculateMagnitudesVideo(Group g2) throws Exception{
 	//public void calculateMagnitudesVideo(Group g2, PackageData parent) throws Exception{
+			System.out.println("Running video!");
 			VideoGroup g = (VideoGroup) g2;
 			g.clearMagnitudeList();
 			magList.clear();
@@ -178,6 +179,7 @@ public class CalculationTask extends Task<Void> {
 			    	mag.convertTo(floatMags, CV_32F);
 			    	Scalar mean =  org.bytedeco.javacpp.opencv_core.mean(floatMags);
 			    	double magAverage = mean.get(0);
+				   	magList.add(magAverage);
 				   	System.out.println(magAverage);
 			    	double perc = (double)(i+1)/(double) (N);
 			    	
@@ -208,19 +210,20 @@ public class CalculationTask extends Task<Void> {
 							String timeAvg = String.valueOf(time_end) + ending;
 //							parent.setTimeAvg(timeAvg);
 							thisgroup.setRemainingTime(timeAvg);
+							((VideoGroup) thisgroup).addSize();
 						}
 			        });
 				}
-				frameGrabber.flush();
-				frameGrabber.close();
-				
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
 						thisgroup.setMagnitudeList(magList);
+						System.out.println("Set video mag list!");
+						
 					}
 		        });
-				
+				frameGrabber.flush();
+				frameGrabber.close();				
 			}catch(Exception e){
 				e.printStackTrace();
 			}

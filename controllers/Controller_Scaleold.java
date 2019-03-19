@@ -7,14 +7,11 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 import static org.bytedeco.javacpp.opencv_imgcodecs.imwrite;
 
-import org.apache.poi.common.usermodel.fonts.FontFamily;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacv.Java2DFrameUtils;
@@ -37,28 +34,28 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
-public class Controller_Scale implements Initializable{
+public class Controller_Scaleold implements Initializable{
 	
+	private double mask_value;
 	private double scale_start;
 	private double scale_end;
-	private int width = 120;
-	private int plot_width = 30;
+	private int width = 30;
 	private int height = 450;
 	private double spacing = 10;
 	private int font_size = 15;
-	private int tick_number = 0;
 	public static final IndexColorModel JET = ColorMap.getJet();
 	private ColorMap this_jet;
 	
+//	@FXML
+//	private Canvas testcanvas;
 	@FXML
-	private TextField heightInput, widthInput, spacingInput;
+	private TextField heightInput, widthInput, spacingInput, fontInput;
 	
 	@FXML
 	private CheckBox tickCheck;
@@ -87,7 +84,7 @@ public class Controller_Scale implements Initializable{
         BufferedImage bImage1 = generateCanvasScale();
     	Mat jetLayer = Java2DFrameUtils.toMat(bImage1);
         MatVector channels = new MatVector();
-        Mat jetLayerRGB = new Mat(height, width, org.bytedeco.javacpp.opencv_core.CV_8UC3);
+        Mat jetLayerRGB = new Mat(height+((height * 0.1 )+50), width+(width/2+80), org.bytedeco.javacpp.opencv_core.CV_8UC3);
         org.bytedeco.javacpp.opencv_core.split(jetLayer, channels);
         Mat blueCh = channels.get(1);
         Mat greenCh = channels.get(2);
@@ -97,8 +94,7 @@ public class Controller_Scale implements Initializable{
         channels2.put(1, greenCh);
         channels2.put(2, blueCh);
         org.bytedeco.javacpp.opencv_core.merge(channels2, jetLayerRGB);
-		imwrite(current_filename, jetLayerRGB);
-		ShowSavedDialog.showDialog();
+		imwrite(current_filename, jetLayerRGB);		
 	}
 	
 	@Override
@@ -126,13 +122,11 @@ public class Controller_Scale implements Initializable{
 		        if (!newValue.matches("\\d*")) {
 		        	widthInput.setText(newValue.replaceAll("[^\\d]", ""));
 		        }
-		        int prev_width = 0 + plot_width;
-		        plot_width = Integer.valueOf(newValue);		        	
-				if (plot_width < 30) {
-					plot_width = 30;
-					widthInput.setText(String.valueOf(plot_width));
+				width = Integer.valueOf(newValue);		        	
+				if (width < 30) {
+					width = 30;
+					widthInput.setText(String.valueOf(width));
 				}
-				width = ((width - prev_width) + plot_width);
 		    }
 		});
 		
@@ -143,74 +137,33 @@ public class Controller_Scale implements Initializable{
 		        if (!newValue.matches("\\d*")) {
 		        	spacingInput.setText(newValue.replaceAll("[^\\d]", ""));
 		        }
-	        	if (spacing < scale_end && spacing > 0) {
+	        	if (spacing < height && spacing < width) {
 	        		spacing = Double.valueOf(newValue);
 	        	}
-				int spacing_int = (int) spacing;
-				double spacing_delta =  (double) spacing_int;
-				if (spacing - spacing_delta != 0) {
-					//round spacing max to two numbers
-				}
-				calcTickNumber();
-				//get maximum spacing number, calculate its maximum font size to fit 50 pixel font box
-				calcTickMaxFontSize();
 		    }
 		});
-		//get maximum spacing number, calculate its maximum font size to fit 50 pixel font box
-	}
-	
-	private List<Double> tickList = new ArrayList<Double>();
-			
-	public void calcTickNumber() {
-		tickList.clear();
-		tick_number = 0;
-		for (double i = scale_start; i <= scale_end; i=i+spacing) {
-			tickList.add(i);
-			tick_number++;
-		}
-		if (!tickList.contains(scale_end)) {
-			tickList.add(scale_end);
-			tick_number++;
-		}
-	}
-	
-	
-	private int font_height = 0;
-	private int font_width = 0;
-	
-	public void calcTickMaxFontSize() {
-		int max_tick_length = 0;
-		String max_tick = "";
-		for (double tick : tickList) {
-			int tick_string_len = String.valueOf(tick).length();
-			if (max_tick_length  < tick_string_len) {
-				max_tick_length = tick_string_len;
-				max_tick = String.valueOf(tick);
-			}
-		}
-		Text theText = new Text(max_tick);
-		theText.setFont(javafx.scene.text.Font.font("Arial", FontWeight.BOLD, font_size));
-		double text_width = theText.getBoundsInLocal().getWidth();
-		double text_total_height = theText.getBoundsInLocal().getHeight() * tick_number;
-		boolean fit_text = ((text_width < 50) && (text_total_height < height));
-		while (fit_text != true && font_size >= 6) {
-			font_size = font_size - 1;
-			theText.setFont(javafx.scene.text.Font.font("Arial", FontWeight.BOLD, font_size));
-			text_width = theText.getBoundsInLocal().getWidth();
-			text_total_height = theText.getBoundsInLocal().getHeight() * tick_number;
-			fit_text = ((text_width < 50) && (text_total_height < height));
-		}
-		font_height = (int) theText.getBoundsInLocal().getHeight();
-		font_width = (int) theText.getBoundsInLocal().getWidth();
+		
+		fontInput.textProperty().addListener(new ChangeListener<String>() {
+		    @Override
+		    public void changed(ObservableValue<? extends String> observable, String oldValue, 
+		        String newValue) {
+		        if (!newValue.matches("\\d*")) {
+		        	fontInput.setText(newValue.replaceAll("[^\\d]", ""));
+		        }
+	        	if (font_size < height && font_size < width) {
+	        		font_size = Integer.valueOf(newValue);
+	        	}
+		    }
+		});
+		
 	}
 	
 	public void setContext(double mask_value1, double scale_start1, double scale_end1) {
-		System.out.println("About to gen test scale");
+		System.out.println("About to gen test scale 1");
+		mask_value = mask_value1;
 		scale_start = scale_start1;
 		scale_end = scale_end1;
 		this_jet = new ColorMap(scale_start, scale_end, JET);
-		calcTickNumber();
-		calcTickMaxFontSize();
 	}
 	
 	private double convertScaleToHeight(double y) {
@@ -240,98 +193,111 @@ public class Controller_Scale implements Initializable{
 	void drawArrow(GraphicsContext gc, int x1, int y1, int x2, int y2) {
 	    gc.setFill(Color.BLACK);
 	    gc.setLineWidth(2.0);
+
 	    double dx = x2 - x1, dy = y2 - y1;
 	    double angle = Math.atan2(dy, dx);
 	    int len = (int) Math.sqrt(dx * dx + dy * dy);
+
 	    Transform transform = Transform.translate(x1, y1);
 	    transform = transform.createConcatenation(Transform.rotate(Math.toDegrees(angle), 0, 0));
 	    gc.setTransform(new Affine(transform));
 	    gc.strokeLine(0, 0, len, 0);
 	    gc.strokeLine(len, 0, len - ARR_SIZE, -ARR_SIZE);
 	    gc.strokeLine(len, 0, len - ARR_SIZE, ARR_SIZE);
+//	    gc.strokeLine(len, 0, len + ARR_SIZE, ARR_SIZE);
+//	    gc.fillPolygon(new double[]{len, len - ARR_SIZE, len - ARR_SIZE, len}, new double[]{0, -ARR_SIZE, ARR_SIZE, 0}, 4);
 	}
 	
 	private BufferedImage generateCanvasScale() {
-		Canvas canvas1 = new Canvas(width, height); //create canvas
+		Canvas canvas1 = new Canvas((int) width+(width/2+80), (int) height+((height * 0.1 )+50));
 		GraphicsContext gc = canvas1.getGraphicsContext2D();
     	gc.setFill(Color.WHITE);
-    	gc.fillRect(0, 0, canvas1.getWidth(), canvas1.getHeight()); //fill canvas with white rectangle
+    	gc.fillRect(0, 0, canvas1.getWidth(), canvas1.getHeight());
 		gc.save();
-		PixelWriter pixel_writing = canvas1.getGraphicsContext2D().getPixelWriter(); //start pixelwriter
-		for (int x = 0; x <= plot_width; x++) {
-			for (int y = 0; y <= height; y++) {
-				java.awt.Color a = this_jet.getColor(convertToMag(y)); //get color for each dot
+		PixelWriter pixel_writing = canvas1.getGraphicsContext2D().getPixelWriter();
+		
+
+//        int tick_number = (int) (scale_end / spacing);
+		for (int x = 0; x < width; x++) {
+			for (int y = 20; y < height+20; y++) {
+				int y_new = y-20;
+        		java.awt.Color a = this_jet.getColor(convertToMag(y_new));
+//				java.awt.Color a = this_jet.getColor(convertToMag(y));
         		Color this_color = new Color( (Double.valueOf(a.getRed()) / 255.0), (Double.valueOf(a.getGreen()) / 255.0 ) , (Double.valueOf(a.getBlue()) / 255.0), 1.0);
-				pixel_writing.setColor( x, ((int)canvas1.getHeight()-y), this_color); //print color to canvas
+//				pixel_writing.setColor(x, y, this_color);
+				pixel_writing.setColor( x, ((int)canvas1.getHeight()-30-y), this_color);
+				
 			}
 		}
-
-		 //tick width to write
-		
-		if (tickCheck.isSelected() == true) { //if ticks enabled, prepare to paint ticks
-			System.out.println("About to print each tick");
+		//write tick labels
+		if (tickCheck.isSelected() == true) {
 			gc.setFill(Color.BLACK);
 			gc.setTextAlign(TextAlignment.CENTER);
 	        gc.setTextBaseline(VPos.CENTER);
 	        javafx.scene.text.Font number_font = javafx.scene.text.Font.font("Arial",FontWeight.BOLD, font_size);
+	        
 	        gc.setFont(number_font);
-	        //graphic context settings above
-	        int x = plot_width+2;
-	        System.out.println("Tick number: " + tick_number);
-			for (int e_tick_n = 1; e_tick_n < tick_number-1; e_tick_n++) {
-				int y = ( (int) convertScaleToHeight(tickList.get(e_tick_n)) );
-				String current_print_a = String.valueOf((e_tick_n) * spacing);
+
+	        int tick_number = (int) (scale_end / spacing);
+	        System.out.println(tick_number);
+	        if (tick_number * spacing < scale_end) {
+	        	tick_number++;
+	        }
+	        
+			for (int t_i = 1; t_i < tick_number; t_i++) {
+				int x = width+20; //tick width to write
+				int y = ((int) convertScaleToHeight((t_i) * spacing)) + 20;
+				//normal
+//				gc.fillText(String.valueOf((t_i) * spacing), x, y);
+				//inverse
+				int currentpad = 5;
 				
-				double current_print_a_num = round(e_tick_n,2); //generate scale end
-				int current_print_a_num_int = (int) current_print_a_num;
-				double delta_to_a =  (double) current_print_a_num_int;
-				if (current_print_a_num - delta_to_a == 0) {
-					current_print_a = current_print_a.split(Pattern.quote("."))[0];
+				String current_print_a = String.valueOf((t_i) * spacing);
+				if (!current_print_a.contains(".")) {
+					current_print_a += ".";
+				} else {
+					int dot_after = current_print_a.split("\\.")[0].length();
+					currentpad = currentpad - dot_after;
 				}
-				
-				Text theText = new Text(current_print_a);
-				theText.setFont(javafx.scene.text.Font.font("Arial", FontWeight.BOLD, font_size));
-				int font_current_width = (int) theText.getBoundsInLocal().getWidth();
-				gc.fillText(current_print_a, x+(font_current_width/2), ((int)canvas1.getHeight()-y) ); //write each tick
+				current_print_a = rightPadZeros(current_print_a, currentpad);
+				gc.fillText(current_print_a, x, ((int)canvas1.getHeight()-30-y) );
 			}
+	        
+	        //inverse
+//			for (int t_i = tick_number; t_i >= 1; t_i--) {
+//				int x = width+20; //tick width to write
+//				int y = ((int) convertScaleToHeight((t_i) * spacing)) + 20;
+//				gc.fillText(String.valueOf((t_i) * spacing), x, y);
+//			}
+			int x = width+20; //tick width to write
+			int y = ((int) convertScaleToHeight(scale_end)) + 20;
+//			gc.fillText(String.valueOf(scale_end), x, y);
+			int currentpad_f = 5;
+			double current_print_f_num = round(scale_end,2);
+			int current_print_f_num_int = (int) current_print_f_num;
+			double delta_to_f =  (double) current_print_f_num_int;
+			String current_print_f = String.valueOf(current_print_f_num);
+			if (current_print_f_num - delta_to_f == 0) {
+				current_print_f = current_print_f.split(Pattern.quote("."))[0];
+			}
+			
+			int currentpad_s = 5;
+			double current_print_s_num = round(scale_start,2);
+			int current_print_s_num_int = (int) current_print_s_num;
+			double delta_to_s =  (double) current_print_s_num_int;
+			String current_print_s = String.valueOf(round(scale_start,2));
+			if (current_print_s_num - delta_to_s == 0) {
+				current_print_s = current_print_s.split(Pattern.quote("."))[0];
+			}
+			
+			gc.fillText(current_print_f, x, ((int)canvas1.getHeight()-30-y));
+			y = ((int) convertScaleToHeight(scale_start)) + 20;
+			gc.fillText(current_print_s, x, ((int)canvas1.getHeight()-30-y));
+//			
 		}
-		
-		int x = plot_width+1;
-		double current_print_f_num = round(scale_end,2); //generate scale end
-		int current_print_f_num_int = (int) current_print_f_num;
-		double delta_to_f =  (double) current_print_f_num_int;
-		String current_print_f = String.valueOf(current_print_f_num);
-		if (current_print_f_num - delta_to_f == 0) {
-			current_print_f = current_print_f.split(Pattern.quote("."))[0];
-		}
-		
-		double current_print_s_num = round(scale_start,2); //generate scale start
-		int current_print_s_num_int = (int) current_print_s_num;
-		double delta_to_s =  (double) current_print_s_num_int;
-		String current_print_s = String.valueOf(round(scale_start,2));
-		if (current_print_s_num - delta_to_s == 0) {
-			current_print_s = current_print_s.split(Pattern.quote("."))[0];
-		}
-		int y = ((int) convertScaleToHeight(scale_end));
-		
-		Text theText = new Text(current_print_f);
-		theText.setFont(javafx.scene.text.Font.font("Arial", FontWeight.BOLD, font_size));
-		int font_current_width = (int) theText.getBoundsInLocal().getWidth();
-				
-		gc.fillText(current_print_f, x+(font_current_width/2), (font_height/2)  ); //draw scale end
-
-		
-		Text theText2 = new Text(current_print_f);
-		theText2.setFont(javafx.scene.text.Font.font("Arial", FontWeight.BOLD, font_size));
-		font_current_width = (int) theText2.getBoundsInLocal().getWidth();
-
-		gc.fillText(current_print_s, x+(font_current_width/2), ( (int)canvas1.getHeight() - (font_height/2) )); //draw scale start
-		
 		gc.setFill(Color.BLACK);
 		gc.setTextAlign(TextAlignment.CENTER);
         gc.setTextBaseline(VPos.CENTER);
-        //restore canvas default settings
-        
         javafx.scene.text.Font subtitle_font = javafx.scene.text.Font.font("Arial",FontWeight.BOLD, 15);
         gc.setFont(subtitle_font);
 	    Transform transform = Transform.rotate(-90.0, (int)canvas1.getWidth()-35, (int)(canvas1.getHeight()/2));
@@ -339,9 +305,20 @@ public class Controller_Scale implements Initializable{
 	    gc.fillText("Speed (\u00B5m/s)", (int)canvas1.getWidth()-35, (int)(canvas1.getHeight()/2));
 	    gc.restore();
 	    
+//	    int x_arrow = (int)canvas1.getWidth()-45;
 	    int x_arrow = (int)canvas1.getWidth()-20;
-	    int y_arrow_init = (int)(canvas1.getHeight()/2) - 30;
-	    int y_arrow_end = (int)(canvas1.getHeight()/2) + 30;
+//    	int y_arrow_init = (int)(canvas1.getHeight()/2) - (height/10);
+//    	int y_arrow_end = (int)(canvas1.getHeight()/2) + (height/10);
+//	    if (y_arrow_end - y_arrow_init  < 30) {
+//	    	y_arrow_init = (int)(canvas1.getHeight()/2) - 15;
+//	    	y_arrow_end = (int)(canvas1.getHeight()/2) + 15;
+//	    }
+	    int y_arrow_init = (int)(canvas1.getHeight()/2) - 46;
+	    int y_arrow_end = (int)(canvas1.getHeight()/2) + 46;
+	    
+	    
+	    
+//		drawArrow(gc, x_arrow, y_arrow_init, x_arrow, y_arrow_end);
 		drawArrow(gc, x_arrow, y_arrow_end, x_arrow, y_arrow_init);
 		
     	WritableImage writableImage = new WritableImage((int) canvas1.getWidth(), (int)canvas1.getHeight());

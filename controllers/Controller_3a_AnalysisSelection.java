@@ -21,12 +21,15 @@ import javax.swing.JOptionPane;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
+import javafx.geometry.HPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -36,10 +39,12 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -123,28 +128,18 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
-    	
 		URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
     	FXMLLoader fxmlloader = new FXMLLoader();
     	fxmlloader.setLocation(url);
     	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
         Parent root;
     	root = fxmlloader.load();
-//    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
-//    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
-    	
-		//((Controller_1_InitialScreen)fxmlloader.getController()).setContext(exec, queuedItems, doneItems);
-		//Pane root = FXMLLoader.load(getClass().getResource("FXML_1_InitialScreen.fxml"));
-		//Scene scene = new Scene(root, 600, 400);
 		primaryStage.setTitle("ContractionWave - Welcome");
-//		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		
 		primaryStage.setX(prior_X);
 		primaryStage.setY(prior_Y);
-
     }
 
     @FXML
@@ -171,10 +166,6 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 		fpsFac.valueProperty().bindBidirectional(formatter.valueProperty());
 		formatter.valueProperty().addListener((s, ov, nv) -> {
 			fps_value = nv;
-//			System.out.println("bind value");
-//			System.out.println("fps_value");
-//			System.out.println(fps_value);
-			
 		});
 		
 		Spinner<Double> txtPixels = new Spinner<Double>();
@@ -186,9 +177,6 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 		pixelFac.valueProperty().bindBidirectional(formatter2.valueProperty());
 		formatter2.valueProperty().addListener((s, ov, nv) -> {
 			pixel_value = nv;
-//			System.out.println("bind value");
-//			System.out.println("pixel_value");
-//			System.out.println(pixel_value);
 		});
 		
 		Label label1 = new Label();
@@ -213,24 +201,16 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     	dialogMicroscope.show();
     	
     	dialogMicroscope.setOnCloseRequest(event -> {
-//    		System.out.println("pixel_value");
-//    		System.out.println(pixel_value);
-//    		System.out.println("fps_value");
-//    		System.out.println(fps_value);
 			fps_value = txtFPS.getValue();
 			pixel_value = txtPixels.getValue();
-//			System.out.println("pixel_value");
-//			System.out.println(pixel_value);
-//			System.out.println("fps_value");
-//			System.out.println(fps_value);
         	if(dialogMicroscope.getResult() == null) return;
-    		File tmpDir = new File(getInitialDirectory().toFile().getAbsolutePath() + "/microscope.pref");
+    		File tmpDir = new File(getInitialDirectory().toFile().getAbsolutePath() + File.separator + "microscope.pref");
     		boolean exists = tmpDir.exists();
     		if (exists == true) {
     			tmpDir.delete();
     		}
     		MicroscopePreferences a = new MicroscopePreferences(pixel_value, fps_value);
-    		File tmpDir2 = new File(getInitialDirectory().toFile().getAbsolutePath() + "/microscope.pref");
+    		File tmpDir2 = new File(getInitialDirectory().toFile().getAbsolutePath() + File.separator + "microscope.pref");
     		FileOutputStream fout = null;
 			try {
 				fout = new FileOutputStream(tmpDir2);
@@ -264,14 +244,121 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     	});
 	}
 	
-	public void nextWindow() {
-		System.out.println("pixel_value");
-		System.out.println(pixel_value);
-		System.out.println("fps_value");
-		System.out.println(fps_value);
+	
+	void askDeleteFile(String selecteditem) {
+		Button buttonTypeOk = new Button("Delete");
+		Button buttonTypeCancel = new Button("Cancel");
+		Stage dialogDeleteF= new Stage();    		
+		dialogDeleteF.initModality(Modality.APPLICATION_MODAL);
+		dialogDeleteF.initOwner(null);
+		dialogDeleteF.setResizable(false);
+    	GridPane grid = new GridPane();
+    	grid.setPrefWidth(450);
+    	grid.setPrefHeight(80);
+    	Label askQuestion = new Label("Delete file: " + selecteditem + " ?");
+    	GridPane.setHalignment(askQuestion, HPos.CENTER);
+    	GridPane.setHgrow(askQuestion, Priority.ALWAYS);
+    	GridPane.setVgrow(askQuestion, Priority.ALWAYS);
+    	grid.add(askQuestion, 0, 0, 2, 1);
+    	
+    	GridPane.setHalignment(buttonTypeOk, HPos.CENTER);
+    	GridPane.setHgrow(buttonTypeOk, Priority.ALWAYS);
+    	GridPane.setVgrow(buttonTypeOk, Priority.ALWAYS);
+    	grid.add(buttonTypeOk, 0, 1, 1, 1);
+
+    	GridPane.setHalignment(buttonTypeCancel, HPos.CENTER);
+    	GridPane.setHgrow(buttonTypeCancel, Priority.ALWAYS);
+    	GridPane.setVgrow(buttonTypeCancel, Priority.ALWAYS);
+    	grid.add(buttonTypeCancel, 1, 1, 1, 1);
+    	buttonTypeOk.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+        		Path currentRelativePath = Paths.get("");
+        		String s = currentRelativePath.toAbsolutePath().toString() + File.separator + selecteditem + "_group.ser";
+        		System.out.println(s);
+        		File t = new File(s);
+        		t.delete();
+        		groupsListView.getItems().remove(selecteditem + " (Saved File)");
+        		groupsListView.refresh();
+            	dialogDeleteF.close();
+            }
+        });
+    	buttonTypeCancel.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	dialogDeleteF.close();
+            }
+        });
+    	dialogDeleteF.setScene(new Scene(grid));
+    	dialogDeleteF.show();
+	}
+	
+	void askDeleteMemory(String selecteditem) {
+		Button buttonTypeOk = new Button("Delete");
+		Button buttonTypeCancel = new Button("Cancel");
+		Stage dialogDeleteF= new Stage();    		
+		dialogDeleteF.initModality(Modality.APPLICATION_MODAL);
+		dialogDeleteF.initOwner(null);
+		dialogDeleteF.setResizable(false);
+    	GridPane grid = new GridPane();
+    	grid.setPrefWidth(450);
+    	grid.setPrefHeight(80);
+    	Label askQuestion = new Label("Delete Group: " + selecteditem + " ?");
+    	GridPane.setHalignment(askQuestion, HPos.CENTER);
+    	GridPane.setHgrow(askQuestion, Priority.ALWAYS);
+    	GridPane.setVgrow(askQuestion, Priority.ALWAYS);
+    	grid.add(askQuestion, 0, 0, 2, 1);
+    	
+    	GridPane.setHalignment(buttonTypeOk, HPos.CENTER);
+    	GridPane.setHgrow(buttonTypeOk, Priority.ALWAYS);
+    	GridPane.setVgrow(buttonTypeOk, Priority.ALWAYS);
+    	grid.add(buttonTypeOk, 0, 1, 1, 1);
+
+    	GridPane.setHalignment(buttonTypeCancel, HPos.CENTER);
+    	GridPane.setHgrow(buttonTypeCancel, Priority.ALWAYS);
+    	GridPane.setVgrow(buttonTypeCancel, Priority.ALWAYS);
+    	buttonTypeOk.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+        		Groups g = main_package.getCurrent_groups();
+        		g.remove(selecteditem);
+        		groupsListView.getItems().remove(selecteditem + " (Temporary)");
+        		groupsListView.refresh();
+//        		doneFiles.remove(selecteditem);
+            	dialogDeleteF.close();
+            }
+        });
+    	buttonTypeCancel.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	dialogDeleteF.close();
+            }
+        }); 
+    	dialogDeleteF.setScene(new Scene(grid));
+    	dialogDeleteF.show();
+	}
+	
+	@FXML
+	void handleDeleteGroup(ActionEvent event) {
 		String selecteditem = groupsListView.getSelectionModel().getSelectedItem();
-		if (selecteditem.indexOf("_group.ser") > -1) {
-			selecteditem = selecteditem.split(Pattern.quote("_group.ser"))[0];
+		if (selecteditem.indexOf(" (Saved File)") > -1) {
+			//ask delete file, if yes delete file
+			String selecteditem2 = selecteditem.split(Pattern.quote(" (Saved File)"))[0];
+			askDeleteFile(selecteditem2);
+		} else {
+			//delete from memory
+			String selecteditem2 = selecteditem.split(Pattern.quote(" (Temporary)"))[0];
+			askDeleteMemory(selecteditem2);
+		}
+	}
+	
+	public void nextWindow() {
+		String selecteditem = groupsListView.getSelectionModel().getSelectedItem();
+		if (selecteditem.indexOf(" (Saved File)") > -1) {
+			selecteditem = selecteditem.split(Pattern.quote(" (Saved File)"))[0];
+		}
+		if (selecteditem.indexOf(" (Temporary)") > -1) {
+			selecteditem = selecteditem.split(Pattern.quote(" (Temporary)"))[0];
 		}
 		Stage primaryStage = (Stage) cmdNext.getScene().getWindow();
     	double prior_X = primaryStage.getX();
@@ -288,9 +375,6 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-//    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
-	
-//    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
     	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
 	
 		try {
@@ -329,7 +413,10 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 	    		nextWindow();
 			}
 		} else {
-			JOptionPane.showMessageDialog(null, "Please select a valid group.","Warning",JOptionPane.WARNING_MESSAGE);
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Warning");
+			alert.setContentText("Please select a valid group.");
+			alert.showAndWait();
 		}
 
 	}
@@ -340,15 +427,16 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 		for (int i = 0; i < g.size(); i ++) {
 			Group t = g.get(i);
 			String name = t.getName();
+			doneFiles.add(name + " (Temporary)");
 			//TODO add check for Done/Running status
-			if (doneFiles.contains(name + "_group.ser") == false) {
-				doneFiles.add(name);
-			}
+//			if (doneFiles.contains(name + "_group.ser") == false) {
+//				doneFiles.add(name);
+//			}
 		}
 		FXCollections.sort(doneFiles);
 		groupsListView.setItems(doneFiles);
 		
-		File tmpDir = new File(getInitialDirectory().toFile().getAbsolutePath() + "/microscope.pref");
+		File tmpDir = new File(getInitialDirectory().toFile().getAbsolutePath() + File.separator +"microscope.pref");
 		boolean exists = tmpDir.exists();
 		if (exists == true) {
 	        FileInputStream fin = new FileInputStream(tmpDir);
@@ -383,10 +471,8 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 		File[] groupfiles = finder(s);
 		for (int i = 0; i < groupfiles.length; i++) {
 			File currentfile = groupfiles[i];
-			System.out.println(currentfile.getName().toString());
-			doneFiles.add(currentfile.getName().toString());
+			doneFiles.add(currentfile.getName().toString().split(Pattern.quote("_group.ser")) [0] + " (Saved File)");
 		}
-		System.out.println("Current relative path is: " + s);
 	
 	}
 	
@@ -431,83 +517,5 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     	});
     	return dblFactory;
     }
-  
-//    class IncrementHandler implements EventHandler<MouseEvent> {
-//        private Spinner spinner;
-//        private boolean increment;
-//        private long startTimestamp;
-//        private int currentFrame = 0;
-//        private int previousFrame = 0;  
-//
-//        private long initialDelay = 1000l * 1000L * 750L; // 0.75 sec
-//        private Node button;
-//
-//        private final AnimationTimer timer = new AnimationTimer() {
-//
-//            @Override
-//            public void handle(long now) {
-//            	if (currentFrame == previousFrame || currentFrame % 10 == 0) {
-//	                if (now - startTimestamp >= initialDelay) {
-//	                    // trigger updates every frame once the initial delay is over
-//	                    if (increment) {
-//	                        spinner.increment();
-//	                    } else {
-//	                        spinner.decrement();
-//	                    }
-//	                }
-//            	}
-//            	++currentFrame;
-//            }
-//        };
-//
-//        @Override
-//        public void handle(MouseEvent event) {
-//            if (event.getButton() == MouseButton.PRIMARY) {
-//                Spinner source = (Spinner) event.getSource();
-//                Node node = event.getPickResult().getIntersectedNode();
-//
-//                Boolean increment = null;
-//                // find which kind of button was pressed and if one was pressed
-//                while (increment == null && node != source) {
-//                    if (node.getStyleClass().contains("increment-arrow-button")) {
-//                        increment = Boolean.TRUE;
-//                    } else if (node.getStyleClass().contains("decrement-arrow-button")) {
-//                        increment = Boolean.FALSE;
-//                    } else {
-//                        node = node.getParent();
-//                    }
-//                }
-//                if (increment != null) {
-//                    event.consume();
-//                    source.requestFocus();
-//                    spinner = source;
-//                    this.increment = increment;
-//
-//                    // timestamp to calculate the delay
-//                    startTimestamp = System.nanoTime();
-//
-//                    button = node;
-//
-//                    // update for css styling
-//                    node.pseudoClassStateChanged(PRESSED, true);
-//
-//                    // first value update
-//                    timer.handle(startTimestamp + initialDelay);
-//
-//                    // trigger timer for more updates later
-//                    timer.start();
-//                }
-//            }
-//        }
-//
-//        public void stop() {
-//            timer.stop();
-//            button.pseudoClassStateChanged(PRESSED, false);
-//            button = null;
-//            spinner = null;
-//            previousFrame = currentFrame;
-//        }
-//    }
-	
 	
 }

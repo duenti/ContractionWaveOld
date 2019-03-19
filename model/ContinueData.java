@@ -32,6 +32,7 @@ public class ContinueData implements Serializable {
 		fps_val = fps_val1;
 		pixel_val = pixel_val1;
 		upper_limit = upper_limit1;
+		average_value = average_value1;
 		intervalsList = intervalsList1;
 		maximum_list = maximum_list1;
 		minimum_list = minimum_list1;

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -42,7 +43,7 @@
          </children>
       </VBox>
    </top>
-   <left>
+   <center>
       <GridPane BorderPane.alignment="CENTER">
         <columnConstraints>
           <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
@@ -82,14 +83,12 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button id="glass-grey" fx:id="cmdBack" mnemonicParsing="false" onAction="#back" prefHeight="45.0" prefWidth="45.0" stylesheets="@button_styles.css" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
-                  <Button id="glass-grey" fx:id="cmdShowAll" mnemonicParsing="false" onAction="#handleExpandAll" prefHeight="25.0" prefWidth="25.0" stylesheets="@button_styles.css" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
-                  <Button id="glass-grey" fx:id="cmdMergeGroups" mnemonicParsing="false" onAction="#handleMergeSelection" prefHeight="25.0" prefWidth="25.0" stylesheets="@button_styles.css" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
-                  <Button id="glass-grey" fx:id="cmdHideAll" mnemonicParsing="false" onAction="#handleCollapseAll" prefHeight="25.0" prefWidth="25.0" stylesheets="@button_styles.css" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
-                  <Button id="glass-grey" fx:id="cmdNext" mnemonicParsing="false" onAction="#next" prefHeight="45.0" prefWidth="45.0" stylesheets="@button_styles.css" GridPane.columnIndex="11" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
-                  <Button id="glass-grey" fx:id="cmdDeleteGroup" mnemonicParsing="false" onAction="#handleRemoveSelection" prefHeight="25.0" prefWidth="25.0" stylesheets="@button_styles.css" GridPane.columnIndex="10" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
-                  <TreeView fx:id="filetreeview" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="7" GridPane.rowIndex="2" GridPane.rowSpan="5" />
-                  <ListView fx:id="grouplistview" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="9" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.rowSpan="5" />
+                  <Button id="glass-grey" fx:id="cmdShowAll" mnemonicParsing="false" onAction="#handleExpandAll" prefHeight="25.0" prefWidth="25.0" stylesheets="@button_styles.css" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+                  <Button id="glass-grey" fx:id="cmdMergeGroups" mnemonicParsing="false" onAction="#handleMergeSelection" prefHeight="25.0" prefWidth="25.0" stylesheets="@button_styles.css" visible="false" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+                  <Button id="glass-grey" fx:id="cmdHideAll" mnemonicParsing="false" onAction="#handleCollapseAll" prefHeight="25.0" prefWidth="25.0" stylesheets="@button_styles.css" GridPane.columnIndex="7" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+                  <Button id="glass-grey" fx:id="cmdDeleteGroup" mnemonicParsing="false" onAction="#handleRemoveSelection" prefHeight="25.0" prefWidth="25.0" stylesheets="@button_styles.css" GridPane.columnIndex="10" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+                  <TreeView fx:id="filetreeview" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.columnSpan="7" GridPane.rowIndex="2" GridPane.rowSpan="6" />
+                  <ListView fx:id="grouplistview" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="9" GridPane.columnSpan="3" GridPane.rowIndex="2" GridPane.rowSpan="6" />
                   <Label prefHeight="16.0" prefWidth="173.0" text="Select the data path:" GridPane.columnIndex="1" GridPane.columnSpan="4" GridPane.rowIndex="1" GridPane.valignment="BOTTOM" />
                   <Label text="Groups:" GridPane.columnIndex="9" GridPane.columnSpan="3" GridPane.rowIndex="1" GridPane.valignment="BOTTOM" />
                   <Label alignment="CENTER" prefHeight="16.0" prefWidth="742.0" text="Create Groups from Image Folders" GridPane.columnIndex="3" GridPane.columnSpan="7">
@@ -101,5 +100,23 @@
             </GridPane>
          </children>
       </GridPane>
-   </left>
+   </center>
+   <bottom>
+      <BorderPane BorderPane.alignment="CENTER">
+         <left>
+            <Button id="glass-grey" fx:id="cmdBack" mnemonicParsing="false" onAction="#back" prefHeight="45.0" prefWidth="45.0" stylesheets="@button_styles.css" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="30.0" left="80.0" />
+               </BorderPane.margin>
+            </Button>
+         </left>
+         <right>
+            <Button id="glass-grey" fx:id="cmdNext" mnemonicParsing="false" onAction="#next" prefHeight="45.0" prefWidth="45.0" stylesheets="@button_styles.css" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets bottom="30.0" right="80.0" />
+               </BorderPane.margin>
+            </Button>
+         </right>
+      </BorderPane>
+   </bottom>
 </BorderPane>

@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
@@ -65,6 +66,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -74,6 +76,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -197,7 +200,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         //Show save file dialog
         File file = fileChooser.showSaveDialog(primaryStage);
 		writeTSV(file);
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     @FXML
@@ -209,7 +213,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         //Show save file dialog
         File file = fileChooser.showSaveDialog(primaryStage);
 		writeTSV(file);
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     public void writeTSV(File file) throws Exception {
@@ -242,7 +247,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		Row row = spreadsheet.createRow(0);
 		
 		row.createCell(0).setCellValue("Time (s)");
-		row.createCell(1).setCellValue("Speed (\u00B5/s)");
+		row.createCell(1).setCellValue("Average Speed (\u00B5/s)");
 		
 		for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
 			double average = currentGroup.getMagnitudeListValue(i);
@@ -261,7 +266,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		workbook.write(fileOut);
 		workbook.close();
 		fileOut.close();
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     @FXML
@@ -278,7 +284,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
                 currentZoomChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     @FXML
@@ -295,7 +302,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
                 currentZoomChart,
                 panel.getWidth(),
                 panel.getHeight());
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     @FXML
@@ -323,354 +331,15 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         channels2.put(2, blueCh);
         org.bytedeco.javacpp.opencv_core.merge(channels2, imgLayerRGB);
 		imwrite(file.getCanonicalPath(), imgLayerRGB);
-		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
     }
     
     @FXML
-    void handleMarkerAlpha(ActionEvent event) {
-    	Dialog<Boolean> dialogJet = new Dialog<>();
-    	dialogJet.setHeaderText("Set Marker Alpha:");
-    	dialogJet.setResizable(true);
-    	Label label1 = new Label("Marker Alpha: ");
-    	Spinner<Double> xwindowSpin = new Spinner<Double>();
-    	SpinnerValueFactory<Double> dobGen = facGen(0.0, 1.0, (double) main_package.getPlot_preferences().getMarkerAlpha(), 0.01);
-    	xwindowSpin.setEditable(true);
-		TextFormatter<Double> formatter1 = new TextFormatter<Double>(dobGen.getConverter(), dobGen.getValue());
-		xwindowSpin.getEditor().setTextFormatter(formatter1);
-		dobGen.valueProperty().bindBidirectional(formatter1.valueProperty());
-		formatter1.valueProperty().addListener((s, ov, nv) -> {
-			main_package.getPlot_preferences().setMarkerAlpha((float)nv.doubleValue());
-			for (IntervalMarker m : intervalsList) {
-	        	m.setAlpha((float)nv.doubleValue());
-			}
-		});
-//    	xwindowSpin.setValueFactory(facGen(0.0, 1.0, (double) main_package.getPlot_preferences().getMarkerAlpha(), 0.01));
-//    	xwindowSpin.setEditable(true);
-//		IncrementHandler handler2 = new IncrementHandler();
-//		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, handler2);
-//		xwindowSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, evt -> {
-//	        Node node = evt.getPickResult().getIntersectedNode();
-//	        if (node.getStyleClass().contains("increment-arrow-button") ||
-//	            node.getStyleClass().contains("decrement-arrow-button")) {
-//	                if (evt.getButton() == MouseButton.PRIMARY) {
-//	                    handler2.stop();
-//	                }
-//	        }
-//	    });
-//		xwindowSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				main_package.getPlot_preferences().setMarkerAlpha(Float.valueOf(newValue));
-//				for (IntervalMarker m : intervalsList) {
-//					m.setAlpha(Float.valueOf(newValue));
-//				}
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//	    });
-//		xwindowSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//	        if (newValue == false) {
-//	        	xwindowSpin.increment(0);
-//	        } 
-//	    });
-    	GridPane grid = new GridPane();
-    	grid.add(label1, 1, 1);
-    	grid.add(xwindowSpin, 2, 1);
-    	dialogJet.getDialogPane().setContent(grid);
-    	ButtonType buttonTypeOk = new ButtonType("Okay", ButtonData.OK_DONE);
-    	dialogJet.getDialogPane().getButtonTypes().add(buttonTypeOk);
-    	dialogJet.show();
-    }
-
-    @FXML
-    void handleMarkerColor(ActionEvent event) {
-    	java.awt.Color initialColor = main_package.getPlot_preferences().getMarkerColorRGB();
-        java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Marker color", initialColor);
-        main_package.getPlot_preferences().setMarkerColorRGB(newColor);
-    	XYPlot plot = currentChart.getXYPlot();
-        for (IntervalMarker m : intervalsList) {
-        	m.setPaint(newColor);
-        	plot.removeDomainMarker(m);
-//            plot.addDomainMarker(m,Layer.BACKGROUND);
-        }
-        for (IntervalMarker m : intervalsList) {
-            plot.addDomainMarker(m,Layer.BACKGROUND);
-        }
-    }
-    
-    @FXML
-    void handleSeriesColor(ActionEvent event) {
+    void handleColors(ActionEvent event) {
     	XYPlot plot = currentChart.getXYPlot();
     	XYPlot plot2 = currentZoomChart.getXYPlot();
-    	java.awt.Color initialColor = main_package.getPlot_preferences().getSeriesColorRGB();
-        java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Series color", initialColor);
-        plot.getRenderer().setSeriesPaint(0, newColor);
-        plot2.getRenderer().setSeriesPaint(0, newColor);
-        main_package.getPlot_preferences().setSeriesColorRGB(newColor);
-    }
-    
-    @FXML
-    void handleSeriesThickness(ActionEvent event) {
-    	XYPlot plot = currentChart.getXYPlot();
-    	XYPlot plot2 = currentZoomChart.getXYPlot();
-    	//int thickness = main_package.getPlot_preferences().getLineThickness();
-        String test1 = JOptionPane.showInputDialog(null, "Please input new line thickness (Default: 1)");
-        float new_thickness = Float.parseFloat(test1);
-        if (new_thickness > 0) {
-        	plot.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
-        	plot2.getRenderer().setSeriesStroke(0, new java.awt.BasicStroke(new_thickness));
-        	main_package.getPlot_preferences().setLineThickness(new_thickness);
-        }
-    }
-    
-    @FXML
-    void handleShowAnnotations(ActionEvent event) {
-    	XYPlot plot = currentChart.getXYPlot();
-    	XYPlot plot2 = currentZoomChart.getXYPlot();
-    	XYDataset dataset = plot.getDataset();
-    	XYDataset dataset2 = plot2.getDataset();
-    	int input = JOptionPane.showConfirmDialog(null, "Hide Annotations?");
-    	if (input == 1 && main_package.getPlot_preferences().isDrawAnnotations() == false) {
-    		//show
-    		main_package.getPlot_preferences().setDrawAnnotations(true);
-    		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-    	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
-    	        	double x = dataset.getXValue(0, x1);
-    	        	double y = dataset.getYValue(0, x1);
-    	        	if (valid_maximum_list.contains(x1)) {
-    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
-    	        	}
-    	        	if (valid_minimum_list.contains(x1)) {
-    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
-    	        	}
-    	        	if (first_points.contains(x1) && !valid_minimum_list.contains(x1)) {
-    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
-    	        	}
-    	        	if (fifth_points.contains(x1) && !valid_minimum_list.contains(x1)  && !first_points.contains(x1)) {
-    	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
-    	        	}
-    	        }
-    		}
-    		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-    	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
-    	        	double x = dataset2.getXValue(0, x1);
-    	        	double y = dataset2.getYValue(0, x1);
-    	        	if (valid_maximum_list.contains(x1 + zoomMinValue)) {
-    	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
-    	        	}
-    	        	if (valid_minimum_list.contains(x1 + zoomMinValue)) {
-    	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
-    	        	}
-    	        	if (first_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)) {
-    	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
-    	        	}
-    	        	if (fifth_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)  && !first_points.contains(x1 + zoomMinValue)) {
-    	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
-    	        	}
-    	        }
-    		}
-    	} else if (input == 0 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-    		main_package.getPlot_preferences().setDrawAnnotations(false);
-    		//hide
-    		System.out.println("cleared");
-            plot.clearAnnotations();
-            plot2.clearAnnotations();
-    	}
-    }
-    
-    @FXML
-    void handleMinimumColor(ActionEvent event) {
-    	XYPlot plot = currentChart.getXYPlot();
-    	XYPlot plot2 = currentZoomChart.getXYPlot();
-    	XYDataset dataset = plot.getDataset();
-    	XYDataset dataset2 = plot2.getDataset();
-    	java.awt.Color initialColor = main_package.getPlot_preferences().getSeriesColorRGB();
-        java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
-        main_package.getPlot_preferences().setMinimumDotColorRGB(newColor);
-        plot.clearAnnotations();
-        plot2.clearAnnotations();
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
-	        	double x = dataset.getXValue(0, x1);
-	        	double y = dataset.getYValue(0, x1);
-	        	if (valid_maximum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
-	        	}
-	        	if (valid_minimum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
-	        	}
-	        	if (first_points.contains(x1) && !valid_minimum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
-	        	}
-	        	if (fifth_points.contains(x1) && !valid_minimum_list.contains(x1)  && !first_points.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
-	        	}
-	        }
-		}
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
-	        	double x = dataset2.getXValue(0, x1);
-	        	double y = dataset2.getYValue(0, x1);
-	        	if (valid_maximum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
-	        	}
-	        	if (valid_minimum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
-	        	}
-	        	if (first_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
-	        	}
-	        	if (fifth_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)  && !first_points.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
-	        	}
-	        }
-		}
-    }
-	
-    @FXML
-    void handleMaximumColor(ActionEvent event) {
-    	XYPlot plot = currentChart.getXYPlot();
-    	XYPlot plot2 = currentZoomChart.getXYPlot();
-    	XYDataset dataset = plot.getDataset();
-    	XYDataset dataset2 = plot2.getDataset();
-    	java.awt.Color initialColor = main_package.getPlot_preferences().getSeriesColorRGB();
-        java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
-        main_package.getPlot_preferences().setMaximumDotColorRGB(newColor);
-        plot.clearAnnotations();
-        plot2.clearAnnotations();
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
-	        	double x = dataset.getXValue(0, x1);
-	        	double y = dataset.getYValue(0, x1);
-	        	if (valid_maximum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
-	        	}
-	        	if (valid_minimum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
-	        	}
-	        	if (first_points.contains(x1) && !valid_minimum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
-	        	}
-	        	if (fifth_points.contains(x1) && !valid_minimum_list.contains(x1)  && !first_points.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
-	        	}
-	        }
-		}
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
-	        	double x = dataset2.getXValue(0, x1);
-	        	double y = dataset2.getYValue(0, x1);
-	        	if (valid_maximum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
-	        	}
-	        	if (valid_minimum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
-	        	}
-	        	if (first_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
-	        	}
-	        	if (fifth_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)  && !first_points.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
-	        	}
-	        }
-		}
-    }
-    
-    @FXML
-    void handleFirstColor(ActionEvent event) {
-    	XYPlot plot = currentChart.getXYPlot();
-    	XYPlot plot2 = currentZoomChart.getXYPlot();
-    	XYDataset dataset = plot.getDataset();
-    	XYDataset dataset2 = plot2.getDataset();
-    	java.awt.Color initialColor = main_package.getPlot_preferences().getSeriesColorRGB();
-        java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
-        main_package.getPlot_preferences().setFirstDotColorRGB(newColor);
-        plot.clearAnnotations();
-        plot2.clearAnnotations();
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
-	        	double x = dataset.getXValue(0, x1);
-	        	double y = dataset.getYValue(0, x1);
-	        	if (valid_maximum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
-	        	}
-	        	if (valid_minimum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
-	        	}
-	        	if (first_points.contains(x1) && !valid_minimum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
-	        	}
-	        	if (fifth_points.contains(x1) && !valid_minimum_list.contains(x1)  && !first_points.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
-	        	}
-	        }
-		}
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
-	        	double x = dataset2.getXValue(0, x1);
-	        	double y = dataset2.getYValue(0, x1);
-	        	if (valid_maximum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
-	        	}
-	        	if (valid_minimum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
-	        	}
-	        	if (first_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
-	        	}
-	        	if (fifth_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)  && !first_points.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
-	        	}
-	        }
-		}
-    }
-    
-    @FXML
-    void handleLastColor(ActionEvent event) {
-    	XYPlot plot = currentChart.getXYPlot();
-    	XYPlot plot2 = currentZoomChart.getXYPlot();
-    	XYDataset dataset = plot.getDataset();
-    	XYDataset dataset2 = plot2.getDataset();
-    	java.awt.Color initialColor = main_package.getPlot_preferences().getSeriesColorRGB();
-        java.awt.Color newColor = JColorChooser.showDialog(null, "Choose Peak minimum color", initialColor);
-        main_package.getPlot_preferences().setLastDotColorRGB(newColor);
-        plot.clearAnnotations();
-        plot2.clearAnnotations();
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
-	        	double x = dataset.getXValue(0, x1);
-	        	double y = dataset.getYValue(0, x1);
-	        	if (valid_maximum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
-	        	}
-	        	if (valid_minimum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
-	        	}
-	        	if (first_points.contains(x1) && !valid_minimum_list.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
-	        	}
-	        	if (fifth_points.contains(x1) && !valid_minimum_list.contains(x1)  && !first_points.contains(x1)) {
-	        		plot.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
-	        	}
-	        }
-		}
-		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
-	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
-	        	double x = dataset2.getXValue(0, x1);
-	        	double y = dataset2.getYValue(0, x1);
-	        	if (valid_maximum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMaximumDotColorRGB()));
-	        	}
-	        	if (valid_minimum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getMinimumDotColorRGB()));
-	        	}
-	        	if (first_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getFirstDotColorRGB()));
-	        	}
-	        	if (fifth_points.contains(x1 + zoomMinValue) && !valid_minimum_list.contains(x1 + zoomMinValue)  && !first_points.contains(x1 + zoomMinValue)) {
-	        		plot2.addAnnotation(new XYCircleAnnotation(x, y, 5.0, main_package.getPlot_preferences().getLastDotColorRGB()));
-	        	}
-	        }
-		}
+    	ShowMultMarkerColorThickDialog.showDialog(main_package, plot, plot2, intervalsList, valid_maximum_list, valid_minimum_list, first_points, fifth_points, last_addition);
     }
     
     @FXML
@@ -680,7 +349,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		dialogAverageSet.setResizable(true);
 		Label label1 = new Label("Average Value (µ/s): ");
 		Spinner<Double> averageSetSpin = new Spinner<Double>();
-		SpinnerValueFactory<Double> dobFacN = new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE, average_value, 0.01);
+		SpinnerValueFactory<Double> dobFacN = facGen(0, Double.MAX_VALUE, average_value, 0.01);
 		averageSetSpin.setValueFactory(dobFacN);
 		averageSetSpin.setEditable(true);
 		TextFormatter<Double> formatter1n = new TextFormatter<Double>(dobFacN.getConverter(), dobFacN.getValue());
@@ -695,7 +364,6 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 				valid_minimum_list.clear();
 				first_points.clear();
 				fifth_points.clear();
-				//writeLinePlotPop();
 				rewriteLinePlotPop();
 				//redraw markers to avoid caos
 				XYPlot fplot = (XYPlot) currentChart.getPlot();
@@ -712,51 +380,6 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 				e.printStackTrace();
 			}
 		});
-		
-//		averageSetSpin.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, Double.MAX_VALUE, average_value, 0.01));
-//		averageSetSpin.setEditable(true);
-//		IncrementHandler handler_x = new IncrementHandler();
-//		averageSetSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, handler_x);
-//		averageSetSpin.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_RELEASED, evt -> {
-//			Node node = evt.getPickResult().getIntersectedNode();
-//			if (node.getStyleClass().contains("increment-arrow-button") ||
-//					node.getStyleClass().contains("decrement-arrow-button")) {
-//				if (evt.getButton() == MouseButton.PRIMARY) {
-//					handler_x.stop();
-//				}
-//			}
-//		});
-//		averageSetSpin.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				average_value = Double.valueOf(newValue);
-//				maximum_list.clear();
-//				minimum_list.clear();
-//				valid_maximum_list.clear();
-//				valid_minimum_list.clear();
-//				first_points.clear();
-//				fifth_points.clear();
-//				writeLinePlotPop();
-//				//redraw markers to avoid caos
-//				XYPlot fplot = (XYPlot) currentChart.getPlot();
-////				intervalsList.clear();
-//				for (IntervalMarker az : intervalsList) {
-//					az.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
-//					az.setAlpha(main_package.getPlot_preferences().getMarkerAlpha());
-//					fplot.addDomainMarker(az,Layer.BACKGROUND);
-//				}
-//				writeFlowLinePlotZoom(last_min_zoom, last_max_zoom, last_addition);
-//				//reset previous zoom
-//				
-//				main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//		});
-//		averageSetSpin.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//			if (newValue == false) {
-//				averageSetSpin.increment(0);
-//			} 
-//		});
 
 		GridPane grid = new GridPane();
 		grid.add(label1, 1, 1);
@@ -813,8 +436,13 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     
     @FXML
 	void nextPageNavigate(ActionEvent event) throws IOException, ClassNotFoundException {
+
+		Alert alert = new Alert(AlertType.WARNING);
+		alert.setTitle("Warning");
+		alert.setContentText("Please select a Cycle in the Upper Plot by clicking and dragging.");
 		if(intervalsList.size() == 0) {
-			JOptionPane.showMessageDialog(null, "Please select a Cycle in the Upper Plot by clicking and dragging.");
+//			JOptionPane.showMessageDialog(null, "Please select a Cycle in the Upper Plot by clicking and dragging.");
+			alert.showAndWait();
 			return;
 		}
     	Stage primaryStage = (Stage) cmdNext.getScene().getWindow();
@@ -853,7 +481,27 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		pixel_val = pixel_val1;
 		currentGroup = g1;
 		timespeedlist = timespeedlist2;
-		double delta1 = main_package.getDelta() * fps_val * pixel_val;
+		double delta1 = 1.0 * fps_val * pixel_val;
+//		if (main_package.getDelta() > 0) {
+//			delta1 = main_package.getDelta() * fps_val * pixel_val;
+//		} else {
+//			double median = 0.0;
+//			List<Double> to_median = new ArrayList<Double>();
+//			for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
+//				double average = currentGroup.getMagnitudeListValue(i);
+//				double avg2 = Double.valueOf((average * fps_val * pixel_val) - (average_value));
+//				to_median.add(avg2);
+//			}
+//			if (to_median.size() % 2 == 0) {
+//				median = (to_median.get((to_median.size() / 2)-1) + to_median.get(to_median.size() / 2)) / 2.0;
+//			} else {
+//				median = to_median.get( (int) (( (double) to_median.size() / 2.0) - 0.5));
+//			}
+////			delta1 = median;
+//			delta1 = 1.0 * fps_val * pixel_val;
+//			main_package.setDelta(median / fps_val / pixel_val);
+//		}
+		System.out.println("Delta: " + (main_package.getDelta() * fps_val * pixel_val));
 		double inter1 = main_package.getInter();
 		double intra1 = main_package.getIntra();
 		resetAndRun();
@@ -904,31 +552,15 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		deltaFac.valueProperty().bindBidirectional(formatter.valueProperty());
 		formatter.valueProperty().addListener((s, ov, nv) -> {
 		    // do stuff that needs to be done on commit
-//			intervalsList.clear();
-//			maximum_list.clear();
-//			minimum_list.clear();
-//			valid_maximum_list.clear();
-//			valid_minimum_list.clear();
-//			first_points.clear();
-//			fifth_points.clear();
-//			System.out.print("Delta change");
-//			writeLinePlotPop();
-//			last_min_zoom = 0;
-//			last_max_zoom = currentGroup.getMagnitudeSize();
-//			last_addition = 0;
-//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-//			main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
 			maximum_list.clear();
 			minimum_list.clear();
 			valid_maximum_list.clear();
 			valid_minimum_list.clear();
 			first_points.clear();
 			fifth_points.clear();
-			//writeLinePlotPop();
 			rewriteLinePlotPop();
 			//redraw markers to avoid caos
 			XYPlot fplot = (XYPlot) currentChart.getPlot();
-//			intervalsList.clear();
 			for (IntervalMarker az : intervalsList) {
 				az.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());
 				az.setAlpha(main_package.getPlot_preferences().getMarkerAlpha());
@@ -936,76 +568,22 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 			}
 			writeFlowLinePlotZoom(last_min_zoom, last_max_zoom, last_addition);
 			main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
-			
 		});
-//		spinnerDelta.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				maximum_list.clear();
-//				minimum_list.clear();
-//				valid_maximum_list.clear();
-//				valid_minimum_list.clear();
-//				first_points.clear();
-//				fifth_points.clear();
-//				System.out.print("Delta change");
-//				writeLinePlotPop();
-//				last_min_zoom = 0;
-//				last_max_zoom = currentGroup.getMagnitudeSize();
-//				last_addition = 0;
-//				writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-//				main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//	    });
-		
-		
-//		spinnerDelta.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//			maximum_list.clear();
-//			minimum_list.clear();
-//			valid_maximum_list.clear();
-//			valid_minimum_list.clear();
-//			first_points.clear();
-//			fifth_points.clear();
-//			System.out.print("Delta unfocus");
-//			writeLinePlotPop();
-//			last_min_zoom = 0;
-//			last_max_zoom = currentGroup.getMagnitudeSize();
-//			last_addition = 0;
-//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-//			main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
-//			if (newValue == false) {
-//				spinnerDelta.increment(0);
-//			} 
-//		});
-		
+
 		SpinnerValueFactory intraFac = facGen(0.0, 10000.0, 0.1, 0.01);
 		spinnerIntra.setValueFactory(intraFac);
 		spinnerIntra.setEditable(true);
 		
 		TextFormatter formatter2 = new TextFormatter(intraFac.getConverter(), intraFac.getValue());
 		intraFac.valueProperty().bindBidirectional(formatter2.valueProperty());
+		spinnerIntra.getEditor().setTextFormatter(formatter2);
 		formatter2.valueProperty().addListener((s, ov, nv) -> {
-		    // do stuff that needs to be done on commit
-//			intervalsList.clear();
-//			maximum_list.clear();
-//			minimum_list.clear();
-//			valid_maximum_list.clear();
-//			valid_minimum_list.clear();
-//			first_points.clear();
-//			fifth_points.clear();
-//			System.out.print("Delta change");
-//			writeLinePlotPop();
-//			last_min_zoom = 0;
-//			last_max_zoom = currentGroup.getMagnitudeSize();
-//			last_addition = 0;
-//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
 			maximum_list.clear();
 			minimum_list.clear();
 			valid_maximum_list.clear();
 			valid_minimum_list.clear();
 			first_points.clear();
 			fifth_points.clear();
-//			writeLinePlotPop();
 			rewriteLinePlotPop();
 			//redraw markers to avoid caos
 			XYPlot fplot = (XYPlot) currentChart.getPlot();
@@ -1019,71 +597,19 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 			main_package.setIntra(Double.valueOf(spinnerIntra.getValue()));
 		});
 		
-//		spinnerIntra.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				System.out.println("Change detected");
-//				maximum_list.clear();
-//				minimum_list.clear();
-//				valid_maximum_list.clear();
-//				valid_minimum_list.clear();
-//				first_points.clear();
-//				fifth_points.clear();
-//				System.out.print("Intra change");
-//				writeLinePlotPop();
-//				last_min_zoom = 0;
-//				last_max_zoom = currentGroup.getMagnitudeSize();
-//				last_addition = 0;
-//				writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-//				main_package.setIntra(Double.valueOf(spinnerIntra.getValue()));
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//	    });
-//		spinnerIntra.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//			maximum_list.clear();
-//			minimum_list.clear();
-//			valid_maximum_list.clear();
-//			valid_minimum_list.clear();
-//			first_points.clear();
-//			fifth_points.clear();
-//			System.out.print("Intra unfocus");
-//			writeLinePlotPop();
-//			last_min_zoom = 0;
-//			last_max_zoom = currentGroup.getMagnitudeSize();
-//			last_addition = 0;
-//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-//			main_package.setIntra(Double.valueOf(spinnerIntra.getValue()));
-//			if (newValue == false) {
-//				spinnerIntra.increment(0);
-//			} 
-//		});
 		SpinnerValueFactory interFac = facGen(0.0, 10000.0, 0.1, 0.01);
 		spinnerInter.setValueFactory(interFac);
 		spinnerInter.setEditable(true);
 		TextFormatter formatter3 = new TextFormatter(interFac.getConverter(), interFac.getValue());
 		interFac.valueProperty().bindBidirectional(formatter3.valueProperty());
+		spinnerInter.getEditor().setTextFormatter(formatter3);
 		formatter3.valueProperty().addListener((s, ov, nv) -> {
-		    // do stuff that needs to be done on commit
-//			intervalsList.clear();
-//			maximum_list.clear();
-//			minimum_list.clear();
-//			valid_maximum_list.clear();
-//			valid_minimum_list.clear();
-//			first_points.clear();
-//			fifth_points.clear();
-//			System.out.print("Delta change");
-//			writeLinePlotPop();
-//			last_min_zoom = 0;
-//			last_max_zoom = currentGroup.getMagnitudeSize();
-//			last_addition = 0;
-//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
 			maximum_list.clear();
 			minimum_list.clear();
 			valid_maximum_list.clear();
 			valid_minimum_list.clear();
 			first_points.clear();
 			fifth_points.clear();
-//			writeLinePlotPop();
 			rewriteLinePlotPop();
 			//redraw markers to avoid caos
 			XYPlot fplot = (XYPlot) currentChart.getPlot();
@@ -1096,43 +622,6 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 			writeFlowLinePlotZoom(last_min_zoom, last_max_zoom, last_addition);
 			main_package.setInter(Double.valueOf(spinnerInter.getValue()));
 		});
-//		spinnerInter.getEditor().textProperty().addListener((obs, oldValue, newValue) -> {
-//			try {
-//				maximum_list.clear();
-//				minimum_list.clear();
-//				valid_maximum_list.clear();
-//				valid_minimum_list.clear();
-//				first_points.clear();
-//				fifth_points.clear();
-//				System.out.print("Inter change");
-//				writeLinePlotPop();
-//				last_min_zoom = 0;
-//				last_max_zoom = currentGroup.getMagnitudeSize();
-//				last_addition = 0;
-//				writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-//				main_package.setInter(Double.valueOf(spinnerInter.getValue()));
-//			} catch (java.lang.Exception e) {
-//				e.printStackTrace();
-//			}
-//	    });
-//		spinnerInter.focusedProperty().addListener((obs, oldValue, newValue) -> {
-//			maximum_list.clear();
-//			minimum_list.clear();
-//			valid_maximum_list.clear();
-//			valid_minimum_list.clear();
-//			first_points.clear();
-//			fifth_points.clear();
-//			System.out.print("Inter unfocus");
-//			writeLinePlotPop();
-//			last_min_zoom = 0;
-//			last_max_zoom = currentGroup.getMagnitudeSize();
-//			last_addition = 0;
-//			writeFlowLinePlotZoom(0, currentGroup.getMagnitudeSize(), 0);
-//			main_package.setInter(Double.valueOf(spinnerInter.getValue()));
-//	        if (newValue == false) {
-//	        	spinnerInter.increment(0);
-//	        } 
-//		});
 	}
 	
 	@FXML
@@ -1254,6 +743,209 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 
     private List<Integer> first_points = new ArrayList<Integer>();		
     private List<Integer> fifth_points = new ArrayList<Integer>();
+       
+    private void newPeakDetectionAlgorithm2() {
+    	double delta = spinnerDelta.getValue();
+    	double intraPeaks = spinnerIntra.getValue();
+    	
+
+    	List<Integer> possible_max = new ArrayList<Integer>();
+    	List<Integer> possible_f = new ArrayList<Integer>();
+    	possible_f.add(0);
+//    	possible_f.add(currentGroup.getMagnitudeSize()-1);
+    	List<Integer> possible_l = new ArrayList<Integer>();
+//    	possible_l.add(currentGroup.getMagnitudeSize()-1);
+    	
+    	double time_step = dataset_general.getYValue(0, 1);
+    	if (intraPeaks < time_step) {
+    		return;
+    	}
+    	    	
+    	for (int point = 0; point < currentGroup.getMagnitudeSize(); point++) {
+    		double speed = dataset_general.getYValue(0, point);
+			boolean prev_tendency = true;
+    		boolean prev_tendency2 = true;
+			if (point > 0) {
+	    		prev_tendency2 = false;
+				double previous_speed = dataset_general.getYValue(0, point-1);
+				double delta_back = speed - previous_speed;
+				if (speed <= 0 && delta_back < 0) {
+					prev_tendency2 = true;
+				}
+			}
+			
+    		boolean next_tendency = true;
+    		if (point < currentGroup.getMagnitudeSize()-1) {
+    			prev_tendency = false;
+    			next_tendency = false;
+    			//calculate next tendency
+    			double next_speed = dataset_general.getYValue(0, point+1);
+    			double delta_front = speed - next_speed;
+				if (speed <= 0 && next_speed > 0) {
+					prev_tendency = true;
+				}
+    			if (speed <= 0 && delta_front < 0) {
+    				next_tendency = true;
+    			}
+    		}
+    		if (speed > delta) {
+    			possible_max.add(point);
+    		} else if (speed <= 0) {
+    			if (prev_tendency == true) {
+    				if (possible_f.contains(point) ==  false) {
+    					possible_f.add(point);
+    				}
+    			}
+    			if (prev_tendency2 == true && next_tendency == true) {
+    				if (possible_l.contains(point) ==  false) {
+    					possible_l.add(point);
+    				}
+    			}
+    		}
+    	}
+
+		if (possible_f.contains(currentGroup.getMagnitudeSize()-1) ==  false) {
+			possible_f.add(currentGroup.getMagnitudeSize()-1);
+		}
+		if (possible_l.contains(currentGroup.getMagnitudeSize()-1) ==  false) {
+			possible_l.add(currentGroup.getMagnitudeSize()-1);
+		}
+		
+    	//validate all possible first, last pairs by maximum interpeak distance AND by a minimum of two points bigger than delta
+    	List<Integer> first_possible_list = new ArrayList<Integer>();
+    	List<Integer> last_possible_list = new ArrayList<Integer>();
+    	LinkedHashMap<String, List<Integer>> first_to_max = new LinkedHashMap<String, List<Integer>>();
+    	for (int s : possible_f) {
+    		double time1 = dataset_general.getXValue(0, s);
+    		for (int e : possible_l) {
+    			if (e > s) {
+	    			double time2 = dataset_general.getXValue(0, e);
+	    			double time_delta = time2 - time1;
+//	    			System.out.println(s + " " + e + ": " + time_delta + " " + intraPeaks);
+	    			if (time_delta <= intraPeaks && e - s > 4) { //interval from start to end smaller than intraPeaks but bigger than 4
+	    				IntStream a = IntStream.range(s, e); 
+	    				List<Integer> between = a.boxed().collect(Collectors.toList()); //get all values between start and end
+	    				List<Integer> duplicates = new ArrayList<Integer>(between); 
+	    				duplicates.retainAll(possible_max); //get all above delta between start and end
+	    				if (duplicates.size() >= 2) { //if two or more above delta, add first and last as possible points to explore
+	    			    	//compare pairs and in case of same first or last remove ones with smaller index
+	    					if (first_possible_list.contains(s)) {
+	    						int s_index = first_possible_list.indexOf(s);
+	    						int other_e = last_possible_list.get(s_index);
+	    						if (e < other_e) {
+	    							first_possible_list.add(s_index, s);
+	    							first_possible_list.remove(s_index+1);
+	    							last_possible_list.add(s_index, e);
+	    							last_possible_list.remove(s_index+1);
+	    							first_to_max.remove(String.valueOf(s) + "_" + String.valueOf(other_e));
+			    					first_to_max.put(String.valueOf(s) + "_" + String.valueOf(e), duplicates);
+	    						}
+	    					} else if (last_possible_list.contains(e)) {
+	    						int e_index = last_possible_list.indexOf(e);
+	    						int other_s = first_possible_list.get(e_index);
+	    						if (s > other_s) {
+	    							first_possible_list.add(e_index, s);
+	    							first_possible_list.remove(e_index+1);
+	    							last_possible_list.add(e_index, e);
+	    							last_possible_list.remove(e_index+1);
+	    							first_to_max.remove(String.valueOf(other_s) + "_" + String.valueOf(e));
+			    					first_to_max.put(String.valueOf(s) + "_" + String.valueOf(e), duplicates);
+	    						}
+	    					} else {
+	    						first_possible_list.add(s);
+	    						last_possible_list.add(e);
+		    					first_to_max.put(String.valueOf(s) + "_" + String.valueOf(e), duplicates);
+	    					}
+	    				}
+	    			}
+    			}
+    		}
+		}
+//    	System.out.println("Printing lists2:");
+//    	System.out.println(first_possible_list.toString());
+//    	System.out.println(last_possible_list.toString());
+    	
+    	for (int i = 0; i < first_possible_list.size(); i++) {
+    		int first = first_possible_list.get(i);
+    		int last = last_possible_list.get(i);
+    		boolean jump = false;
+    		for (int k = 0; k < first_points.size(); k++) {
+    			int f_dot = first_points.get(k);
+    			int l_dot = fifth_points.get(k);
+				if (last < f_dot || last < l_dot) {
+					jump = true;
+					break;
+				}
+			}
+    		if (jump == true) {
+    			continue;
+    		}
+//        	System.out.println("Allowed!");
+    		int min = -1;
+    		double min_value = Double.MAX_VALUE;
+    		int max1 = -1;
+    		double max_value1 = Double.MIN_VALUE;
+    		int max2 = -1;
+    		double max_value2 = Double.MIN_VALUE;
+    		List<Integer> current_maximums = first_to_max.get(String.valueOf(first) + "_" + String.valueOf(last));
+//    		System.out.println("Maximums: " + current_maximums.toString());
+			//get smallest minimum between first and last and two possible maximums
+    		for (int first_plus = first+1; first_plus < last-1; first_plus++) {
+    			double current_speed = dataset_general.getYValue(0, first_plus);
+				double prev_speed = dataset_general.getYValue(0, first_plus-1);
+				double delta_prev = current_speed - prev_speed;
+				double next_speed = dataset_general.getYValue(0, first_plus+1);
+				double delta_next = current_speed - next_speed;
+				if (delta_prev < 0 && delta_next < 0) { //check if is a well
+//	    			System.out.println("Found well! well: " + first_plus);
+					boolean smaller_find = false;
+					boolean bigger_find = false;
+					for (int a : current_maximums) { //check if well is between any two maximums
+						if (a < first_plus) {
+//							System.out.println("Found max smaller than! well: " + first_plus);
+							smaller_find = true;
+						} else if (a > first_plus) {
+//							System.out.println("Found max bigger than! well: " + first_plus);
+							bigger_find = true;
+						} 
+					}
+					if (smaller_find == true && bigger_find == true && current_speed < min_value) { //get smallest well
+//						System.out.println("Found small well! well: " + first_plus);
+						min_value = current_speed;
+						min = first_plus;
+					}
+				}
+			}
+    		if (min > 0) {
+//    			System.out.println("Found Min! Min: " + min);
+    			//from smallest well to first get biggest point
+    			for (int j = first; j < min; j++) {
+    				double speed_this = dataset_general.getYValue(0, j);
+    				if (speed_this > max_value1) {
+    					max_value1 = speed_this;
+    					max1 = j;
+    				}
+    			}
+    			//from smallest well to last get biggest point
+    			for (int j = min; j < last; j++) {
+    				double speed_this = dataset_general.getYValue(0, j);
+    				if (speed_this > max_value2) {
+    					max_value2 = speed_this;
+    					max2 = j;
+    				}
+    			}
+    			if (max1 > -1 && max2 > -1) {
+//    				System.out.println("Found Max 1 and 2! Max 1: " + max1 + " Max2: " + max2);
+        			first_points.add(first);
+            		valid_maximum_list.add(max1);
+            		valid_maximum_list.add(max2);
+            		valid_minimum_list.add(min);
+        			fifth_points.add(last);
+    			}
+    		}	
+		}
+    }
+    
     
 	private void peakDetectionAlgorithm(double delta) {
 		//estimacao de janela http://paulbourke.net/fractals/fracdim/		
@@ -1315,10 +1007,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         		pre_valid_list.add(next_maximum_index);
         		max_cycle = true;
         		last_peak_dist = next_value;
-        		//skip added points
-        		z++;
-//        		minFlag = false;
-//        		maxFlag = true;
+        		z++; //skip added points
         	}
         	if (max_cycle == true  && intra_distance <= minIntra) {
         		double inter_distance = first_value - last_peak_dist;
@@ -1416,7 +1105,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Main Plot",
             "Time (s)",
-            "Speed (\u00B5m/s)",
+            "Average Speed (\u00B5m/s)",
             dataset,
             PlotOrientation.VERTICAL,
             true,
@@ -1459,10 +1148,11 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         	renderer.setSeriesStroke(0, new java.awt.BasicStroke(main_package.getPlot_preferences().getLineThickness()));
         }
         //https://stackoverflow.com/questions/11350380/place-a-circle-on-top-of-an-xylinechart-in-jfreechart
-        double delta = spinnerDelta.getValue() / fps_val / pixel_val;
+//        double delta = spinnerDelta.getValue() / fps_val / pixel_val;
 		
 		//maximum and minimum detection
-		peakDetectionAlgorithm(delta);
+//		peakDetectionAlgorithm(delta);
+		newPeakDetectionAlgorithm2();
 		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && main_package.getPlot_preferences().isDrawAnnotations() == true) {
 	        for(int x1 = 0; x1 < dataset.getItemCount(0); x1++){
 	        	double x = dataset.getXValue(0, x1);
@@ -1820,7 +1510,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
         JFreeChart chart = ChartFactory.createXYLineChart(
             "Zoom Plot",
             "Time (s)",
-            "Speed (\u00B5m/s)",
+            "Average Speed (\u00B5m/s)",
             dataset,
             PlotOrientation.VERTICAL,
             true,
