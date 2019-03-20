@@ -21,7 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Controller_3e_ViewJetQuiverMergeSingle">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.71" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Controller_3e_ViewJetQuiverMergeSingle">
    <top>
       <VBox maxHeight="300.0" BorderPane.alignment="CENTER">
          <children>
@@ -190,8 +190,14 @@
                      <children>
                         <VBox alignment="CENTER_LEFT">
                            <children>
-                              <CheckBox fx:id="quiverCheck" mnemonicParsing="false" text="Vector Field" />
-                              <CheckBox fx:id="jetCheck" mnemonicParsing="false" text="Magnitude Field" />
+                              <CheckBox fx:id="quiverCheck" mnemonicParsing="false" text="Vector Field">
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin></CheckBox>
+                              <CheckBox fx:id="jetCheck" mnemonicParsing="false" text="Magnitude Field">
+                                 <VBox.margin>
+                                    <Insets bottom="10.0" />
+                                 </VBox.margin></CheckBox>
                               <CheckBox fx:id="mergeCheck" mnemonicParsing="false" text="Original Image" />
                            </children>
                         </VBox>
@@ -217,13 +223,19 @@
                                     <Font size="12.0" />
                                  </font>
                               </Label>
-                              <Spinner fx:id="spinnerMask" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+                              <Spinner fx:id="spinnerMask" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
+                                 <GridPane.margin>
+                                    <Insets bottom="5.0" />
+                                 </GridPane.margin></Spinner>
                               <Label text="Color Scale Start (μm/s):" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="1" GridPane.valignment="CENTER">
                                  <font>
                                     <Font size="12.0" />
                                  </font>
                               </Label>
-                              <Spinner fx:id="spinnerScaleStart" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                              <Spinner fx:id="spinnerScaleStart" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets bottom="5.0" />
+                                 </GridPane.margin></Spinner>
                               <Spinner fx:id="spinnerScaleEnd" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                               <Label text="Color Scale End (μm/s):" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                                  <font>
@@ -259,7 +271,7 @@
                   </GridPane>
                </children>
             </HBox>
-            <HBox maxHeight="200.0" maxWidth="640.0" prefHeight="200.0" prefWidth="640.0" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.rowSpan="4" GridPane.valignment="BOTTOM">
+            <HBox maxHeight="200.0" maxWidth="640.0" prefHeight="200.0" prefWidth="640.0" GridPane.columnIndex="1" GridPane.columnSpan="10" GridPane.halignment="CENTER" GridPane.rowIndex="12" GridPane.rowSpan="5" GridPane.valignment="BOTTOM">
                <children>
                   <GridPane HBox.hgrow="ALWAYS">
                      <columnConstraints>
@@ -273,6 +285,9 @@
                      </children>
                   </GridPane>
                </children>
+               <GridPane.margin>
+                  <Insets bottom="10.0" />
+               </GridPane.margin>
             </HBox>
             <Slider fx:id="sliderGroups" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER" GridPane.rowIndex="18" />
             <Button fx:id="cmdSliderPlay" mnemonicParsing="false" onAction="#handlePlayStopButton" text="Play" GridPane.columnIndex="9" GridPane.rowIndex="18">

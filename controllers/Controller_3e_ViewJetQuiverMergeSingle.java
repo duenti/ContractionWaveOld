@@ -19,15 +19,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JColorChooser;
-import javax.swing.JOptionPane;
 import javax.swing.border.Border;
 
 import org.apache.commons.math3.stat.descriptive.rank.Median;
@@ -114,6 +111,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.scene.transform.Affine;
 import javafx.scene.transform.Transform;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -481,17 +479,29 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	}
 	
 	void genericVideoExportation(String type_do) throws IOException, InterruptedException {
-    	DirectoryChooser chooser = new DirectoryChooser();
+    	FileChooser chooser = new FileChooser();
+    	
+		
+		//DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Saving path selection:");
         chooser.setInitialDirectory(getInitialDirectory().toFile());
     	Stage primaryStage;
     	primaryStage = (Stage) sliderGroups.getScene().getWindow();
-        File chosenDir = chooser.showDialog(primaryStage);
-        current_filename = chosenDir.getAbsolutePath().toString() + File.separator + currentGroup.getName() + "_" + type_do.replace("Jet", "Mag").replace("Quiver", "Vect") + ".mp4";
+        
+    	FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("MP4 files (*.mp4)", "*.mp4");
+        chooser.getExtensionFilters().add(extFilter);
+    	
+    	//File chosenDir = chooser.showDialog(primaryStage);
+        File file = chooser.showSaveDialog(primaryStage);
+    	
+        if(file == null) return;
+                
+        //current_filename = chosenDir.getAbsolutePath().toString() + File.separator + currentGroup.getName() + "_" + type_do.replace("Jet", "Mag").replace("Quiver", "Vect") + ".mp4";
         waitCursor();
         save_as_video = true;
         Rational framerate_do = Rational.make(1, (int)frameRate);
-        Muxer muxer = Muxer.make(current_filename, null, "mp4");
+        //Muxer muxer = Muxer.make(current_filename, null, "mp4");
+        Muxer muxer = Muxer.make(file.getCanonicalPath(), null, "mp4");
         MuxerFormat format = muxer.getFormat();
         Codec codec = Codec.findEncodingCodec(format.getDefaultVideoCodecId());
 //        System.out.println(codec.toString());

@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.embed.swing.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.embed.swing.SwingNode?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -16,7 +22,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Controller_3c_PeakDetectMean">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Controller_3c_PeakDetectMean">
    <top>
       <VBox maxHeight="300.0" BorderPane.alignment="CENTER">
          <children>
@@ -113,8 +119,11 @@
                         <Font size="17.0" />
                      </font>
                   </Label>
-                  <SwingNode fx:id="swgChart" GridPane.columnIndex="1" GridPane.columnSpan="11" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.rowSpan="5" GridPane.valignment="CENTER" />
-                  <HBox alignment="CENTER" GridPane.columnIndex="4" GridPane.columnSpan="5" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER">
+                  <SwingNode fx:id="swgChart" GridPane.columnIndex="1" GridPane.columnSpan="11" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.rowSpan="8" GridPane.valignment="CENTER">
+                     <GridPane.margin>
+                        <Insets top="30.0" />
+                     </GridPane.margin></SwingNode>
+                  <HBox alignment="CENTER" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="CENTER">
                      <children>
                         <Label alignment="CENTER_RIGHT" text="Selected area Average value (µm/s):">
                            <HBox.margin>
@@ -127,9 +136,15 @@
                            </HBox.margin>
                         </TextField>
                      </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <GridPane.margin>
+                        <Insets left="20.0" right="20.0" />
+                     </GridPane.margin>
                   </HBox>
-                  <Button fx:id="btnZoomMode" mnemonicParsing="false" onAction="#handleZoomMode" text="Zoom Mode" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
-                  <Button fx:id="btnSelectMode" mnemonicParsing="false" onAction="#handleSelectMode" text="Select Mode" GridPane.columnIndex="10" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER" />
+                  <Button fx:id="btnZoomMode" mnemonicParsing="false" onAction="#handleZoomMode" text="Zoom Mode" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="CENTER" />
+                  <Button fx:id="btnSelectMode" mnemonicParsing="false" onAction="#handleSelectMode" text="Select Mode" GridPane.columnIndex="10" GridPane.columnSpan="2" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="CENTER" />
                </children>
             </GridPane>
          </children>

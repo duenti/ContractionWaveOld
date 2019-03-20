@@ -88,7 +88,7 @@ public class Main extends Application {
 		    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
 		        Parent root;
 		    	root = fxmlloader.load();
-		    	Scene scene = new Scene(root);
+		    	Scene scene = new Scene(root,920,690);
 				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
 				primaryStage.setTitle("ContractionWave - Welcome");
 				//primaryStage.setMaximized(true);
@@ -102,7 +102,7 @@ public class Main extends Application {
 		    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
 		        Parent root;
 		    	root = fxmlloader.load();
-		    	Scene scene = new Scene(root);
+		    	Scene scene = new Scene(root,920,690);
 				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
 				primaryStage.setTitle("ContractionWave - Welcome");
 				//primaryStage.setMaximized(true);
@@ -117,7 +117,7 @@ public class Main extends Application {
 		    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
 		        Parent root;
 		    	root = fxmlloader.load();
-		    	Scene scene = new Scene(root);
+		    	Scene scene = new Scene(root,920,690);
 				((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
 				primaryStage.setTitle("ContractionWave - Welcome");
 				//primaryStage.setMaximized(true);
@@ -139,7 +139,7 @@ public class Main extends Application {
 	    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
 	        Parent root;
 	    	root = fxmlloader.load();
-	    	Scene scene = new Scene(root);
+	    	Scene scene = new Scene(root,920,690);
 			((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
 			primaryStage.setTitle("ContractionWave - Welcome");
 			//primaryStage.setMaximized(true);

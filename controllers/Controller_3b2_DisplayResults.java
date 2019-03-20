@@ -876,7 +876,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		}
 		
         DecimalFormat df = new DecimalFormat("#.#");
-        df.setMaximumFractionDigits(5);
+        df.setMaximumFractionDigits(2);
         
 		freqFourier.setText(df.format(found_freq) + "");
 //		fourier_freqs = fft_frequency;
