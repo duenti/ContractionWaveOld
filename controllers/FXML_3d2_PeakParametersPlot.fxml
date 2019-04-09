@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import javafx.embed.swing.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 <?import javafx.embed.swing.SwingNode?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -19,7 +25,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Controller_3d2_PeakParametersPlot">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Controller_3d2_PeakParametersPlot">
    <top>
       <VBox maxHeight="300.0" BorderPane.alignment="CENTER">
          <children>
@@ -46,9 +52,8 @@
                     <items>
                         <Menu mnemonicParsing="false" text="Chart Data">
                           <items>
-                            <MenuItem mnemonicParsing="false" onAction="#handleExportXLS" text="XLS" />
                             <MenuItem mnemonicParsing="false" onAction="#handleExportTSV" text="TSV" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportTXT" text="TXT" />
+                            <MenuItem mnemonicParsing="false" onAction="#handleExportXLS" text="XLS" />
                           </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Chart Image">
@@ -62,9 +67,8 @@
                           <items>
                               <Menu mnemonicParsing="false" text="Current">
                                  <items>
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportTableXLS" text="XLS" />
                                     <MenuItem mnemonicParsing="false" onAction="#handleExportTableTSV" text="TSV" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportTableTXT" text="TXT" />
+                                    <MenuItem mnemonicParsing="false" onAction="#handleExportTableXLS" text="XLS" />
                                  </items>
                               </Menu>
                               <Menu mnemonicParsing="false" text="All">

@@ -210,20 +210,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 //		JOptionPane.showMessageDialog(null, "File was saved successfully.");
 		ShowSavedDialog.showDialog();
     }
-    
-    @FXML
-    void handleExportTXT(ActionEvent event) throws Exception{
-    	FileChooser fileChooser = new FileChooser();
-    	fileChooser.setInitialFileName("time-speed.txt");
-        Stage primaryStage;
-    	primaryStage = (Stage) cmdNext.getScene().getWindow();
-        //Show save file dialog
-        File file = fileChooser.showSaveDialog(primaryStage);
-		writeTSV(file);
-//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
-		ShowSavedDialog.showDialog();
-    }
-    
+        
     public void writeTSV(File file) throws Exception {
 	    Writer writer = null;
 	    try {

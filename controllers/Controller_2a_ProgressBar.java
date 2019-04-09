@@ -119,6 +119,7 @@ public class Controller_2a_ProgressBar implements Initializable {
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
     	double prior_X = primaryStage.getX();
     	double prior_Y = primaryStage.getY();
+    	Scene oldScene = primaryStage.getScene();
 		URL url = getClass().getResource("FXML_1_InitialScreen.fxml");
     	FXMLLoader fxmlloader = new FXMLLoader();
     	fxmlloader.setLocation(url);
@@ -128,7 +129,7 @@ public class Controller_2a_ProgressBar implements Initializable {
 
 //    	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
 //    	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
-    	Scene scene = new Scene(root, primaryStage.getWidth(), primaryStage.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
     	killTimeline();
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(main_package);
 		primaryStage.setTitle("ContractionWave - Welcome");

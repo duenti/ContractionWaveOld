@@ -193,20 +193,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		ShowSavedDialog.showDialog();
 		//JOptionPane.showMessageDialog(null, "File was saved successfully.");
     }
-    
-    @FXML
-    void handleExportTXT(ActionEvent event) throws Exception{
-    	FileChooser fileChooser = new FileChooser();
-    	fileChooser.setInitialFileName("time-speed.txt");
-        Stage primaryStage;
-    	primaryStage = (Stage) cmdNext.getScene().getWindow();
-        //Show save file dialog
-        File file = fileChooser.showSaveDialog(primaryStage);
-		writeTSV(file);
-		ShowSavedDialog.showDialog();
-//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
-    }
-    
+        
     @FXML
     void handleExportJPEG(ActionEvent event) throws Exception{
     	FileChooser fileChooser = new FileChooser();

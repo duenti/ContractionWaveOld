@@ -337,20 +337,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 //		JOptionPane.showMessageDialog(null, "File was saved successfully.");
 		ShowSavedDialog.showDialog();
     }
-    
-    @FXML
-    void handleExportTXT(ActionEvent event) throws Exception{
-    	FileChooser fileChooser = new FileChooser();
-    	fileChooser.setInitialFileName("time-speed.txt");
-        Stage primaryStage;
-    	primaryStage = (Stage) cmdNext.getScene().getWindow();
-        //Show save file dialog
-        File file = fileChooser.showSaveDialog(primaryStage);
-		writeTSV(file);
-//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
-		ShowSavedDialog.showDialog();
-    }
-    
+        
     public void writeTSV(File file) throws Exception {
 	    Writer writer = null;
 	    try {
@@ -520,20 +507,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 //    	JOptionPane.showMessageDialog(null, "File was saved successfully.");
 		ShowSavedDialog.showDialog();
     }
-    
-    @FXML
-    void handleExportTableTXT(ActionEvent event) throws Exception{
-    	if (radioGroup.getSelectedToggle().getUserData().equals("time") == true) {
-    		exportTable(timeTableView,1,"time-table.txt"); 
-    	} else if (radioGroup.getSelectedToggle().getUserData().equals("speed") == true) {
-    		exportTable(speedTableView,1,"speed-table.txt");
-    	} else {
-    		exportTable(areaTableView,1,"area-table.txt");
-    	}
-//    	JOptionPane.showMessageDialog(null, "File was saved successfully.");
-		ShowSavedDialog.showDialog();
-    }
-    
+        
     @FXML
     void handleColors(ActionEvent event) {
     	XYPlot plot = currentChart.getXYPlot();

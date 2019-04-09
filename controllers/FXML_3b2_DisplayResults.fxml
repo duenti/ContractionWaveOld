@@ -56,9 +56,8 @@
                     <items>
                         <Menu mnemonicParsing="false" text="Data">
                           <items>
-                            <MenuItem mnemonicParsing="false" onAction="#handleExportXLS" text="XLS" />
                             <MenuItem mnemonicParsing="false" onAction="#handleExportTSV" text="TSV" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportTXT" text="TXT" />
+                            <MenuItem mnemonicParsing="false" onAction="#handleExportXLS" text="XLS" />
                           </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="Image">

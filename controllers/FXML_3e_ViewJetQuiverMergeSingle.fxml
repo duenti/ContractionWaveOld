@@ -54,69 +54,10 @@
                      <items>
                         <Menu mnemonicParsing="false" text="Current">
                            <items>
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentJPG" text="Current JPG" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentPNG" text="Current PNG" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentTIFF" text="Current TIFF" />
-                           </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="All Vectors">
-                           <items>
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverJPG" text="JPG" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverPNG" text="PNG" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverTIFF" text="TIFF" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportQuiverAVI" text="MP4" />
-                           </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="All Magnitudes">
-                           <items>
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportJetJPG" text="JPG" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportJetPNG" text="PNG" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportJetTIFF" text="TIFF" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportJetAVI" text="MP4" />
-                           </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="All Merge">
-                           <items>
-                              <Menu mnemonicParsing="false" text="Magnitude">
-                                 <items>
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetJPG" text="JPG" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetPNG" text="PNG" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetTIFF" text="TIFF" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeJetAVI" text="MP4" />
-                                 </items>
-                              </Menu>
-                              <Menu mnemonicParsing="false" text="Vectors">
-                                 <items>
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeQuiverJPG" text="JPG" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeQuiverPNG" text="PNG" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeQuiverTIFF" text="TIFF" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeQuiverAVI" text="MP4" />
-                                 </items>
-                              </Menu>
-                              <Menu mnemonicParsing="false" text="Both">
-                                 <items>
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeBothJPG" text="JPG" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeBothPNG" text="PNG" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeBothTIFF" text="TIFF" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportMergeBothAVI" text="MP4" />
-                                 </items>
-                              </Menu>
-                              <Menu mnemonicParsing="false" text="Magnitude and Vectors only">
-                                 <items>
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportJetQuiverJPG" text="Jet and Quiver JPG" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportJetQuiverPNG" text="Jet and Quiver PNG" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportJetQuiverTIFF" text="Jet and Quiver TIFF" />
-                                    <MenuItem mnemonicParsing="false" onAction="#handleExportJetQuiverAVI" text="Jet and Quiver MP4" />
-                                 </items>
-                              </Menu>
-                           </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="All Plain">
-                           <items>
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportPlainJPG" text="JPG" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportPlainPNG" text="PNG" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportPlainTIFF" text="TIFF" />
-                              <MenuItem mnemonicParsing="false" onAction="#handleExportPlainAVI" text="MP4" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentJPG" text="JPG" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentPNG" text="PNG" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentTIFF" text="TIFF" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentVideo" text="MP4" />
                            </items>
                         </Menu>
                         <MenuItem mnemonicParsing="false" onAction="#handleExportScale" text="Export Scale" />
