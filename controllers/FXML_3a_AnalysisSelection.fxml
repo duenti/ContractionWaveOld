@@ -32,6 +32,7 @@
                               <MenuItem fx:id="menuNewVideo" mnemonicParsing="false" onAction="#handleMenuNewVideo" text="Video" />
                           </items>
                         </Menu>
+                        <MenuItem mnemonicParsing="false" onAction="#handleCheckProgress" text="Check Progress" />
                         <MenuItem mnemonicParsing="false" onAction="#handleReinitialize" text="Reinitialize" />
                         <MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
                      </items>

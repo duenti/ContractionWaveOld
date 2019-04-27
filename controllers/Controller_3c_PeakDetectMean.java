@@ -27,16 +27,16 @@ import java.io.Writer;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JColorChooser;
-import javax.swing.JOptionPane;
 import javax.swing.border.Border;
 
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -72,14 +72,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -161,6 +155,32 @@ public class Controller_3c_PeakDetectMean implements Initializable {
     }
     
     @FXML
+    void handleCheckProgress(ActionEvent event) throws IOException {
+    	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
+    	double prior_X = primaryStage.getX();
+    	double prior_Y = primaryStage.getY();
+    	
+    	URL url = getClass().getResource("FXML_2a_ProgressBar.fxml");
+    	FXMLLoader fxmlloader = new FXMLLoader();
+    	fxmlloader.setLocation(url);
+    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+        Parent root;
+    	root = fxmlloader.load();
+//        	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+//        	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
+    	((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
+    	primaryStage.setTitle("ContractionWave - Processing Progress");
+//    		primaryStage.setMaximized(true);
+    	primaryStage.setScene(scene);
+    	primaryStage.show();
+    	
+    	primaryStage.setX(prior_X);
+    	primaryStage.setY(prior_Y);
+    }
+    
+    @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
     	Scene oldScene = primaryStage.getScene();
@@ -215,7 +235,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	    Writer writer = null;
 	    try {
 	        writer = new BufferedWriter(new FileWriter(file));
-	        String text2 = "Time (s)\tSpeed (\u00B5/s)\n";
+	        String text2 = "Time (s)\tSpeed (\u00B5/s)\r\n";
 	        writer.write(text2);
 	        
 	        for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
@@ -223,7 +243,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 				writer.write(String.valueOf(i / fps_value));
 				writer.write(",");
 				writer.write(String.valueOf(average * fps_value * pixel_value));
-				writer.write("\n");
+				writer.write("\r\n");
 			}	        
 	    } catch (Exception ex) {
 	        ex.printStackTrace();
@@ -783,12 +803,14 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	        	    boolean start = false;
 	        	    int ind = -1;
 	        	    double max = 0.0;
+	        	    List<Double> values = new ArrayList<Double>();
 	        	    for (TimeSpeed a : timespeedlist) {
 	        	    	double value = a.getTime();
 	        	    	if (value >= v1 && value <= v2) {
 	        	    		ind = a.getIndex();
 	        	    		double num = givenNumbers.get(ind);
 	        	    		sum += num * pixel_value * fps_value;
+	        	    		values.add(num * pixel_value * fps_value);
 	        	    		if ( (num * pixel_value * fps_value) > max) {
 	        	    			max = (num * pixel_value * fps_value);
 	        	    		}
@@ -802,9 +824,21 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	        	    if (ind != -1) {
 	        	    	toField = ind;
 	        	    }
+	        	    
+	        	    StandardDeviation sdObj = new StandardDeviation();
+	        	    double[] dValues = new double[values.size()];
+	        	    for(int i = 0; i < values.size(); i++){
+	        	    	Double dObj = values.get(i);
+	        	    	double dVal = dObj.doubleValue();
+	        	    	System.out.println(dVal);
+	        	    	dValues[i] = dVal;
+	        	    }
+	        	    double sd = sdObj.evaluate(dValues);
+	        	    
 	        	    double mean = sum / size_numbers;
+	        	    
 //	        	    txtAverage.setText(String.valueOf(mean));
-	        	    txtAverage.setText(String.valueOf(max));
+	        	    txtAverage.setText(String.valueOf(mean+sd));
 	                //marker.setPaint(new java.awt.Color(0xDD, 0xFF, 0xDD, 0x80));
 	        	    current_marker = marker;
 	                marker.setPaint(main_package.getPlot_preferences().getMarkerColorRGB());

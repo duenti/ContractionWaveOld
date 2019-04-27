@@ -94,6 +94,32 @@ public class Controller_2b_ImagesNew implements Initializable {
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
     	primaryStage.close();
     }
+
+    @FXML
+    void handleCheckProgress(ActionEvent event) throws IOException {
+    	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
+    	double prior_X = primaryStage.getX();
+    	double prior_Y = primaryStage.getY();
+    	
+    	URL url = getClass().getResource("FXML_2a_ProgressBar.fxml");
+    	FXMLLoader fxmlloader = new FXMLLoader();
+    	fxmlloader.setLocation(url);
+    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+        Parent root;
+    	root = fxmlloader.load();
+//        	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+//        	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
+    	((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
+    	primaryStage.setTitle("ContractionWave - Processing Progress");
+//    		primaryStage.setMaximized(true);
+    	primaryStage.setScene(scene);
+    	primaryStage.show();
+    	
+    	primaryStage.setX(prior_X);
+    	primaryStage.setY(prior_Y);
+    }
     
     @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
@@ -309,15 +335,10 @@ public class Controller_2b_ImagesNew implements Initializable {
 		    listviewitems.add(result.get());
 		    listviewpaths.add(full_items_paths);
 		}
-		//add group to listview
-		System.out.println("\nCurrent paths (added):\n" + listviewpaths.toString());
 	}
 	
 	@FXML
 	private void handleRemoveSelection(ActionEvent event) {
-		System.out.println("\n\n");
-		System.out.println(listviewpaths.get(grouplistview.getSelectionModel().getSelectedIndex()));
-		
 		findUnCheckItems(filetreeview.getRoot(), listviewpaths.get(grouplistview.getSelectionModel().getSelectedIndex()));
 		System.out.println(String.valueOf(this.getReturnBool()));
 		
@@ -326,7 +347,6 @@ public class Controller_2b_ImagesNew implements Initializable {
 			listviewitems.remove(grouplistview.getSelectionModel().getSelectedItem().toString());
 		}
 		this.setReturnBool(false);
-		System.out.println("\nCurrent paths(removed):\n" + listviewpaths.toString());
 	}
 	
 	public static void createTree(File file, CheckBoxTreeItem<String> parent) {
@@ -350,8 +370,6 @@ public class Controller_2b_ImagesNew implements Initializable {
 	        		}
 	        		System.out.println(full_path);
 	        	}
-	        	System.out.println(listviewitems.toString());
-	        	System.out.println("\nCurrent paths(selected):\n" + listviewpaths.toString());
 	        });
 	        
 	        parent.getChildren().add(treeItem);
@@ -464,8 +482,6 @@ public class Controller_2b_ImagesNew implements Initializable {
 	        		}
 	        		System.out.println(f.getName());
 	        	}
-	        	System.out.println(listviewitems.toString());
-	        	System.out.println("\nCurrent paths(selected):\n" + listviewpaths.toString());
 	        });
 			
 			item.setSelected(true);

@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -88,6 +89,32 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     }
     
     @FXML
+    void handleCheckProgress(ActionEvent event) throws IOException {
+    	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
+    	double prior_X = primaryStage.getX();
+    	double prior_Y = primaryStage.getY();
+    	
+    	URL url = getClass().getResource("FXML_2a_ProgressBar.fxml");
+    	FXMLLoader fxmlloader = new FXMLLoader();
+    	fxmlloader.setLocation(url);
+    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+        Parent root;
+    	root = fxmlloader.load();
+//        	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+//        	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
+    	((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
+    	primaryStage.setTitle("ContractionWave - Processing Progress");
+//    		primaryStage.setMaximized(true);
+    	primaryStage.setScene(scene);
+    	primaryStage.show();
+    	
+    	primaryStage.setX(prior_X);
+    	primaryStage.setY(prior_Y);
+    }
+    
+    @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
     	Scene oldScene = primaryStage.getScene();
@@ -154,13 +181,36 @@ public class Controller_3a_AnalysisSelection implements Initializable {
     
 	
 	@FXML
-	void handleDialogMicroscope(ActionEvent event) {
+	void handleDialogMicroscope(ActionEvent event) throws ClassNotFoundException, IOException {
 		showDialogMicroscope(false);
 	}
 	
-	public void showDialogMicroscope(boolean next) {
-    	Spinner<Double> txtFPS = new Spinner<Double>();    	
-		SpinnerValueFactory<Double> fpsFac = facGen(1.0, 10000.0, 200.0, 1.0);
+	public void showDialogMicroscope(boolean next) throws IOException, ClassNotFoundException {
+		Spinner<Double> txtFPS = new Spinner<Double>();    	
+		Spinner<Double> txtPixels = new Spinner<Double>();
+		SpinnerValueFactory<Double> fpsFac;
+		SpinnerValueFactory<Double> pixelFac;
+		
+		
+		File inputfile = new File(getInitialDirectory().toFile().getAbsolutePath() + File.separator +"microscope.pref");
+		if (inputfile.exists()) {
+		    FileInputStream fin = new FileInputStream(inputfile);
+			ObjectInputStream oin = new ObjectInputStream(fin);
+			MicroscopePreferences readCase = (MicroscopePreferences) oin.readObject();
+			
+			fpsFac = facGen(1.0, 10000.0, readCase.getFps_value(), 1.0);
+			pixelFac = facGen(0.001, 10000.0, readCase.getPixel_value(), 0.001);
+			
+			fin.close();
+			oin.close();
+			
+		}else{
+			fpsFac = facGen(1.0, 10000.0, 200.0, 1.0);
+			pixelFac = facGen(0.001, 10000.0, 0.02375, 0.001);
+		}
+		
+		
+		//SpinnerValueFactory<Double> fpsFac = facGen(1.0, 10000.0, 200.0, 1.0);
 		txtFPS.setValueFactory(fpsFac);
 		txtFPS.setEditable(true);
 		TextFormatter<Double> formatter = new TextFormatter<Double>(fpsFac.getConverter(), fpsFac.getValue());
@@ -170,8 +220,7 @@ public class Controller_3a_AnalysisSelection implements Initializable {
 			fps_value = nv;
 		});
 		
-		Spinner<Double> txtPixels = new Spinner<Double>();
-		SpinnerValueFactory<Double> pixelFac = facGen(0.001, 10000.0, 0.02375, 0.001);
+		//SpinnerValueFactory<Double> pixelFac = facGen(0.001, 10000.0, 0.02375, 0.001);
 		txtPixels.setValueFactory(pixelFac);
 		txtPixels.setEditable(true);
 		TextFormatter<Double> formatter2 = new TextFormatter<Double>(pixelFac.getConverter(), pixelFac.getValue());

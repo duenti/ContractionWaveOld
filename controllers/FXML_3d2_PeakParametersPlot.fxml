@@ -39,6 +39,7 @@
                               <MenuItem fx:id="menuNewVideo" mnemonicParsing="false" onAction="#handleMenuNewVideo" text="Video" />
                           </items>
                         </Menu>
+                        <MenuItem mnemonicParsing="false" onAction="#handleCheckProgress" text="Check Progress" />
                         <MenuItem mnemonicParsing="false" onAction="#handleReinitialize" text="Reinitialize" />
                         <MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
                      </items>
@@ -196,8 +197,8 @@
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" GridPane.columnIndex="1" GridPane.columnSpan="9" GridPane.halignment="CENTER" GridPane.rowIndex="13" GridPane.valignment="CENTER">
                      <children>
                         <RadioButton fx:id="timeRadio" mnemonicParsing="false" text="Time" />
-                        <RadioButton fx:id="speedRadio" mnemonicParsing="false" text="Speed" />
-                        <RadioButton fx:id="areaRadio" mnemonicParsing="false" text="Area" />
+                        <RadioButton fx:id="speedRadio" mnemonicParsing="false" text="Speed ( ‎μm/s)" />
+                        <RadioButton fx:id="areaRadio" mnemonicParsing="false" text="Area ( ‎μ²)" />
                         <CheckBox fx:id="checkSeconds" mnemonicParsing="false" selected="true" text="Millisec. to Sec.">
                            <font>
                               <Font size="10.0" />

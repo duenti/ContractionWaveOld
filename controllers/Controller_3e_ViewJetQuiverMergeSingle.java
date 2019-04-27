@@ -208,6 +208,32 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		}
 		primaryStage.close();
 	}
+	
+	@FXML
+    void handleCheckProgress(ActionEvent event) throws IOException {
+    	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
+    	double prior_X = primaryStage.getX();
+    	double prior_Y = primaryStage.getY();
+    	
+    	URL url = getClass().getResource("FXML_2a_ProgressBar.fxml");
+    	FXMLLoader fxmlloader = new FXMLLoader();
+    	fxmlloader.setLocation(url);
+    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+        Parent root;
+    	root = fxmlloader.load();
+//        	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+//        	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
+    	((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
+    	primaryStage.setTitle("ContractionWave - Processing Progress");
+//    		primaryStage.setMaximized(true);
+    	primaryStage.setScene(scene);
+    	primaryStage.show();
+    	
+    	primaryStage.setX(prior_X);
+    	primaryStage.setY(prior_Y);
+    }
 
 	@FXML
 	void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
@@ -897,9 +923,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     			
     		}
 		}
-    	System.out.println(maximum_value);
-    	System.out.println(average_value);
-    	mask_value = average_value;
+    	mask_value = round(average_value, 2);
     	scale_start = 0.0;
     	scale_end = java.lang.Math.ceil(maximum_value);
     	System.out.println(scale_end);

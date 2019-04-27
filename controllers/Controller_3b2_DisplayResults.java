@@ -145,6 +145,32 @@ public class Controller_3b2_DisplayResults implements Initializable{
     }
     
     @FXML
+    void handleCheckProgress(ActionEvent event) throws IOException {
+    	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
+    	double prior_X = primaryStage.getX();
+    	double prior_Y = primaryStage.getY();
+    	
+    	URL url = getClass().getResource("FXML_2a_ProgressBar.fxml");
+    	FXMLLoader fxmlloader = new FXMLLoader();
+    	fxmlloader.setLocation(url);
+    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+        Parent root;
+    	root = fxmlloader.load();
+//        	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+//        	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
+    	((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
+    	primaryStage.setTitle("ContractionWave - Processing Progress");
+//    		primaryStage.setMaximized(true);
+    	primaryStage.setScene(scene);
+    	primaryStage.show();
+    	
+    	primaryStage.setX(prior_X);
+    	primaryStage.setY(prior_Y);
+    }
+    
+    @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
     	Scene oldScene = primaryStage.getScene();
@@ -553,11 +579,11 @@ public class Controller_3b2_DisplayResults implements Initializable{
 	    ObservableList selectedItems = viewResultsTable.getItems();
 	    try {
 	        writer = new BufferedWriter(new FileWriter(file));
-	        String text2 = "Time(s)\tSpeed(\u00B5/s)\n";
+	        String text2 = "Time(s)\tSpeed(\u00B5/s)\r\n";
 	        writer.write(text2);
 	        for (Object each : selectedItems) {
 	        	TimeSpeed each_time_speed = (TimeSpeed) each;
-	            String text = String.valueOf(each_time_speed.getTime()) + "\t" + each_time_speed.getTime1() + "\t" + String.valueOf(each_time_speed.getSpeed()) + "\n";
+	            String text = String.valueOf(each_time_speed.getTime()) + "\t" + each_time_speed.getTime1() + "\t" + String.valueOf(each_time_speed.getSpeed()) + "\r\n";
 	            writer.write(text);
 	        }
 	    } catch (Exception ex) {

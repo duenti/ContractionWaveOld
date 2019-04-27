@@ -33,7 +33,7 @@ public class PackageData  implements Serializable {
 
 	private double inter = 0.1;
 
-	private double intra = 0.1;
+	private double intra = 1.0;
 	
 	private static Path rootDir; // The chosen root or source directory
 	private static final String DEFAULT_DIRECTORY =

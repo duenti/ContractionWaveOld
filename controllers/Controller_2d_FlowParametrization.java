@@ -108,6 +108,32 @@ public class Controller_2d_FlowParametrization implements Initializable {
     }
     
     @FXML
+    void handleCheckProgress(ActionEvent event) throws IOException {
+    	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
+    	double prior_X = primaryStage.getX();
+    	double prior_Y = primaryStage.getY();
+    	
+    	URL url = getClass().getResource("FXML_2a_ProgressBar.fxml");
+    	FXMLLoader fxmlloader = new FXMLLoader();
+    	fxmlloader.setLocation(url);
+    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+        Parent root;
+    	root = fxmlloader.load();
+//        	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+//        	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
+    	((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
+    	primaryStage.setTitle("ContractionWave - Processing Progress");
+//    		primaryStage.setMaximized(true);
+    	primaryStage.setScene(scene);
+    	primaryStage.show();
+    	
+    	primaryStage.setX(prior_X);
+    	primaryStage.setY(prior_Y);
+    }
+    
+    @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdParametrize.getScene().getWindow();
     	Scene oldScene = primaryStage.getScene();
@@ -370,7 +396,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
 			levelsList.add(1);
 			winSizeList.add(15);
 			iterationsList.add(1);
-			polySigmaList.add(1.1);
+			polySigmaList.add(1.5);
 			polyNList.add(5);
 		}
 
@@ -427,7 +453,7 @@ public class Controller_2d_FlowParametrization implements Initializable {
 		titlePane.setExpanded(false);
 		cmbPolyN.setEditable(false);
 		cmbPolyN.getItems().addAll("5","7");
-		cmbPolyN.getSelectionModel().select(0);
+		cmbPolyN.getSelectionModel().select(1);
 		
 		txtPyrScale.setEditable(true);
 		txtLevels.setEditable(true);

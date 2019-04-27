@@ -36,6 +36,7 @@
                               <MenuItem fx:id="menuNewVideo" mnemonicParsing="false" onAction="#handleMenuNewVideo" text="Video" />
                           </items>
                         </Menu>
+                        <MenuItem mnemonicParsing="false" onAction="#handleCheckProgress" text="Check Progress" />
                         <MenuItem mnemonicParsing="false" onAction="#handleReinitialize" text="Reinitialize" />
                         <MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
                      </items>
@@ -124,7 +125,7 @@
                      </GridPane.margin></SwingNode>
                   <HBox alignment="CENTER" GridPane.columnIndex="3" GridPane.columnSpan="7" GridPane.halignment="CENTER" GridPane.rowIndex="9" GridPane.valignment="CENTER">
                      <children>
-                        <Label alignment="CENTER_RIGHT" text="Selected area Average value (µm/s):">
+                        <Label alignment="CENTER_RIGHT" text="Selected area value (Avg+SD µm/s):">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>

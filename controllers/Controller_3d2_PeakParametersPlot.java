@@ -290,6 +290,32 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
     }
     
     @FXML
+    void handleCheckProgress(ActionEvent event) throws IOException {
+    	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
+    	double prior_X = primaryStage.getX();
+    	double prior_Y = primaryStage.getY();
+    	
+    	URL url = getClass().getResource("FXML_2a_ProgressBar.fxml");
+    	FXMLLoader fxmlloader = new FXMLLoader();
+    	fxmlloader.setLocation(url);
+    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+        Parent root;
+    	root = fxmlloader.load();
+//        	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+//        	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
+    	((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
+    	primaryStage.setTitle("ContractionWave - Processing Progress");
+//    		primaryStage.setMaximized(true);
+    	primaryStage.setScene(scene);
+    	primaryStage.show();
+    	
+    	primaryStage.setX(prior_X);
+    	primaryStage.setY(prior_Y);
+    }
+    
+    @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
     	Scene oldScene = primaryStage.getScene();
@@ -347,7 +373,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 				time_str = "Time (ms)";
 			}
 	        
-	        String text2 = time_str+"\tSpeed (\u00B5/s)\n";
+	        String text2 = time_str+"\tSpeed (\u00B5/s)\r\n";
 	        writer.write(text2);
 	        
 //	        for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
@@ -357,10 +383,10 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 
 				double average = currentGroup.getMagnitudeListValue(i);
 				writer.write(String.valueOf(i / fps_val));
-				writer.write(",");
+				writer.write("\t");
 //				writer.write(String.valueOf(average * fps_val * pixel_val));
 				writer.write(String.valueOf((average * fps_val * pixel_val) - average_value));
-				writer.write("\n");
+				writer.write("\r\n");
 			}	        
 	    } catch (Exception ex) {
 	        ex.printStackTrace();
@@ -387,7 +413,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 //		for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
 		for (int i = start; i < stop; i++) {
 			double average = currentGroup.getMagnitudeListValue(i);
-			row = spreadsheet.createRow(i + 1);
+			row = spreadsheet.createRow((i-start) + 1);
 			
 			row.createCell(0).setCellValue(i / fps_val);
 //			row.createCell(1).setCellValue(average * fps_val * pixel_val);
@@ -691,7 +717,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 				}
 				writer.write(text2 + "\t");
 			}
-	        writer.write("\n");
+	        writer.write("\r\n");
 	        
 	        for (int i = 0; i < viewResultsTable.getItems().size(); i++) {
 	        	for (int j = 0; j < viewResultsTable.getColumns().size(); j++) {
@@ -717,7 +743,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 					}
 	        		writer.write(text2 + "\t");
 	        	}
-	        	writer.write("\n");
+	        	writer.write("\r\n");
 	        }
 	    } catch (Exception ex) {
 	        ex.printStackTrace();
@@ -1503,11 +1529,11 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	    trCol2.setGraphic(rtLabel2);
 		trCol2.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label vmcLabel = new Label("Contraction Time up to VMC");
-		Label vmcLabel2 = new Label("Contraction Time up to VMC");
+		Label vmcLabel = new Label("Contraction time-to-peak (CTP)");
+		Label vmcLabel2 = new Label("Contraction time-to-peak (CTP)");
 //		Label vmcLabel = new Label("CT-VMC");
-	    vmcLabel.setTooltip(new Tooltip("Contraction Time up to VMC"));
-	    vmcLabel2.setTooltip(new Tooltip("Contraction Time up to VMC"));
+	    vmcLabel.setTooltip(new Tooltip("Contraction time-to-peak (CTP)"));
+	    vmcLabel2.setTooltip(new Tooltip("Contraction time-to-peak (CTP)"));
 	    tc_vmcCol.setText("");
 	    tc_vmcCol.setGraphic(vmcLabel);
 		tc_vmcCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
@@ -1515,12 +1541,12 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	    tc_vmcCol2.setGraphic(vmcLabel2);
 		tc_vmcCol2.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label vmcMinLabel = new Label("Contraction Time up to Minimum Speed");
-		Label vmcMinLabel2 = new Label("Contraction Time up to Minimum Speed");
+		Label vmcMinLabel = new Label("Contraction time from peak to minimum speed (CTPMS)");
+		Label vmcMinLabel2 = new Label("Contraction time from peak to minimum speed (CTPMS)");
 		
 //		Label vmcMinLabel = new Label("CT-MS");
-		vmcMinLabel.setTooltip(new Tooltip("Contraction Time up to Minimum Speed"));
-		vmcMinLabel2.setTooltip(new Tooltip("Contraction Time up to Minimum Speed"));
+		vmcMinLabel.setTooltip(new Tooltip("Contraction time from peak to minimum speed (CTPMS)"));
+		vmcMinLabel2.setTooltip(new Tooltip("Contraction time from peak to minimum speed (CTPMS)"));
 	    tc_vmc_minCol.setText("");
 	    tc_vmc_minCol.setGraphic(vmcMinLabel);
 		tc_vmc_minCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
@@ -1530,11 +1556,11 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		
 //		System.out.println(tc_vmc_minCol.getMaxWidth() - theText.getBoundsInLocal().getWidth());
 		
-		Label tr_vmrLabel = new Label("Relaxation Time up to VMR");
-		Label tr_vmrLabel2 = new Label("Relaxation Time up to VMR");
+		Label tr_vmrLabel = new Label("Relaxation time-to-peak (RTP)");
+		Label tr_vmrLabel2 = new Label("Relaxation time-to-peak (RTP)");
 //		Label tr_vmrLabel = new Label("RT-VMR");
-		tr_vmrLabel.setTooltip(new Tooltip("Relaxation Time up to VMR"));
-		tr_vmrLabel2.setTooltip(new Tooltip("Relaxation Time up to VMR"));
+		tr_vmrLabel.setTooltip(new Tooltip("Relaxation time-to-peak (RTP)"));
+		tr_vmrLabel2.setTooltip(new Tooltip("Relaxation time-to-peak (RTP)"));
 	    tr_vmrCol.setText("");
 	    tr_vmrCol.setGraphic(tr_vmrLabel);
 		tr_vmrCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
@@ -1542,11 +1568,11 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	    tr_vmrCol2.setGraphic(tr_vmrLabel2);
 		tr_vmrCol2.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label tr_vmr_bLabel = new Label("Relaxation Time up to Basal");
-		Label tr_vmr_bLabel2 = new Label("Relaxation Time up to Basal");
+		Label tr_vmr_bLabel = new Label("Relaxation time from peak to Basaline (RTPB)");
+		Label tr_vmr_bLabel2 = new Label("Relaxation time from peak to Basaline (RTPB)");
 //		Label tr_vmr_bLabel = new Label("RT-B");
-		tr_vmr_bLabel.setTooltip(new Tooltip("Relaxation Time up to Basal"));
-		tr_vmr_bLabel2.setTooltip(new Tooltip("Relaxation Time up to Basal"));
+		tr_vmr_bLabel.setTooltip(new Tooltip("Relaxation time from peak to Basaline (RTPB)"));
+		tr_vmr_bLabel2.setTooltip(new Tooltip("Relaxation time from peak to Basaline (RTPB)"));
 	    tr_vmr_bCol.setText("");
 	    tr_vmr_bCol.setGraphic(tr_vmr_bLabel);
 		tr_vmr_bCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
@@ -1554,11 +1580,11 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	    tr_vmr_bCol2.setGraphic(tr_vmr_bLabel2);
 		tr_vmr_bCol2.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
 		
-		Label t_vmc_vmrLabel = new Label("MCS/MRS Difference Time");
-		Label t_vmc_vmrLabel2 = new Label("MCS/MRS Difference Time");
+		Label t_vmc_vmrLabel = new Label("Time between Contraction-Relaxation maximum speed (TBC-RMS)");
+		Label t_vmc_vmrLabel2 = new Label("Time between Contraction-Relaxation maximum speed (TBC-RMS)");
 //		Label t_vmc_vmrLabel = new Label("MCS/MRS-DT");
-		t_vmc_vmrLabel.setTooltip(new Tooltip("MCS/MRS Difference Time"));
-		t_vmc_vmrLabel2.setTooltip(new Tooltip("MCS/MRS Difference Time"));
+		t_vmc_vmrLabel.setTooltip(new Tooltip("Time between Contraction-Relaxation maximum speed (TBC-RMS)"));
+		t_vmc_vmrLabel2.setTooltip(new Tooltip("Time between Contraction-Relaxation maximum speed (TBC-RMS)"));
 	    t_vmc_vmrCol.setText("");
 	    t_vmc_vmrCol.setGraphic(t_vmc_vmrLabel);
 		t_vmc_vmrCol.setMaxWidth( 1f * Integer.MAX_VALUE * 11 ); // 11% width
@@ -1631,11 +1657,11 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 	    speedAREATCol2.setGraphic(speedAREATLabel2);
 		speedAREATCol2.setMaxWidth( 1f * Integer.MAX_VALUE * 33 );
 		
-		Label speedAREACLabel = new Label("Shortening Fraction Area");
-		Label speedAREACLabel2 = new Label("Shortening Fraction Area");
+		Label speedAREACLabel = new Label("Shortening Area (SA)");
+		Label speedAREACLabel2 = new Label("Shortening Area (SA)");
 //		Label speedAREACLabel = new Label("SFA");
-		speedAREACLabel.setTooltip(new Tooltip("Shortening Fraction Area"));
-		speedAREACLabel2.setTooltip(new Tooltip("Shortening Fraction Area"));
+		speedAREACLabel.setTooltip(new Tooltip("Shortening Area (SA)"));
+		speedAREACLabel2.setTooltip(new Tooltip("Shortening Area (SA)"));
 	    speedAREACCol.setText("");
 	    speedAREACCol.setGraphic(speedAREACLabel);
 		speedAREACCol.setMaxWidth( 1f * Integer.MAX_VALUE * 33 );
@@ -1760,7 +1786,7 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 		for (int i = min; i < max; i++) {
 			double average = currentGroup.getMagnitudeListValue(i);
 //			series1.add(i / fps_val, average * fps_val * pixel_val);
-			double new_time = i / fps_val;
+			double new_time = (i-min) / fps_val;
 			if (checkSeconds.isSelected() == false) {
 				new_time *= 1000;
 			}

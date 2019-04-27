@@ -155,6 +155,32 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
     	primaryStage.close();
     }
+
+    @FXML
+    void handleCheckProgress(ActionEvent event) throws IOException {
+    	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+    	Scene oldScene = primaryStage.getScene();
+    	double prior_X = primaryStage.getX();
+    	double prior_Y = primaryStage.getY();
+    	
+    	URL url = getClass().getResource("FXML_2a_ProgressBar.fxml");
+    	FXMLLoader fxmlloader = new FXMLLoader();
+    	fxmlloader.setLocation(url);
+    	fxmlloader.setBuilderFactory(new JavaFXBuilderFactory());
+        Parent root;
+    	root = fxmlloader.load();
+//        	Rectangle2D screenSize = Screen.getPrimary().getVisualBounds();
+//        	Scene scene = new Scene(root, screenSize.getWidth(), screenSize.getHeight());
+    	Scene scene = new Scene(root, oldScene.getWidth(), oldScene.getHeight());
+    	((Controller_2a_ProgressBar)fxmlloader.getController()).setContext(main_package);
+    	primaryStage.setTitle("ContractionWave - Processing Progress");
+//    		primaryStage.setMaximized(true);
+    	primaryStage.setScene(scene);
+    	primaryStage.show();
+    	
+    	primaryStage.setX(prior_X);
+    	primaryStage.setY(prior_Y);
+    }
     
     @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
@@ -209,7 +235,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 	    Writer writer = null;
 	    try {
 	        writer = new BufferedWriter(new FileWriter(file));
-	        String text2 = "Time (s)\tSpeed (\u00B5/s)\n";
+	        String text2 = "Time (s)\tSpeed (\u00B5/s)\r\n";
 	        writer.write(text2);
 	        
 	        for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
@@ -217,7 +243,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 				writer.write(String.valueOf(i / fps_val));
 				writer.write(",");
 				writer.write(String.valueOf((average * fps_val * pixel_val)-average_value));
-				writer.write("\n");
+				writer.write("\r\n");
 			}	        
 	    } catch (Exception ex) {
 	        ex.printStackTrace();
@@ -560,7 +586,7 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 			main_package.setDelta(Double.valueOf(spinnerDelta.getValue() / fps_val / pixel_val));
 		});
 
-		SpinnerValueFactory intraFac = facGen(0.0, 10000.0, 0.1, 0.01);
+		SpinnerValueFactory intraFac = facGen(0.0, 10000.0, 1.0, 0.01);
 		spinnerIntra.setValueFactory(intraFac);
 		spinnerIntra.setEditable(true);
 		
@@ -1205,6 +1231,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 //		linepanel2.setChart(null);
 //		linepanel2.remove(0);
 		linepanel2.setChart(new_chart);
+		
+		/*
 		JCheckBoxMenuItem gridLinesmenuItem2 = new JCheckBoxMenuItem();
 		gridLinesmenuItem2.setSelected(true);
 		gridLinesmenuItem2.setText("Gridlines on/off");
@@ -1216,7 +1244,8 @@ public class Controller_3d_MagnitudeFirstCharts implements Initializable {
 		SplineShow splineRendering = new SplineShow(linepanel2);
 		showSpline.addActionListener(splineRendering);
 		linepanel2.getPopupMenu().add(showSpline);
-
+		*/
+		
 		linepanel2.setRangeZoomable(false);
 		linepanel2.setDomainZoomable(false);
 		this_mouse_marker.setNewStuff(linepanel2);
