@@ -25,9 +25,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JColorChooser;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.border.Border;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -63,7 +61,10 @@ import javafx.fxml.JavaFXBuilderFactory;
 import javafx.geometry.HPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -75,20 +76,22 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.Group;
 import model.Groups;
+import model.ImageGroup;
 import model.PackageData;
 import model.TimeSpeed;
+import model.VideoGroup;
 import model.XYCircleAnnotation;
 
 public class Controller_3b2_DisplayResults implements Initializable{
@@ -168,6 +171,53 @@ public class Controller_3b2_DisplayResults implements Initializable{
     	
     	primaryStage.setX(prior_X);
     	primaryStage.setY(prior_Y);
+    }
+    
+    @FXML
+    void handleChangeFolder(ActionEvent event){
+    	if(currentGroup.getType() == 0){//ImageGroup
+	    	DirectoryChooser directoryChooser = new DirectoryChooser();
+	    	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+	    	
+	    	File selectedDirectory = directoryChooser.showDialog(primaryStage);
+	
+	    	if(selectedDirectory != null){
+	    	     boolean result = ((ImageGroup) currentGroup).changeImagePath(selectedDirectory.getAbsolutePath());
+	    	     if(result){
+	    	    	 Alert alert = new Alert(AlertType.INFORMATION);
+	    	    	 alert.setTitle("Path Changed");
+	    	    	 alert.setContentText("The path has been successfully changed.");
+	    	    	 alert.showAndWait();
+	    	     }else{
+	    	    	 Alert alert = new Alert(AlertType.WARNING);
+	    	    	 alert.setTitle("Path Failed");
+	    	    	 String errorFile = currentGroup.getErrorMessage();
+	    	    	 alert.setContentText("Could not find " + errorFile + " file.");
+	    	    	 alert.showAndWait();
+	    	     }
+	    	}
+    	}else{//VideoGroup
+    		FileChooser fileChooser = new FileChooser();
+    		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+	    	
+    		File selectedFile = fileChooser.showOpenDialog(primaryStage);
+    		
+    		if(selectedFile != null){
+    			boolean result = ((VideoGroup) currentGroup).changeVideoFile(selectedFile);
+    			if(result){
+	    	    	 Alert alert = new Alert(AlertType.INFORMATION);
+	    	    	 alert.setTitle("File Changed");
+	    	    	 alert.setContentText("The file has been successfully changed.");
+	    	    	 alert.showAndWait();
+	    	     }else{
+	    	    	 Alert alert = new Alert(AlertType.WARNING);
+	    	    	 alert.setTitle("File Failed");
+	    	    	 String errorFile = currentGroup.getErrorMessage();
+	    	    	 alert.setContentText("Could not find " + errorFile + " file.");
+	    	    	 alert.showAndWait();
+	    	     }
+    		}
+    	}
     }
     
     @FXML
@@ -579,11 +629,11 @@ public class Controller_3b2_DisplayResults implements Initializable{
 	    ObservableList selectedItems = viewResultsTable.getItems();
 	    try {
 	        writer = new BufferedWriter(new FileWriter(file));
-	        String text2 = "Time(s)\tSpeed(\u00B5/s)\r\n";
+	        String text2 = "Time(s)\tTime(ms)\tSpeed(\u00B5/s)\r\n";
 	        writer.write(text2);
 	        for (Object each : selectedItems) {
 	        	TimeSpeed each_time_speed = (TimeSpeed) each;
-	            String text = String.valueOf(each_time_speed.getTime()) + "\t" + each_time_speed.getTime1() + "\t" + String.valueOf(each_time_speed.getSpeed()) + "\r\n";
+	            String text = String.valueOf(each_time_speed.getTime()) + "\t" + String.valueOf(Math.round(each_time_speed.getTime1())) + "\t" + String.valueOf(each_time_speed.getSpeed()) + "\r\n";
 	            writer.write(text);
 	        }
 	    } catch (Exception ex) {
@@ -673,7 +723,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
 		original_dataset = dataset;
 		fourier_dataset = dataset;
         JFreeChart chart = ChartFactory.createXYLineChart(
-            "Main Plot",
+            currentGroup.getName(),
             "Time(s)",
             "Average Speed(\u00B5m/s)",
             dataset,
@@ -1205,7 +1255,7 @@ public class Controller_3b2_DisplayResults implements Initializable{
 			//https://stackoverflow.com/questions/49238446/polynomial-regression-with-apache-maths-3-6-1
 		    double[] preg = org.jfree.data.statistics.Regression.getPolynomialRegression(this.dataset, 0, this.dataset.getItemCount(0)-2);
 	        XYSeriesCollection dataset_new = new XYSeriesCollection();
-		    XYSeries series1 = new XYSeries("Optical Flow");
+		    XYSeries series1 = new XYSeries("Coordinates");
 		    XYSeries series2 = new XYSeries("Polynomial");
 		    for (int i = 0; i < preg.length; i++) {
 //		    	dataset_new.add

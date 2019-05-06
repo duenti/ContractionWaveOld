@@ -1,5 +1,6 @@
 package model;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,6 +31,7 @@ public abstract class Group implements Serializable {
 	protected String savestatus;
 	protected double progress;
 	protected String remainingTime;
+	protected String errorMessage;
 	
 	protected Group(String pname, String ppath, int ptype){
 		paths = new ArrayList<String>();
@@ -44,6 +46,7 @@ public abstract class Group implements Serializable {
 		savestatus = "Queued";
 		progress = 0;
 		remainingTime = "Infinite";
+		errorMessage = "";
 	}
 	protected Group(String pname,List<String> ppath, int ptype){
 		matrices = new ArrayList<Mat>();
@@ -57,6 +60,7 @@ public abstract class Group implements Serializable {
 		savestatus = "Queued";
 		progress = 0;
 		remainingTime = "Infinite";
+		errorMessage = "";
 	}
 	
 //	public abstract void calculateMagnitudes(ProgressBar test, Label lblRunPerc, double pyrScale, int levels, int winSize, int iterations, int polyN, double polySigma) throws Exception;
@@ -222,5 +226,12 @@ public abstract class Group implements Serializable {
 	}
 	public void setRemainingTime(String v){
 		this.remainingTime = v;
+	}
+	public String getErrorMessage(){
+		return errorMessage;
+	}
+	public void setPath(String directory){
+		paths.clear();
+		paths.add(directory);
 	}
 }

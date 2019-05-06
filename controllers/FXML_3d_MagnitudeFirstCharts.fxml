@@ -30,6 +30,7 @@
                           </items>
                         </Menu>
                         <MenuItem mnemonicParsing="false" onAction="#handleCheckProgress" text="Check Progress" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleChangeFolder" text="Change Project Directory" />
                         <MenuItem mnemonicParsing="false" onAction="#handleReinitialize" text="Reinitialize" />
                         <MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
                      </items>
@@ -38,6 +39,11 @@
                      <items>
                         <MenuItem mnemonicParsing="false" onAction="#handleColors" text="Change Plot Configs" />
                      </items></Menu>
+                  <Menu mnemonicParsing="false" text="Advanced">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#handleSetAverage" text="Change Prev. Average Value" />
+                    </items>
+                  </Menu>
                   <Menu mnemonicParsing="false" text="Export">
                     <items>
                         <Menu mnemonicParsing="false" text="Data">
@@ -53,11 +59,6 @@
                               <MenuItem mnemonicParsing="false" onAction="#handleExportTIFF" text="TIFF" />
                           </items>
                         </Menu>
-                    </items>
-                  </Menu>
-                  <Menu mnemonicParsing="false" text="Advanced">
-                    <items>
-                      <MenuItem mnemonicParsing="false" onAction="#handleSetAverage" text="Change Prev. Average Value" />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Help">

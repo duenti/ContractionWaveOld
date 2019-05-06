@@ -269,4 +269,26 @@ public class ImageGroup extends Group{
 	public void setHeight(int height) {
 		this.height = height;
 	}
+	
+	public boolean changeImagePath(String directory){
+		List<File> newImages = new ArrayList<File>();
+		
+		for(File f : images){
+			String filename = f.getName();
+			String newFilename = directory + File.separator + filename;
+			File f2 = new File(newFilename);
+			if(f2.exists()){
+				newImages.add(f2);
+				System.out.println(newFilename);
+			}else{
+				errorMessage = newFilename;
+				return false;
+			}
+		}
+		
+		images = newImages;
+		paths.clear();
+		paths.add(directory);
+		return true;
+	}
 }

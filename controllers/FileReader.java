@@ -45,26 +45,6 @@ public class FileReader {
         if(chosenDir == null){
         	return;
         }
-//		JFileChooser chooser = new JFileChooser() {
-//			public void approveSelection() {
-//				if (getSelectedFile().isFile()) {
-//					return;
-//				} else
-//					super.approveSelection();
-//			}
-//		};
-//		chooser.setCurrentDirectory(getInitialDirectory().toFile());
-//	    chooser.setDialogTitle("Select a root path:");
-//		chooser.setFileSelectionMode( JFileChooser.FILES_AND_DIRECTORIES );
-//		int returnVal = chooser.showOpenDialog(null);
-//	    if(returnVal == JFileChooser.APPROVE_OPTION) {
-//	       System.out.println("You chose to open this folder as root: " +
-//	            chooser.getSelectedFile().getName());
-//	       determineRootDirectory(chooser.getSelectedFile());
-//	    } else {
-//	    	return;
-//	    }
-//	    
 
 		//URL url = getClass().getResource("FXML_2b_ImagesNew.fxml");
 		FXMLLoader fxmlloader = new FXMLLoader();

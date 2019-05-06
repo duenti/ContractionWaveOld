@@ -9,7 +9,7 @@ public class PlotPreferences implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private float markerAlpha = 0.5f;
+	private float markerAlpha;
 	private Color markerColorRGB;
 	private Color seriesColorRGB;
 	private Color firstDotColorRGB;
@@ -27,9 +27,9 @@ public class PlotPreferences implements Serializable {
 	public PlotPreferences(){
 		setDrawAnnotations(true);
 		lineThickness = 1;
-		markerAlpha = 0.5f;
-		markerColorRGB = new Color(247, 246, 215);
-		seriesColorRGB = new Color(0x00, 0x00, 0xFF);
+		markerAlpha = 0.3f;
+		markerColorRGB = Color.BLACK;
+		seriesColorRGB = Color.BLACK;
 		firstDotColorRGB = Color.BLACK;
 		minimumDotColorRGB = Color.BLUE;
 		maximumDotColorRGB = Color.RED;

@@ -80,13 +80,16 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.Group;
+import model.ImageGroup;
 import model.PackageData;
 import model.TimeSpeed;
+import model.VideoGroup;
 
 public class Controller_3c_PeakDetectMean implements Initializable {
 	private PackageData main_package;
@@ -181,6 +184,53 @@ public class Controller_3c_PeakDetectMean implements Initializable {
     }
     
     @FXML
+    void handleChangeFolder(ActionEvent event){
+    	if(currentGroup.getType() == 0){//ImageGroup
+	    	DirectoryChooser directoryChooser = new DirectoryChooser();
+	    	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+	    	
+	    	File selectedDirectory = directoryChooser.showDialog(primaryStage);
+	
+	    	if(selectedDirectory != null){
+	    	     boolean result = ((ImageGroup) currentGroup).changeImagePath(selectedDirectory.getAbsolutePath());
+	    	     if(result){
+	    	    	 Alert alert = new Alert(AlertType.INFORMATION);
+	    	    	 alert.setTitle("Path Changed");
+	    	    	 alert.setContentText("The path has been successfully changed.");
+	    	    	 alert.showAndWait();
+	    	     }else{
+	    	    	 Alert alert = new Alert(AlertType.WARNING);
+	    	    	 alert.setTitle("Path Failed");
+	    	    	 String errorFile = currentGroup.getErrorMessage();
+	    	    	 alert.setContentText("Could not find " + errorFile + " file.");
+	    	    	 alert.showAndWait();
+	    	     }
+	    	}
+    	}else{//VideoGroup
+    		FileChooser fileChooser = new FileChooser();
+    		Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
+	    	
+    		File selectedFile = fileChooser.showOpenDialog(primaryStage);
+    		
+    		if(selectedFile != null){
+    			boolean result = ((VideoGroup) currentGroup).changeVideoFile(selectedFile);
+    			if(result){
+	    	    	 Alert alert = new Alert(AlertType.INFORMATION);
+	    	    	 alert.setTitle("File Changed");
+	    	    	 alert.setContentText("The file has been successfully changed.");
+	    	    	 alert.showAndWait();
+	    	     }else{
+	    	    	 Alert alert = new Alert(AlertType.WARNING);
+	    	    	 alert.setTitle("File Failed");
+	    	    	 String errorFile = currentGroup.getErrorMessage();
+	    	    	 alert.setContentText("Could not find " + errorFile + " file.");
+	    	    	 alert.showAndWait();
+	    	     }
+    		}
+    	}
+    }
+    
+    @FXML
     void handleReinitialize(ActionEvent event) throws IOException, ClassNotFoundException{
     	Stage primaryStage = (Stage) cmdBack.getScene().getWindow();
     	Scene oldScene = primaryStage.getScene();
@@ -241,7 +291,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	        for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
 				double average = currentGroup.getMagnitudeListValue(i);
 				writer.write(String.valueOf(i / fps_value));
-				writer.write(",");
+				writer.write("\t");
 				writer.write(String.valueOf(average * fps_value * pixel_value));
 				writer.write("\r\n");
 			}	        
@@ -603,7 +653,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	}
 	
 	private XYDataset createDataset() {
-		XYSeries series1 = new XYSeries("Optical Flow");
+		XYSeries series1 = new XYSeries("Coordinates");
         
 //		for (int j = 0; j < 20; j++) {
 			for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
@@ -621,7 +671,7 @@ public class Controller_3c_PeakDetectMean implements Initializable {
 	
 	private JFreeChart createChart(XYDataset dataset) {			
         JFreeChart chart = ChartFactory.createXYLineChart(
-            "Main Plot",
+        	currentGroup.getName(),
             "Time (s)",
             "Average Speed (\u00B5m/s)",
             dataset,

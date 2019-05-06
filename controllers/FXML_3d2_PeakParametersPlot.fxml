@@ -1,11 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.embed.swing.*?>
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.embed.swing.SwingNode?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -25,7 +19,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Controller_3d2_PeakParametersPlot">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.71" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Controller_3d2_PeakParametersPlot">
    <top>
       <VBox maxHeight="300.0" BorderPane.alignment="CENTER">
          <children>
@@ -40,6 +34,7 @@
                           </items>
                         </Menu>
                         <MenuItem mnemonicParsing="false" onAction="#handleCheckProgress" text="Check Progress" />
+                        <MenuItem mnemonicParsing="false" onAction="#handleChangeFolder" text="Change Project Directory" />
                         <MenuItem mnemonicParsing="false" onAction="#handleReinitialize" text="Reinitialize" />
                         <MenuItem mnemonicParsing="false" onAction="#handleClose" text="Close" />
                      </items>
@@ -198,7 +193,7 @@
                      <children>
                         <RadioButton fx:id="timeRadio" mnemonicParsing="false" text="Time" />
                         <RadioButton fx:id="speedRadio" mnemonicParsing="false" text="Speed ( ‎μm/s)" />
-                        <RadioButton fx:id="areaRadio" mnemonicParsing="false" text="Area ( ‎μ²)" />
+                        <RadioButton fx:id="areaRadio" mnemonicParsing="false" text="Area ( ‎μm²)" />
                         <CheckBox fx:id="checkSeconds" mnemonicParsing="false" selected="true" text="Millisec. to Sec.">
                            <font>
                               <Font size="10.0" />

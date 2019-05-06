@@ -66,19 +66,16 @@ public class VideoGroup extends Group{
 		this.frames += 1;
 	}
 	
-//	public void clearFrames(){
-//		this.selectedFrames.clear();
-//	}
-//	
-//	public void addFrame(Mat img){
-//		this.selectedFrames.add(img);
-//	}
-//	
-//	public int framesSize(){
-//		return this.selectedFrames.size();
-//	}
-//	
-//	public Mat getFrame(int i){
-//		return this.selectedFrames.get(i);
-//	}
+	public boolean changeVideoFile(File newVideo){
+		if(newVideo.exists()){
+			video = newVideo;
+			paths.clear();
+			paths.add(newVideo.getAbsolutePath());
+			return true;
+		}
+		
+		errorMessage = newVideo.getAbsolutePath();
+		return false;
+	}
+
 }

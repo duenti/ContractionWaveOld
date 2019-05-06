@@ -53,15 +53,35 @@
                   </Menu>
                   <Menu mnemonicParsing="false" text="Export">
                      <items>
-                        <Menu mnemonicParsing="false" text="Current">
+                        <Menu mnemonicParsing="false" text="Current Image">
                            <items>
                               <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentJPG" text="JPG" />
                               <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentPNG" text="PNG" />
                               <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentTIFF" text="TIFF" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Current Image Set">
+                           <items>
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentJPG2" text="JPG" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentPNG2" text="PNG" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentTIFF2" text="TIFF" />
                               <MenuItem mnemonicParsing="false" onAction="#handleExportCurrentVideo" text="MP4" />
                            </items>
                         </Menu>
                         <MenuItem mnemonicParsing="false" onAction="#handleExportScale" text="Export Scale" />
+                     	<Menu mnemonicParsing="false" text="Chart Data">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#handleExportTSV" text="TSV" />
+                            <MenuItem mnemonicParsing="false" onAction="#handleExportXLS" text="XLS" />
+                          </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Chart Image">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#handleExportJPEG" text="JPEG" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportPNG" text="PNG" />
+                              <MenuItem mnemonicParsing="false" onAction="#handleExportTIFF" text="TIFF" />
+                          </items>
+                        </Menu>
                      </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Help">
@@ -132,15 +152,15 @@
                      <children>
                         <VBox alignment="CENTER_LEFT">
                            <children>
-                              <CheckBox fx:id="quiverCheck" mnemonicParsing="false" text="Vector Field">
-                                 <VBox.margin>
-                                    <Insets bottom="10.0" />
-                                 </VBox.margin></CheckBox>
+                              <CheckBox fx:id="mergeCheck" mnemonicParsing="false" text="Original Image" />
                               <CheckBox fx:id="jetCheck" mnemonicParsing="false" text="Magnitude Field">
                                  <VBox.margin>
-                                    <Insets bottom="10.0" />
+                                    <Insets bottom="10.0" top="10.0" />
                                  </VBox.margin></CheckBox>
-                              <CheckBox fx:id="mergeCheck" mnemonicParsing="false" text="Original Image" />
+                              <CheckBox fx:id="quiverCheck" mnemonicParsing="false" text="Vector Field">
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin></CheckBox>
                            </children>
                         </VBox>
                         <Separator orientation="VERTICAL" prefHeight="200.0" prefWidth="20.0" />
@@ -234,11 +254,11 @@
             <Slider fx:id="sliderGroups" GridPane.columnIndex="2" GridPane.columnSpan="7" GridPane.halignment="CENTER" GridPane.rowIndex="18" />
             <Button fx:id="cmdSliderPlay" mnemonicParsing="false" onAction="#handlePlayStopButton" text="Play" GridPane.columnIndex="9" GridPane.rowIndex="18">
                <GridPane.margin>
-                  <Insets left="20.0" />
+                  <Insets left="20.0" top="10.0" />
                </GridPane.margin>
             </Button>
-            <Label text="Frame per Second:" GridPane.columnIndex="6" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="17" GridPane.valignment="CENTER" />
-            <Spinner fx:id="spinnerFPS" editable="true" GridPane.columnIndex="8" GridPane.rowIndex="17">
+            <Label text="Frame per Second (Fps):" GridPane.columnIndex="7" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="17" GridPane.valignment="CENTER" />
+            <Spinner fx:id="spinnerFPS" editable="true" GridPane.columnIndex="9" GridPane.rowIndex="17">
                <GridPane.margin>
                   <Insets left="5.0" />
                </GridPane.margin>
@@ -248,8 +268,13 @@
                   <VBox visible="false" />
                </children>
             </HBox>
-            <Label prefHeight="16.0" prefWidth="88.0" text="Current:" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="17" />
-            <Label fx:id="currentImgName" prefHeight="16.0" prefWidth="255.0" text="..........." GridPane.columnIndex="3" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="17" />
+            <Label prefHeight="16.0" prefWidth="88.0" text="Current Image:" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="17" />
+            <Label fx:id="currentImgName" prefHeight="16.0" prefWidth="255.0" text="..........." GridPane.columnIndex="2" GridPane.columnSpan="3" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.rowIndex="17" />
+            <CheckBox fx:id="checkSeconds" mnemonicParsing="false" text="Millisec. to Sec." GridPane.columnIndex="5" GridPane.columnSpan="2" GridPane.rowIndex="17">
+               <GridPane.margin>
+                  <Insets left="10.0" right="10.0" />
+               </GridPane.margin>
+            </CheckBox>
          </children>
       </GridPane>
    </center>

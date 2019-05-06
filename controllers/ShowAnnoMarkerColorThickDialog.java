@@ -33,7 +33,7 @@ public class ShowAnnoMarkerColorThickDialog {
     	XYDataset dataset2 = plot2.getDataset();
         plot2.clearAnnotations();
 		if (valid_maximum_list.size() + valid_minimum_list.size() < 1500 && mainpack.getPlot_preferences().isDrawAnnotations() == true) {
-			System.out.println("Draw second!");
+			//System.out.println("Draw second!");
 	        for(int x1 = 0; x1 < dataset2.getItemCount(0); x1++){
 	        	double x = dataset2.getXValue(0, x1);
 	        	double y = dataset2.getYValue(0, x1);

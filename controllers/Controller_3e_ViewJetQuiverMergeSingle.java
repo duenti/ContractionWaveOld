@@ -10,8 +10,13 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.nio.FloatBuffer;
@@ -28,6 +33,10 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.border.Border;
 
 import org.apache.commons.math3.stat.descriptive.rank.Median;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.bytedeco.javacpp.opencv_core.Mat;
 import org.bytedeco.javacpp.opencv_core.MatVector;
 import org.bytedeco.javacpp.opencv_core.Point;
@@ -41,6 +50,7 @@ import org.bytedeco.javacv.OpenCVFrameConverter;
 import org.bytedeco.javacv.OpenCVFrameConverter.ToMat;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.event.PlotChangeEvent;
 import org.jfree.chart.event.PlotChangeListener;
@@ -128,6 +138,7 @@ import model.XYCircleAnnotation;
 public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	private int width = 0;
 	private int height = 0;
+	private int start, stop;
 	private String currentRenderType = "Jet";
 	private boolean jet_state = false;
 	private boolean quiver_state = false;
@@ -163,6 +174,9 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	
 	@FXML
 	Label currentImgName;
+	
+	@FXML
+	private CheckBox checkSeconds;
 	
 	@FXML
 	void handleMenuNewImage(ActionEvent event) throws IOException{
@@ -208,6 +222,156 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		}
 		primaryStage.close();
 	}
+	
+	@FXML
+    void handleExportTSV(ActionEvent event) throws Exception{
+    	FileChooser fileChooser = new FileChooser();
+    	fileChooser.setInitialFileName("time-speed.tsv");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdBack.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+		writeTSV(file);
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+    }
+        
+    public void writeTSV(File file) throws Exception {
+	    Writer writer = null;
+	    try {
+	        writer = new BufferedWriter(new FileWriter(file));
+	        String time_str = "Time (s)";
+			if (checkSeconds.isSelected() == false) {
+				time_str = "Time (ms)";
+			}
+	        
+	        String text2 = time_str+"\tSpeed (\u00B5/s)\r\n";
+	        writer.write(text2);
+	        
+//	        for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
+	        
+//		    for (int i = start; i < stop; i++) {
+		    for (int i = start; i < stop; i++) {
+
+				double average = currentGroup.getMagnitudeListValue(i);
+				writer.write(String.valueOf(i / fps_value));
+				writer.write("\t");
+//				writer.write(String.valueOf(average * fps_val * pixel_val));
+				writer.write(String.valueOf((average * fps_value * pixel_value) - average_value));
+				writer.write("\r\n");
+			}	        
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	    }
+	    finally {
+	        writer.flush();
+	        writer.close();
+	    } 
+	}
+    
+    @FXML
+    void handleExportXLS(ActionEvent event) throws IOException{
+    	Workbook workbook = new HSSFWorkbook();
+		Sheet spreadsheet = workbook.createSheet("time_speed");
+		Row row = spreadsheet.createRow(0);
+		
+        String time_str = "Time (s)";
+		if (checkSeconds.isSelected() == false) {
+			time_str = "Time (ms)";
+		}
+		row.createCell(0).setCellValue(time_str);
+		row.createCell(1).setCellValue("Average Speed (\u00B5/s)");
+		
+//		for (int i = 0; i < currentGroup.getMagnitudeSize(); i++) {
+		for (int i = start; i < stop; i++) {
+			double average = currentGroup.getMagnitudeListValue(i);
+			row = spreadsheet.createRow((i-start) + 1);
+			
+			row.createCell(0).setCellValue(i / fps_value);
+//			row.createCell(1).setCellValue(average * fps_val * pixel_val);
+			row.createCell(1).setCellValue((average * fps_value * pixel_value) - average_value);
+		}
+		spreadsheet.autoSizeColumn(0);
+		spreadsheet.autoSizeColumn(1);
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialFileName("time-speed.xls");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdBack.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+		FileOutputStream fileOut = new FileOutputStream(file);
+		workbook.write(fileOut);
+		workbook.close();
+		fileOut.close();
+		
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+    }
+    
+    @FXML
+    void handleExportJPEG(ActionEvent event) throws Exception{
+    	FileChooser fileChooser = new FileChooser();
+    	fileChooser.setInitialFileName("time-speed.jpg");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdBack.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+        ChartPanel panel = (ChartPanel) chartNode.getContent();
+        OutputStream out = new FileOutputStream(file);
+        ChartUtils.writeChartAsJPEG(out,
+                currentChart,
+                panel.getWidth(),
+                panel.getHeight());
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+    }
+    
+    @FXML
+    void handleExportPNG(ActionEvent event) throws Exception{
+    	FileChooser fileChooser = new FileChooser();
+    	fileChooser.setInitialFileName("time-speed.png");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdBack.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+        ChartPanel panel = (ChartPanel) chartNode.getContent();
+        OutputStream out = new FileOutputStream(file);
+        ChartUtils.writeChartAsPNG(out,
+                currentChart,
+                panel.getWidth(),
+                panel.getHeight());
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+    }
+    
+    @FXML
+    void handleExportTIFF(ActionEvent event) throws Exception{
+    	FileChooser fileChooser = new FileChooser();
+    	fileChooser.setInitialFileName("time-speed.tiff");
+        Stage primaryStage;
+    	primaryStage = (Stage) cmdBack.getScene().getWindow();
+        //Show save file dialog
+        File file = fileChooser.showSaveDialog(primaryStage);
+        ChartPanel panel = (ChartPanel) chartNode.getContent();
+        JFreeChart chart = panel.getChart();
+        BufferedImage bImage = chart.createBufferedImage(panel.getWidth(), panel.getHeight());
+        
+        Mat imgLayer = Java2DFrameUtils.toMat(bImage);
+        MatVector channels = new MatVector();
+        Mat imgLayerRGB = new Mat(bImage.getHeight(), bImage.getWidth(), org.bytedeco.javacpp.opencv_core.CV_8UC3);
+        org.bytedeco.javacpp.opencv_core.split(imgLayer, channels);
+        Mat blueCh = channels.get(1);
+        Mat greenCh = channels.get(2);
+        Mat redCh = channels.get(3);
+        MatVector channels2 = new MatVector(3);
+        channels2.put(0, redCh);
+        channels2.put(1, greenCh);
+        channels2.put(2, blueCh);
+        org.bytedeco.javacpp.opencv_core.merge(channels2, imgLayerRGB);
+		imwrite(file.getCanonicalPath(), imgLayerRGB);
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+    }
 	
 	@FXML
     void handleCheckProgress(ActionEvent event) throws IOException {
@@ -260,7 +424,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //		main_package.getListFlows().clear();
 		main_package.resetListsMag();
 		((Controller_1_InitialScreen)fxmlloader.getController()).setContext(new PackageData(main_package.isLoad_preferences()));
-		primaryStage.setTitle("Image Optical Flow");
+		primaryStage.setTitle("Contraction Wave");
 //		primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -274,7 +438,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		Stage stage = new Stage();
 		Parent root = FXMLLoader.load(getClass().getResource("FXML_About.fxml"));
 		stage.setScene(new Scene(root));
-		stage.setTitle("Image Optical Flow");
+		stage.setTitle("Contraction Wave");
 		stage.initModality(Modality.APPLICATION_MODAL);
 		//stage.initOwner(((Node)event.getSource()).getScene().getWindow());
 		stage.show();
@@ -486,6 +650,27 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	}
 	
 	@FXML
+	void handleExportCurrentJPG2(ActionEvent event) throws IOException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+    	File chosenDir = chooser.showDialog(primaryStage);
+        waitCursor();
+    	
+    	for(int i = start; i < stop; i++){
+    		current_filename =chosenDir.getAbsolutePath().toString() + File.separator + currentGroup.getName() +  "_" + String.valueOf(i) + "_Current" +".jpg";
+    	    renderImageView(i-start, currentRenderType , true);
+    		
+    	}
+    	
+		returnCursor();
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+	}
+	
+	@FXML
 	void handleExportCurrentTIFF(ActionEvent event) throws IOException {
     	DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Saving path selection:");
@@ -502,6 +687,24 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 	}
 	
 	@FXML
+	void handleExportCurrentTIFF2(ActionEvent event) throws IOException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+        File chosenDir = chooser.showDialog(primaryStage);
+        waitCursor();
+        for(int i = start; i < stop; i++){
+        	current_filename =chosenDir.getAbsolutePath().toString() + File.separator + currentGroup.getName() +  "_" +current_index + "_Current" +".tiff";
+        	renderImageView(i-start, currentRenderType , true);
+        }
+	    returnCursor();
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+	}
+	
+	@FXML
 	void handleExportCurrentPNG(ActionEvent event) throws IOException {
     	DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Saving path selection:");
@@ -513,6 +716,24 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		current_filename = chosenDir.getAbsolutePath().toString() + File.separator + currentGroup.getName() +  "_" +current_index + "_Current" +".png";
 	    renderImageView(current_index, currentRenderType , true);
 		returnCursor();
+//		JOptionPane.showMessageDialog(null, "File was saved successfully.");
+		ShowSavedDialog.showDialog();
+	}
+	
+	@FXML
+	void handleExportCurrentPNG2(ActionEvent event) throws IOException {
+    	DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Saving path selection:");
+        chooser.setInitialDirectory(getInitialDirectory().toFile());
+    	Stage primaryStage;
+    	primaryStage = (Stage) sliderGroups.getScene().getWindow();
+        File chosenDir = chooser.showDialog(primaryStage);
+        waitCursor();
+        for(int i = start; i < stop; i++){
+        	current_filename = chosenDir.getAbsolutePath().toString() + File.separator + currentGroup.getName() +  "_" +current_index + "_Current" +".png";
+	    	renderImageView(i-start, currentRenderType , true);
+        }
+	    returnCursor();
 //		JOptionPane.showMessageDialog(null, "File was saved successfully.");
 		ShowSavedDialog.showDialog();
 	}
@@ -587,7 +808,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     private JFreeChart currentChart;
 	private double lowerBoundDomain;
 	private double upperBoundDomain;
-	private double alpha_under_two = 0.7;
+	private double alpha_under_two = 0.3;
 	private boolean ask_saved;
 	
 	
@@ -634,7 +855,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //    	main_package.getListFlows().clear();
     	main_package.resetListsMag();
     	((Controller_3d2_PeakParametersPlot)fxmlloader.getController()).setContext(main_package, currentGroup, fps_value, pixel_value, average_value, upper_limit, intervalsList, maximum_list, minimum_list, first_points, fifth_points, timespeedlist, ask_saved);
-    	primaryStage.setTitle("Image Optical Flow - Peak Parameters Plot");
+    	primaryStage.setTitle("Contraction Wave - Peak Parameters Plot");
 //    	primaryStage.setMaximized(true);
 		primaryStage.setScene(scene);
 		primaryStage.show();
@@ -732,7 +953,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 				}
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
-				blur_size = 5;
+				blur_size = 9;
 				blurSpin.getValueFactory().setValue(blur_size);
 				e.printStackTrace();
 			}
@@ -753,7 +974,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 				}
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
-				kernel_dilation = 3;
+				kernel_dilation = 5;
 				dilationSpin.getValueFactory().setValue(kernel_dilation);
 				e.printStackTrace();
 			}
@@ -774,7 +995,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 				}
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
-				kernel_erosion = 11;
+				kernel_erosion = 27;
 				erosionSpin.getValueFactory().setValue(kernel_erosion);
 				e.printStackTrace();
 			}
@@ -795,7 +1016,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			try {
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
-				kernel_smoothing_contours = 5;
+				kernel_smoothing_contours = 9;
 				smoothingSpin.getValueFactory().setValue(kernel_smoothing_contours);
 				e.printStackTrace();
 			}
@@ -812,7 +1033,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			try {
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
-				border_value = 60;
+				border_value = 36;
 				borderSpin.getValueFactory().setValue(border_value);
 				e.printStackTrace();
 			}
@@ -846,7 +1067,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			try {
 				renderImageView(current_index, currentRenderType, false);
 			} catch (Exception e) {
-				alpha_under_two = 1.0;
+				alpha_under_two = 0.3;
 				alphabackSpin.getValueFactory().setValue(alpha_under_two);
 				e.printStackTrace();
 			}
@@ -884,7 +1105,6 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
     	}
     }
 
-    private boolean checkSec;
     private double frameRate = 1;
     
     public void setContext(PackageData main_package_data, Group g1, double fps_value1, double pixel_value1, double average_value1, double upper_limit1, int start, int stop, int step, List<IntervalMarker> intervalsList2, List<Integer> maximum_list2, List<Integer> minimum_list2, List<Integer> first_points2, List<Integer> fifth_points2, List<TimeSpeed> timespeedlist2, boolean saved, boolean checkSec1) throws IOException{
@@ -900,11 +1120,15 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		minimum_list = minimum_list2;
 		first_points = first_points2;
 		fifth_points = fifth_points2;
-		checkSec = checkSec1;
 		width = currentGroup.getWidth();
 		height = currentGroup.getHeight();
 		ask_saved = saved;
     	current_index = 0;
+    	this.start = start;
+    	this.stop = stop;
+    	
+    	checkSeconds.setSelected(checkSec1);
+    	
     	//go around flow list and get maximum value
     	int done_a = 0;
     	double maximum_value = 0.0;
@@ -1007,7 +1231,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		sliderGroups.setShowTickLabels(false);
 		sliderGroups.setShowTickMarks(true);
 		sliderGroups.setSnapToTicks(true);
-		jetCheck.setSelected(true);
+		//jetCheck.setSelected(true);
 		constructRenderType();
 //		renderImageScale();
     }
@@ -1122,6 +1346,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 			}	
 		});
 		
+		mergeCheck.setSelected(true);
+		
 		ChangeListener<Number> gridSizeListenerWidth = new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -1213,6 +1439,14 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		        }
 		    }
 		});
+		
+		checkSeconds.selectedProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+            	writeLinePlot(start, stop);
+            }
+        });
+		
 		//set private variable containing controller class of new dialog equal to the controller of the dialog
 		//stage is open with the width height of the image OR of 90% of the screen if image bigger than 90% of screen in any dimension
 		//controller class has setContext which removes all children of dialog stage and adds a single image view with the size of the stage 
@@ -1283,12 +1517,12 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //  		System.out.println("min , max");
 //  		System.out.println(min + "," + max);
 //  		System.out.println(currentGroup.size() + " " + currentGroup.getMagnitudeSize());
-  		XYSeries series1 = new XYSeries("Optical Flow");
+  		XYSeries series1 = new XYSeries("Coordinates");
   		for (int i = min; i < max; i++) {
   			double average = currentGroup.getMagnitudeListValue(i);
 //  			series1.add(i / fps_value, average * fps_value * pixel_value);
 			double new_time = (i-min )/ fps_value;
-			if (checkSec == false) {
+			if (!checkSeconds.isSelected()) {
 				new_time *= 1000;
 			}
   			series1.add(new_time, (average * fps_value * pixel_value) - average_value);
@@ -1303,7 +1537,7 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
   	private JFreeChart createChart(XYDataset dataset, int min) {
   		  minimum_value_this = min;
   		  String time_str =  "Time (s)";
-  		  if (checkSec == false) {
+  		  if (!checkSeconds.isSelected()) {
   		  	time_str = "Time (ms)";
   		  }
           JFreeChart chart = ChartFactory.createXYLineChart(
@@ -1822,8 +2056,8 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 		
 		if (image_not_save == false) {
 			String this_time = String.format(java.util.Locale.US,"%.2f", general_dataset.getXValue(0,index));
-	  		if (checkSec == false) {
-	  			this_time += "\u00B5s";
+	  		if (!checkSeconds.isSelected()) {
+	  			this_time += "ms";
 	  		} else {
 	  			this_time += "s";
 	  		}
@@ -2201,11 +2435,11 @@ public class Controller_3e_ViewJetQuiverMergeSingle implements Initializable {
 //		return edged;
 	}
     
-	private int kernel_dilation = 3;
-	private int blur_size = 5;
-	private int kernel_erosion = 11;
-	private int kernel_smoothing_contours = 5;
-	private int border_value = 60;
+	private int kernel_dilation = 5;
+	private int blur_size = 9;
+	private int kernel_erosion = 27;
+	private int kernel_smoothing_contours = 9;
+	private int border_value = 36;
 		
     public Mat generateContour(Mat img_src) {
 //    	https://github.com/bytedeco/javacv/blob/master/samples/ImageSegmentation.java
