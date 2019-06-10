@@ -27,8 +27,8 @@ public class PlotPreferences implements Serializable {
 	public PlotPreferences(){
 		setDrawAnnotations(true);
 		lineThickness = 1;
-		markerAlpha = 0.3f;
-		markerColorRGB = Color.BLACK;
+		markerAlpha = 0.8f;
+		markerColorRGB = new Color(250,250,230);
 		seriesColorRGB = Color.BLACK;
 		firstDotColorRGB = Color.BLACK;
 		minimumDotColorRGB = Color.BLUE;

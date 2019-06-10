@@ -902,11 +902,17 @@ public class Controller_3d2_PeakParametersPlot implements Initializable {
 
 		//include average and st deviation table
 		Workbook workbook = new HSSFWorkbook();
-		Sheet spreadsheet = workbook.createSheet("time");
+		String label = "time";
+		if(checkSeconds.isSelected()) label += " (s)";
+		else label += " (ms)";
+		Sheet spreadsheet = workbook.createSheet(label);
+		label = "speed";
+		if(checkSeconds.isSelected()) label += " (\u00B5m-s)";
+		else label += " (\u00B5m/ms)";
 		createNewSheet(spreadsheet, timeTableView);
-		Sheet spreadsheet2 = workbook.createSheet("speed");
+		Sheet spreadsheet2 = workbook.createSheet(label);
 		createNewSheet(spreadsheet2, speedTableView);
-		Sheet spreadsheet3 = workbook.createSheet("area");
+		Sheet spreadsheet3 = workbook.createSheet("area (\u00B5m^2)");
 		createNewSheet(spreadsheet3, areaTableView);
 		Sheet spreadsheet4 = workbook.createSheet("time_stats");
 		createAverageSheet(spreadsheet4, timeTableView);
